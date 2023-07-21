@@ -93,6 +93,30 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        //Databases config personalize
+
+        'integraciones' => [
+            'driver' => 'mysql',
+            'host' => 'localhost',
+            'database' => 'integraciones',
+            'username' => 'root',
+            'password' => '',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+        ],
+
+        'pandapan' => [
+            'driver' => 'mysql',
+            'host' => 'localhost',
+            'database' => 'pandapan',
+            'username' => 'root',
+            'password' => '',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+        ],
+
     ],
 
     /*
