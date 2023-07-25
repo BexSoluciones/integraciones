@@ -9,17 +9,17 @@ class Connection extends Model
 {
     use HasFactory;
 
-    protected $table = 'conexiones';
-
+    protected $table = 'connections';
     protected $fillable = [
-        'id_conexion', 
-        'nombre_conexion',
-        'cron'
+        'name', 
+        'host',
+        'username',
+        'password',
+        'created_at',
+        'updated_at'
     ];
 
     public static function getAll(){
-        return self::select('id_conexion', 'nombre_conexion', 'cron');
-            //->where('nombre_conexion', 'LIKE', 'bex movil')
-            //->whereNotNull('cron')
+        return static::all();
     }
 }

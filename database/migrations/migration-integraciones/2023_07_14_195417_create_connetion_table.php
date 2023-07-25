@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('connection', function (Blueprint $table) {
+        Schema::create('connections', function (Blueprint $table) {
             $table->id();
             $table->string('name', 45);
             $table->string('host', 45);
@@ -20,6 +20,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('connetion');
+        Schema::dropIfExists('connetions');
     }
 };

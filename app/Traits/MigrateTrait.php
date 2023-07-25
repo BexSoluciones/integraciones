@@ -9,11 +9,11 @@ trait MigrateTrait {
     public function migrate($db){
         try {
             //update of migration commands in the 'custom_migrations' table
-            DB::connection($db)
+            DB::connection('dynamic_connection')
                 ->table('custom_migrations')
                 ->where('command', '')
                 ->where(function ($query) {
-                    $query->where('name', 'NOT LIKE', '%\_tbl\_%')
+                    $query->where('name', 'NOT LIKE', '%\_ws\_%')
                         ->orWhereNull('name');
                 })
                 ->update(['command' => ':refresh']);
@@ -27,14 +27,13 @@ trait MigrateTrait {
         foreach ($customMigrations as $migration) {
             try {
                 $this->call('migrate'.$migration->command, [
-                    '--database' => $db,
+                    '--database' => 'dynamic_connection',
                     '--path' => 'database/migrations/migration-'.$db.'/'.$migration->name,
                 ]);
             } catch (\Exception $e) {
                 $this->error('Error al migrar tabla '.$migration->name.': '.$e->getMessage());
             }
         }
-
         $this->info('Tablas migradas con exito!');
     }
 }

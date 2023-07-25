@@ -9,7 +9,7 @@ class Custom_Migration extends Model
 {
     use HasFactory;
 
-    protected $connection = 'pandapan';
+    protected $connection = 'dynamic_connection';
     protected $table = 'custom_migrations';
 
     protected $fillable = [
