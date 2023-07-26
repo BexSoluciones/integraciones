@@ -14,7 +14,8 @@ trait MigrateTrait {
                 ->where('command', '')
                 ->where(function ($query) {
                     $query->where('name', 'NOT LIKE', '%\_ws\_%')
-                        ->orWhereNull('name');
+                        ->orWhereNull('name')
+                        ->orWhere('name', 'NOT LIKE', '%\_tbl\_%');
                 })
                 ->update(['command' => ':refresh']);
         } catch (\Exception $e) {

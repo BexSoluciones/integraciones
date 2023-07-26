@@ -20,7 +20,6 @@ class MigrateIntegraciones extends Command {
     protected $signature   = 'migrate:database {database}';
     protected $description = 'Run migrations for all database';
 
-
     public function handle() {  
 
         $db = $this->argument('database'); //name of the database where we are going to migrate
