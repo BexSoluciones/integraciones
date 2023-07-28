@@ -2,13 +2,12 @@
 
 namespace App\Console\Commands;
 
-use DB;
-
 use App\Models\Connection;
 use App\Traits\MigrateTrait;
 use App\Traits\ConnectionTrait;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;

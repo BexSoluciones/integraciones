@@ -13,9 +13,12 @@ trait MigrateTrait {
                 ->table('custom_migrations')
                 ->where('command', '')
                 ->where(function ($query) {
-                    $query->where('name', 'NOT LIKE', '%\_ws\_%')
-                        ->orWhereNull('name')
-                        ->orWhere('name', 'NOT LIKE', '%\_tbl\_%');
+                    $query->where('name', 'NOT LIKE', '%_ws_%')
+                        ->orWhereNull('name');
+                })
+                ->where(function ($query) {
+                    $query->where('name', 'NOT LIKE', '%_tbl_%')
+                        ->orWhereNull('name');
                 })
                 ->update(['command' => ':refresh']);
         } catch (\Exception $e) {
