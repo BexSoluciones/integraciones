@@ -22,14 +22,7 @@ class MigrateIntegraciones extends Command {
     public function handle() {  
 
         $db = $this->argument('database'); //name of the database where we are going to migrate
-        $existsDB = Connection::where('name', $db)->first(); //Verify that the database exists
-
-        if (!$existsDB) {
-            $this->error("La base de datos '$db' no existe en la tabla 'connections'.");
-            return;
-        }
-
-        $this->connectionDB($existsDB); //Function that configures the database
+        $this->connectionDB($db); //Function that configures the database
         
         if (!Schema::connection('dynamic_connection')->hasTable('custom_migrations')) {
             try {
