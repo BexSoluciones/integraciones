@@ -4,7 +4,6 @@ namespace App\Traits;
 use Exception;
 use SoapClient;
 use App\Models\Tbl_log;
-use App\Models\WsConfig;
 
 trait WebServiceSiesaTrait {
 
@@ -70,7 +69,7 @@ trait WebServiceSiesaTrait {
             $arrayValuesRow = [];
             foreach ($objeto as $keyb => $valores) {
                 $value = ltrim($valores); $value = rtrim($valores);
-                $arrayValuesRow[(String) $keyb] = (String) "'".htmlspecialchars($value)."'";
+                $arrayValuesRow[(String) $keyb] = (String)htmlspecialchars($value);
             }
             $arrayValues[$acumValues] = (array) $arrayValuesRow;
             $acumValues++;

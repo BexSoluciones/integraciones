@@ -30,6 +30,7 @@ class MigrateIntegraciones extends Command {
                 Schema::connection('dynamic_connection')->create('custom_migrations', function (Blueprint $table) {
                     $table->id();
                     $table->string('name');
+                    $table->string('name_table');
                     $table->string('command')->default('');
                     $table->timestamps();
                 });
@@ -41,10 +42,17 @@ class MigrateIntegraciones extends Command {
             $migrationFiles = File::glob(database_path('migrations/migration-'.$db.'/*.php'));
 
             foreach ($migrationFiles as $file) {
-                $migrationName = pathinfo($file, PATHINFO_FILENAME);
+                $migrationName = pathinfo($file, PATHINFO_FILENAME); //Name Migration
+                $migrationCode = file_get_contents($file); //Name Table
+
+                //get table name
+                if (preg_match("/Schema::create\s*\(\s*'([^']+)'/", $migrationCode, $matches)) {
+                    $tableName = $matches[1];
+                }
                 //inserts the migration names data into the 'custom_migrations' table
                 DB::connection('dynamic_connection')->table('custom_migrations')->insert([
-                    'name' => $migrationName.'.php',
+                    'name'       => $migrationName.'.php',
+                    'name_table' => $tableName,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
