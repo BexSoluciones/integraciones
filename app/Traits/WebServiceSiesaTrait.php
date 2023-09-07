@@ -64,17 +64,17 @@ trait WebServiceSiesaTrait {
     }
 
     public static function convertirObjetosArrays($objetos){       
-        $arrayValues = [];  $acumValues = 0;
-        foreach ($objetos as $key => $objeto) {
+        $arrayValues = [];
+        foreach ($objetos as $objeto) {
             $arrayValuesRow = [];
             foreach ($objeto as $keyb => $valores) {
-                $value = ltrim($valores); $value = rtrim($valores);
-                $arrayValuesRow[(String) $keyb] = (String)htmlspecialchars($value);
+                // Aplica htmlspecialchars solo si $valores no es nulo
+                $value = is_null($valores) ? null : htmlspecialchars(trim($valores), ENT_QUOTES, 'UTF-8');
+                $arrayValuesRow[$keyb] = $value;
             }
-            $arrayValues[$acumValues] = (array) $arrayValuesRow;
-            $acumValues++;
+            $arrayValues[] = $arrayValuesRow;
         }
-        return $arrayValues;
+        return json_encode($arrayValues);
     }
     
     public static function errorSOAP($error){
