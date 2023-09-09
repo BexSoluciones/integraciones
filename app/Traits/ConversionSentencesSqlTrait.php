@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 trait ConversionSentencesSqlTrait {
     
-    public function convertionSentenceSql($sentence, $cia, $desde, $cuantos){
+    public function convertionSentenceSql($sentence, $cia, $desde, $cuantos, $idConsulta){
 
         try {
             $sentence = "SET QUOTED_IDENTIFIER OFF; ".$sentence." SET QUOTED_IDENTIFIER ON;";
@@ -24,10 +24,10 @@ trait ConversionSentencesSqlTrait {
             //Replace @Cuantos
             $cuantos = str_replace("@Cuantos", $cuantos, $desde);
             //All sentence
-            $sentence    = $cia;
-            //return $sentence;
-            $this->info($sentence);
-            dd("parar");
+            $sentence    = $cuantos;
+            
+            $this->info('◘ Consulta '.$idConsulta.' convertida con exito');
+            return $sentence;
         } catch (\Exception $e) {
             $this->error('Error al convertir sentencia: ' . $e->getMessage());
         }

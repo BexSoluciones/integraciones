@@ -3,15 +3,13 @@
 namespace App\Console\Commands;
 
 use App\Traits\MigrateTrait;
-use App\Traits\FlatFileTrait;
 use App\Traits\ConnectionTrait;
 use App\Traits\DataImportTrait;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Console\Command;
 
 class UpdateInformation extends Command {
 
-    use MigrateTrait, ConnectionTrait, DataImportTrait, FlatFileTrait;
+    use MigrateTrait, ConnectionTrait, DataImportTrait;
 
     protected $signature = 'command:update-information {database}';
     protected $description = 'Command to migrate, generate flat files';
@@ -23,15 +21,15 @@ class UpdateInformation extends Command {
         //Function that configures the database (ConnetionTrait).
         $this->connectionDB($db); 
 
-        //Function to configure and migrate tables (MigrateTrait).
-        $this->preMigration($db);
-
         //Function to extract data through WS (DataImportTrait).
-        $dataWS = $this->importData();
+        $archivosPlanos = $this->importData($db);
         //$jsonResult = json_encode($dataWS, JSON_PRETTY_PRINT);
         //$this->info($jsonResult);
 
-        //Fuction to generate flat file (FlatFileTrait)
-        $this->generateFlatFile($dataWS, $db);
+        //Function to configure and migrate tables (MigrateTrait).
+        if($archivosPlanos == true){
+            $this->preMigration($db);
+        }
+        
     }
 }

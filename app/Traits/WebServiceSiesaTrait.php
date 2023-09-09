@@ -8,36 +8,41 @@ use App\Models\Tbl_log;
 trait WebServiceSiesaTrait {
 
     public static function structureXML($NombreConexion, $IdCia, $IdProveedor, $Usuario, $Clave, $sentencia, $IdConsulta, $printError, $cacheWSDL) {
-        
-        $parameters = [
-            'printTipoError'     => $printError,
-            'cache_wsdl'         => $cacheWSDL,
-            'pvstrxmlParametros' => "<Consulta>
-                                        <NombreConexion>{$NombreConexion}</NombreConexion>
-                                        <IdCia>{$IdCia}</IdCia>
-                                        <IdProveedor>{$IdProveedor}</IdProveedor>
-                                        <IdConsulta>{$IdConsulta}</IdConsulta>
-                                        <Usuario>{$Usuario}</Usuario>
-                                        <Clave>{$Clave}</Clave>
-                                        <Parametros>
-                                            <Sql>{$sentencia}</Sql>
-                                        </Parametros>
-                                    </Consulta>"
-        ];
-    
-        return $parameters;
+        try {
+            $parameters = [
+                'printTipoError'     => $printError,
+                'cache_wsdl'         => $cacheWSDL,
+                'pvstrxmlParametros' => "<Consulta>
+                                            <NombreConexion>{$NombreConexion}</NombreConexion>
+                                            <IdCia>{$IdCia}</IdCia>
+                                            <IdProveedor>{$IdProveedor}</IdProveedor>
+                                            <IdConsulta>{$IdConsulta}</IdConsulta>
+                                            <Usuario>{$Usuario}</Usuario>
+                                            <Clave>{$Clave}</Clave>
+                                            <Parametros>
+                                                <Sql>{$sentencia}</Sql>
+                                            </Parametros>
+                                        </Consulta>"
+            ];
+
+            return $parameters;
+        } catch (\Exception $e) {
+            $this->error('Error al generar XML: '.$e->getMessage());
+        }
     }
     
-    public static function SOAP($url, $parameters){
+    public static function SOAP($url, $parameters, $IdConsulta, $timeout = 5.0) {
         $finish = 1;
-        do{
+        do {
+            $startTime = microtime(true); // Registrar el tiempo de inicio
+    
             try {
                 $client = new \SoapClient($url, $parameters);
                 $result = $client->EjecutarConsultaXML($parameters)->EjecutarConsultaXMLResult->any;
                 $any = simplexml_load_string($result);
                 if (@is_object($any->NewDataSet->Resultado)) {
                     return self::convertirObjetosArrays($any->NewDataSet->Resultado);
-                }else{
+                } else {
                     $finish = 0;
                 }
                 if (@$any->NewDataSet->Table) {
@@ -48,20 +53,29 @@ trait WebServiceSiesaTrait {
                         echo ("\n Error Desc:\t " . $value->F_DETALLE);
                     }
                 }
-            }catch (\Exception $e){
+            } catch (\Exception $e) {
                 $error = self::errorSOAP($e->getMessage());
                 if ($error == true) {
-                    $reg = new Tbl_log; 
+                    $reg = new Tbl_log;
                     $reg->descripcion =  'CONSULTA => '.$e->getMessage();
                     if ($reg->save()) {
                         $finish = 0;
-                    }else{
+                    } else {
                         echo 'CONSULTA =>  Excepción capturada: ', $e->getMessage(), "\n";
                     }
                 }
             }
-        }while($finish != 0);
+    
+            $endTime = microtime(true); // Registrar el tiempo de finalización
+            $executionTime = $endTime - $startTime;
+    
+            if ($executionTime > $timeout) {
+                // La consulta se ha demorado más de lo esperado
+                return ('El proceso ha finalizado porque la consulta '.$IdConsulta.' expiro en tiemo de espera ('. $executionTime. ' segundos).');
+            }
+        } while ($finish != 0);
     }
+    
 
     public static function convertirObjetosArrays($objetos){       
         $arrayValues = [];

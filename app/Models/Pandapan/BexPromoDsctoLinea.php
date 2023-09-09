@@ -17,7 +17,7 @@ class BexPromoDsctoLinea extends Model {
         'descripcion',
         'estado',
         'estado1',
-        'fini'
+        'fini',
         'ffin',
         'co',
         'codproducto',
@@ -36,7 +36,7 @@ class BexPromoDsctoLinea extends Model {
         'planitem2',
         'criteriomayorcli2',
         'plancli1',
-        'criteriomayorcli1'
+        'criteriomayorcli1',
         'plancli2',
         'criteriomayorcli2',
         'codigoobsequi',

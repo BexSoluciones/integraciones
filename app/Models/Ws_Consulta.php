@@ -26,6 +26,6 @@ class Ws_Consulta extends Model
     ];
 
     public static function getAll(){
-        return static::all();
+        return static::all()->where('estado', 1);
     }
 }
