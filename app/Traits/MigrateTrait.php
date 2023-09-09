@@ -104,6 +104,6 @@ trait MigrateTrait {
                 $this->error('Error al migrar tabla '.$migration->name.': '.$e->getMessage());
             }
         }
-        $this->info('Tablas y Modelos migrados con exito!');
+        $this->info('◘ Tablas y Modelos migrados con exito!');
     }
 }

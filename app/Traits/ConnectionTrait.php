@@ -31,6 +31,7 @@ trait ConnectionTrait {
                     'prefix'    => '',
                 ],
             ]);
+            $this->info('◘ Conexion a Base de Datos '.$db.' realizada con exito');
         } catch (\Exception $e) {
             $this->error('Error al configurar la conexión: ' . $e->getMessage());
         }

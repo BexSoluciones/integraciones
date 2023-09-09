@@ -24,11 +24,11 @@ trait FlatFileTrait {
                 $namefile = strtolower($consultaId) . '.txt';
                 
                 Storage::disk('local')->put('imports/'.$db.'/planos/'. $namefile, str_replace('"','',$content));
-           
+                $this->info('◘ Archivo '.$consultaId.'.txt guardado con exito');
+                $this->info('-------------------------------------------------------------------');
             }
         } catch (\Exception $e) {
-            // Manejo de excepciones
-            echo "Ha ocurrido una excepción: " . $e->getMessage();
+            echo "Ha ocurrido un error (Creación archivo plano): " . $e->getMessage();
         }
     }
     
