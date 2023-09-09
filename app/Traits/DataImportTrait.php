@@ -63,6 +63,7 @@ trait DataImportTrait {
                     $this->error('Proceso detenido, la extraccion de datos no puede ser nula');
                     dd('------------ ERROR SOAP '.$sentence->IdConsulta.' ------------');
                 }
+
                 if($results){
                     $this->info('◘ Importacion datos '.$sentence->IdConsulta.' exitosa');
                 }
@@ -78,7 +79,7 @@ trait DataImportTrait {
                 //Fuction to generate flat file (FlatFileTrait)
                 $this->generateFlatFile($allData, $db);
             }
-            $this->info('◘ Proceso archivos planos completado');
+            $this->info('◘ Proceso archivos planos completado.');
             return true;
         } catch (\Exception $e) {
             $this->info("Error DataImportTrait: " . $e->getMessage());
