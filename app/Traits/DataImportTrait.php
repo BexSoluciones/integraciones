@@ -79,6 +79,7 @@ trait DataImportTrait {
                 //Fuction to generate flat file (FlatFileTrait)
                 $this->generateFlatFile($allData, $db);
             }
+            
             $this->info('◘ Proceso archivos planos completado.');
             return true;
         } catch (\Exception $e) {
