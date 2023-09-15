@@ -35,6 +35,7 @@ return new class extends Migration
             $table->string('coddpto', 30)->nullable();
             $table->string('codmpio', 30)->nullable();
             $table->string('codbarrio', 30)->nullable();
+            $table->string('email', 50)->nullable();
             $table->string('consec', 30)->nullable();
             $table->bigInteger('codcliente')->nullable()->index('codcliente');
             $table->string('estado', 1)->nullable()->default('A');

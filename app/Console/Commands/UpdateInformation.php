@@ -5,11 +5,13 @@ namespace App\Console\Commands;
 use App\Traits\MigrateTrait;
 use App\Traits\ConnectionTrait;
 use App\Traits\DataImportTrait;
+use App\Traits\ReadExportDataTrait;
+
 use Illuminate\Console\Command;
 
 class UpdateInformation extends Command {
 
-    use MigrateTrait, ConnectionTrait, DataImportTrait;
+    use MigrateTrait, ConnectionTrait, DataImportTrait, ReadExportDataTrait;
 
     protected $signature = 'command:update-information {database}';
     protected $description = 'Command to migrate, generate flat files';
@@ -31,5 +33,7 @@ class UpdateInformation extends Command {
             $this->preMigration($db);
         }
         
+        //Function to read and export flat file to tenant DB
+        //$this->readFlatFile($db);
     }
 }
