@@ -10,7 +10,7 @@ trait ConnectionTrait {
     
     public function connectionDB($db){
 
-        $dataConnection = Connection::where('name', $db)->first(); //Verify that the database exists
+        $dataConnection = Connection::where('alias', $db)->first(); //Verify that the database exists
 
         if (!$dataConnection) {
             $this->error("La base de datos '$db' no existe en la tabla 'connections'.");
