@@ -33,57 +33,58 @@ trait DataImportTrait {
             if($backupFlatFile != true){
                 dd($info->error('Error copia de seguridad archivos panos'));
             }
-
+          
             $allData = [];
             foreach($sentences as $sentence){
+                
                 // Convertion of sentence defined in the ConversionSentencesSqlTrait
-                $sentenceSQL = $this->convertionSentenceSql($sentence->sentencia, 
-                                                            $config->IdCia, 
-                                                            $sentence->desde, 
-                                                            $sentence->cuantos,
-                                                            $sentence->IdConsulta);
+                $sentenceSQL = $this->convertionSentenceSql($sentence->f2_sentencia, 
+                                                            $config->f1_IdCia, 
+                                                            $sentence->f2_desde, 
+                                                            $sentence->f2_cuantos,
+                                                            $sentence->f2_IdConsulta);
 
                 //StructureXML function defined in the WebServiceSiesaTrait
-                $xml = $this->structureXML($config->NombreConexion, 
-                                            $config->IdCia, 
-                                            $config->IdProveedor,
-                                            $config->Usuario, 
-                                            $config->Clave, 
+                $xml = $this->structureXML($config->f1_NombreConexion, 
+                                            $config->f1_IdCia, 
+                                            $config->f1_IdProveedor,
+                                            $config->f1_Usuario, 
+                                            $config->f1_Clave, 
                                             $sentenceSQL, 
-                                            $config->IdConsulta, 1, 0);
+                                            $config->f1_IdConsulta, 1, 0);
                 if($xml){
-                    $this->info('◘ Archivo XML '.$sentence->IdConsulta.' generado');
+                    $this->info('◘ Archivo XML '.$sentence->f2_IdConsulta.' generado');
                 }
-                                        
+                               
                 // SOAP function defined in the WebServiceSiesaTrait
-                $results = $this->SOAP($config->url, $xml, $sentence->IdConsulta);
+                $results = $this->SOAP($config->f1_url, $xml, $sentence->f2_IdConsulta); 
                 if($results == null){
                     //Devuelve la copia de seguridad a la carpeta principal
                     $this->backupFlatFile($db, false);
                     $this->error('Proceso detenido, la extraccion de datos no puede ser nula');
-                    dd('------------ ERROR SOAP '.$sentence->IdConsulta.' ------------');
+                    dd('------------ ERROR SOAP '.$sentence->f2_IdConsulta.' ------------');
                 }
 
                 if($results){
-                    $this->info('◘ Importacion datos '.$sentence->IdConsulta.' exitosa');
+                    $this->info('◘ Importacion datos '.$sentence->f2_IdConsulta.' exitosa');
                 }
                 
                 $data = json_decode($results, true);
                 
                 $allData[] = [
                     'data' => $data,
-                    'consulta_id' => $sentence->IdConsulta,
-                    'separador' => $config->separador
+                    'descripcion' => $sentence->f2_descripcion,
+                    'separador' => $config->f1_separador
                 ];
 
                 //Fuction to generate flat file (FlatFileTrait)
                 $this->generateFlatFile($allData, $db);
             }
-            
+           
             $this->info('◘ Proceso archivos planos completado.');
             return true;
         } catch (\Exception $e) {
-            $this->info("Error DataImportTrait: " . $e->getMessage());
+            $this->error("Error DataImportTrait: " . $e->getMessage());
             //Devuelve la copia de seguridad a la carpeta principal
             $this->backupFlatFile($db, false);
         }

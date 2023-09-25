@@ -12,7 +12,7 @@ trait FlatFileTrait {
         try {
             foreach ($dataWS as $item) {
                 $separador = $item['separador'];
-                $consultaId = $item['consulta_id'];
+                $descripcion = $item['descripcion'];
                 $data = $item['data'];
 
                 $content = '';
@@ -21,14 +21,14 @@ trait FlatFileTrait {
                     $content .= json_encode(implode($separador, $key), JSON_PRETTY_PRINT) . "\n";
                 }
                 
-                $namefile = strtolower($consultaId) . '.txt';
+                $namefile = strtolower($descripcion ) . '.txt';
                 
                 Storage::disk('local')->put('imports/'.$db.'/planos/'. $namefile, str_replace('"','',$content));
-                $this->info('◘ Archivo '.$consultaId.'.txt guardado con exito');
+                $this->info('◘ Archivo '.$descripcion.'.txt guardado con exito');
                 $this->info('-------------------------------------------------------------------');
             }
         } catch (\Exception $e) {
-            echo "Ha ocurrido un error (Creación archivo plano): " . $e->getMessage();
+            $this->error("Ha ocurrido un error (Creación archivo plano): " . $e->getMessage());
         }
     }
     

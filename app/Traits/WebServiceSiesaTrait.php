@@ -27,7 +27,7 @@ trait WebServiceSiesaTrait {
 
             return $parameters;
         } catch (\Exception $e) {
-            $this->error('Error al generar XML: '.$e->getMessage());
+            return ('Error al generar XML: '.$e->getMessage());
         }
     }
     

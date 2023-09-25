@@ -10,25 +10,26 @@ class Ws_Config extends Model
     use HasFactory;
 
     protected $connection = 'dynamic_connection';
-    protected $table = 'ws_config';
+    protected $primaryKey = 'f1_id';
+    protected $table = 't1_ws_config';
 
     protected $fillable = [
-        'id',
-        'url', 
-        'NombreConexion',
-        'IdCia',
-        'IdProveedor',
-        'Usuario',
-        'separador',
-        'Clave',
-        'AreaTrabajo',
-        'estado',
-        'usuariointerno',
-        'claveinterno',
-        'ipinterno',
-        'IdConsulta',
-        'proxy_host',
-        'proxy_port'
+        'f1_id',
+        'f1_url', 
+        'f1_NombreConexion',
+        'f1_IdCia',
+        'f1_IdProveedor',
+        'f1_Usuario',
+        'f1_separador',
+        'f1_Clave',
+        'f1_AreaTrabajo',
+        'f1_estado',
+        'f1_usuariointerno',
+        'f1_claveinterno',
+        'f1_ipinterno',
+        'f1_IdConsulta',
+        'f1_proxy_host',
+        'f1_proxy_port'
     ];
 
     public static function getConnectionForId($idConnection){

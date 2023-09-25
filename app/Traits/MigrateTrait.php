@@ -74,32 +74,55 @@ trait MigrateTrait {
 
         foreach ($customMigrations as $migration) {
             try {
-                //migration of the tables contained in the migration folder with their respective commands
-                $this->call('migrate'.$migration->command, [
+                // Migration of the tables contained in the migration folder with their respective commands
+                $this->call('migrate' . $migration->command, [
                     '--database' => 'dynamic_connection',
-                    '--path' => 'database/migrations/migration-'.$db.'/'.$migration->name,
+                    '--path' => 'database/migrations/migration-' . $db . '/' . $migration->name,
                 ]);
 
-                //Generate the model
+                // Generate the model
                 $modelName = ucfirst(Str::camel($migration->name_table));
-                //Check if the model exists
-                $modelPath = app_path('Models') . '/' . ucfirst($db) . '/' . $modelName . '.php';
-                if (strpos($modelName, 'Bex') === 0) { //Verify the prefix "Bex"
-                    if (!File::exists($modelPath)) {
-                        $this->call('make:model', [
-                            'name' => $modelName,
-                        ]);
+                
+                // Get the dynamic namespace from the $db variable
+                $modelNamespace = 'App\\Models\\' . ucfirst($db);
+                
+                // Build the full namespace for the model
+                $fullNamespace = $modelNamespace . '\\' . $modelName;
+                
+                // Build the full model path
+                $modelPath = app_path('Models/' . ucfirst($db) . '/' . $modelName . '.php');
+                
+                if (!File::exists($modelPath)) {
+                    
+                    $this->call('make:model', [
+                        'name' => $fullNamespace,
+                    ]);
 
-                        //Create the folder if it doesn't exist
-                        if (!is_dir(dirname($modelPath))) { 
-                            mkdir(dirname($modelPath), 0777, true);
-                        }
-                        
-                        rename(app_path('Models') . '/' . $modelName . '.php', $modelPath);
-                    } else {
-                        $this->info("El modelo $modelName ya existe, no se creará nuevamente.");
+                    // Create the folder if it doesn't exist
+                    if (!is_dir(dirname($modelPath))) { 
+                        mkdir(dirname($modelPath), 0777, true);
                     }
+                    $columnNames = Schema::connection('dynamic_connection')->getColumnListing($migration->name_table);
+
+                    // Convierte el array de nombres de columnas en una cadena
+                    $fillableString = "['" . implode("', '", $columnNames) . "']";
+                    
+                    // Luego, en el código para generar el modelo
+                    $modelContent = file_get_contents($modelPath);
+                    $modelContent = str_replace(
+                        'use HasFactory;',
+                        "use HasFactory;\n\nprotected \$connection = 'dynamic_connection';\nprotected \$table = '$migration->name_table';\nprotected \$fillable = $fillableString;\npublic \$timestamps = false;",
+                        $modelContent
+                    );
+
+                    // Guarda el archivo del modelo con las propiedades agregadas
+                    file_put_contents($modelPath, $modelContent);
+
+                    rename(app_path('Models') . '/' . $modelName . '.php', $modelPath);
+                } else {
+                    $this->info("El modelo $modelName ya existe, no se creará nuevamente.");
                 }
+            
             } catch (\Exception $e) {
                 $this->error('Error al migrar tabla '.$migration->name.': '.$e->getMessage());
             }
