@@ -29,13 +29,14 @@ trait ReadExportDataTrait {
             //Route of flat file
             $folderPath = storage_path("app/imports/$db/planos");
             $txtFiles = glob("$folderPath/*.txt");
-
+           
             foreach ($txtFiles as $txtFile) {
+                
                 $content = file_get_contents($txtFile);
                 $filenameWithoutExtension = pathinfo($txtFile, PATHINFO_FILENAME);
-
+                
                 foreach ($availableModels as $modelClass => $tableName) {
-                    if ($filenameWithoutExtension === $tableName) {
+                    if ($filenameWithoutExtension === $tableName && $tableName == 't5_bex_clientes') {
                         $this->info("◘ Archivo plano coincide con el modelo: $tableName");
                         $this->processFileContent($modelClass, $content);
                     }
@@ -49,24 +50,23 @@ trait ReadExportDataTrait {
     }
 
     private function processFileContent($modelClass, $content) {
-      
+        
         $modelInstance = new $modelClass();
         $columnsModelo = $modelInstance->getFillable();
-
+        
         if ($content === false) {
             $this->error("No se pudo leer el archivo plano ".$modelInstance);
             return;
         }
-
+        
         // Split the content into lines
         $lines = explode("\n", $content);
-
         foreach ($lines as $line) {
             // Split each line into columns using the |
             $columns = explode("|", $line);
-
+            //dd($columns);
             $dataToInsert = [];
-
+            
             // Check if there are enough columns for the insertion
             if (count($columns) >= count($columnsModelo)) {
                 // Construct an associative array of data for insertion

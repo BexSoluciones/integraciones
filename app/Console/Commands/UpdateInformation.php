@@ -21,8 +21,11 @@ class UpdateInformation extends Command {
         $db = $this->argument('database'); 
         
         //Function that configures the database (ConnetionTrait).
-        $this->connectionDB($db); 
-
+        $configDB = $this->connectionDB($db); 
+        if($configDB == false){
+            return;
+        }
+        
         //Function to extract data through WS (DataImportTrait).
         $archivosPlanos = $this->importData($db);
     
