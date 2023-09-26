@@ -14,7 +14,12 @@ trait ConnectionTrait {
 
         if (!$dataConnection) {
             $this->error("La base de datos '$db' no existe en la tabla 'connections'.");
-            return;
+            return false;
+        }
+
+        if($dataConnection->active != 1){
+            $this->error("El cliente '$db' esta en estado inactivo");
+            return false; 
         }
 
         try {
@@ -32,6 +37,7 @@ trait ConnectionTrait {
                 ],
             ]);
             $this->info('◘ Conexion a Base de Datos '.$db.' realizada con exito');
+            return true;
         } catch (\Exception $e) {
             $this->error('Error al configurar la conexión: ' . $e->getMessage());
         }
