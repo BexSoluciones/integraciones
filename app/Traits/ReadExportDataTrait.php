@@ -36,13 +36,12 @@ trait ReadExportDataTrait {
                 $filenameWithoutExtension = pathinfo($txtFile, PATHINFO_FILENAME);
                 
                 foreach ($availableModels as $modelClass => $tableName) {
-                    if ($filenameWithoutExtension === $tableName && $tableName == 't5_bex_clientes') {
+                    if ($filenameWithoutExtension === $tableName) {
                         $this->info("◘ Archivo plano coincide con el modelo: $tableName");
                         $this->processFileContent($modelClass, $content);
                     }
                 }
             }
-
             $this->info('◘ Proceso de exportacion finalizado en la BD '.$db);
         } catch (\Exception $e) {
             $this->error("Ha ocurrido un error: " . $e->getMessage());
