@@ -14,8 +14,8 @@ class Kernel extends ConsoleKernel
     
     protected function schedule(Schedule $schedule): void {
 
-        $schedule->command('migrate:database-integraciones')->everyMinute();
-        $schedule->command('migrate:database-pandapan')->everyMinute();
+        //$schedule->command('migrate:database-integraciones')->everyMinute();
+        //$schedule->command('migrate:database-pandapan')->everyMinute();
     }
 
 

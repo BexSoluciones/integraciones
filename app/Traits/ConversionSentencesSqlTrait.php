@@ -18,13 +18,13 @@ trait ConversionSentencesSqlTrait {
             //Replace smalller than 
             $smallerThan = str_replace("<", "&lt;", $greaterThan);
             //Remplace @Cia
-            $cia         = str_replace("@Cia", $cia, $smallerThan);
+            $cia = str_replace("@Cia", $cia, $smallerThan);
             //Replace @desde
             $desde = str_replace("@Desde", $desde, $cia);
             //Replace @Cuantos
             $cuantos = str_replace("@Cuantos", $cuantos, $desde);
             //All sentence
-            $sentence    = $cuantos;
+            $sentence = $cuantos;
             
             $this->info('◘ Consulta '.$idConsulta.' convertida con exito');
             return $sentence;

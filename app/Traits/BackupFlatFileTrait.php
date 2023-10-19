@@ -34,7 +34,7 @@ trait BackupFlatFileTrait {
             if($estado == true){
                 $this->info('◘ Copia de seguridad archivos planos '.$db.' realizada con exito');
             }else{
-                $this->info('◘ Se restauro la copia de seguridad archivos planos '.$db);
+                $this->info('◘ Ha ocurrido un error, por lo tanto se restauro la copia de seguridad archivos planos '.$db);
             }
             return true;
         } catch (\Exception $e) {

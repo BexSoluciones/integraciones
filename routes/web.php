@@ -1,18 +1,20 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PanelController;
+use App\Http\Controllers\AssemblyController;
+
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+Route::get('/login', [AuthController::class, 'index']);
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/', function () {
-    return view('welcome');
+Route::group(['prefix'=>'panel', 'middleware'=>['auth']], function(){
+    Route::get('/', [PanelController::class, 'index']);
+});
+
+//Routes for Assembly
+Route::group(['prefix' => 'assembly','middleware' => ['auth:sanctum']], function(){
+    Route::get('/register', [AssemblyController::class, 'register']);
+    Route::post('/store', [AssemblyController::class, 'store']);
 });

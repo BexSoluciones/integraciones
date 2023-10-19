@@ -14,6 +14,11 @@ trait FlatFileTrait {
                 $separador = $item['separador'];
                 $descripcion = $item['descripcion'];
                 $data = $item['data'];
+                
+                // No tomar en cuenta la columna 'ws_id' de $data
+                foreach ($data as &$key) {
+                    unset($key['ws_id']);
+                }
 
                 $content = '';
 
