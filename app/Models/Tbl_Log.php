@@ -10,7 +10,7 @@ class Tbl_Log extends Model {
     use HasFactory;
 
     protected $connection = 'dynamic_connection';
-    protected $table = 'tbl_log';
+    protected $table = 't10_tbl_log';
 
     protected $fillable = [
         'codigo', 
