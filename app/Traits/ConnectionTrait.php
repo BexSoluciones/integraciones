@@ -3,14 +3,19 @@ namespace App\Traits;
 
 use Exception;
 use App\Models\Connection;
+use App\Models\ConnectionBS;
 
 use Illuminate\Support\Facades\DB;
 
 trait ConnectionTrait {
     
-    public function connectionDB($db){
+    public function connectionDB($db, $area=''){
 
-        $dataConnection = Connection::where('name', $db)->first(); //Verify that the database exists
+        if($area!=''){
+            $dataConnection = ConnectionBS::where('name', $db)->where('area', $area)->first();
+        }else{
+            $dataConnection = Connection::where('name', $db)->first(); //Verify that the database exists
+        }
 
         if (!$dataConnection) {
             $this->error("La base de datos '$db' no existe en la tabla 'connections'.");

@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Models\Connection;
+use App\Models\Commands;
 use App\Console\Commands\Migrations\DataBaseIntegraciones;
 use App\Console\Commands\Migrations\DataBasePandapan;
 
@@ -14,8 +15,15 @@ class Kernel extends ConsoleKernel
     
     protected function schedule(Schedule $schedule): void {
 
-        //$schedule->command('migrate:database-integraciones')->everyMinute();
-        //$schedule->command('migrate:database-pandapan')->everyMinute();
+        $tasks = Commands::where('state','1')->all();
+
+        foreach ($tasks as $task) {
+            $schedule->command($task->command, [
+                       $task->name_db, 
+                       $task->area
+                       ])->cron($task->cron_expression);
+                     
+        }
     }
 
 
