@@ -3,14 +3,19 @@ namespace App\Traits;
 
 use Exception;
 use App\Models\Connection;
+use App\Models\Connection_Bexsoluciones;
 
 use Illuminate\Support\Facades\DB;
 
 trait ConnectionTrait {
     
-    public function connectionDB($db){
+    public function connectionDB($db, $area = null){
+        if($area != null){
+            $dataConnection = Connection_Bexsoluciones::getAll()->where('alias', $db)->first();
+        }else{
+            $dataConnection = Connection::getAll()->where('name', $db)->first(); //Verify that the database exists
+        }
 
-        $dataConnection = Connection::where('name', $db)->first(); //Verify that the database exists
 
         if (!$dataConnection) {
             $this->error("La base de datos '$db' no existe en la tabla 'connections'.");
@@ -23,9 +28,11 @@ trait ConnectionTrait {
         }
 
         try {
+            $connectionName = $area != null ? $dataConnection->alias : 'dynamic_connection';
+
             // Database configuration
             config([
-                'database.connections.dynamic_connection' => [
+                'database.connections.' . $connectionName => [
                     'driver'    => 'mysql',
                     'host'      => $dataConnection->host,
                     'database'  => $dataConnection->name,
@@ -36,7 +43,8 @@ trait ConnectionTrait {
                     'prefix'    => '',
                 ],
             ]);
-            $this->info('◘ Conexion a Base de Datos '.$db.' realizada con exito');
+
+            $this->info('◘ Conexion a Base de Datos ' . $db . ' realizada con éxito');
             return true;
         } catch (\Exception $e) {
             $this->error('Error al configurar la conexión: ' . $e->getMessage());
