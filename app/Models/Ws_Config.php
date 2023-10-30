@@ -27,6 +27,7 @@ class Ws_Config extends Model
         'claveinterno',
         'ipinterno',
         'IdConsulta',
+        'ConecctionType',
         'proxy_host',
         'proxy_port'
     ];
