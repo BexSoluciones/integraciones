@@ -11,6 +11,6 @@ class T27BexPresupuestos extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't27_bex_presupuestos';
-protected $fillable = ['fecpptovendia', 'precio', 'tercvendedor'];
+protected $fillable = ['tercvendedor', 'fecpptovendia', 'precio'];
 public $timestamps = false;
 }

@@ -11,6 +11,6 @@ class T28BexProdcli extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't28_bex_prodcli';
-protected $fillable = ['cantidad', 'codcliente', 'codempresa', 'codproducto', 'nitcliente', 'succliente', 'tercvendedor'];
+protected $fillable = ['codempresa', 'tercvendedor', 'nitcliente', 'succliente', 'codproducto', 'cantidad', 'codcliente'];
 public $timestamps = false;
 }

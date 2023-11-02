@@ -11,6 +11,6 @@ class T37BexAmovil extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't37_bex_amovil';
-protected $fillable = ['ano', 'codcliente', 'codvendedor', 'mes', 'nitcliente', 'succliente', 'tercvendedor', 'valor'];
+protected $fillable = ['nitcliente', 'succliente', 'ano', 'mes', 'valor', 'tercvendedor', 'codcliente', 'codvendedor'];
 public $timestamps = false;
 }

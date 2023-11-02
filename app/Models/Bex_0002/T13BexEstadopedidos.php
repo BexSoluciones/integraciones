@@ -11,6 +11,6 @@ class T13BexEstadopedidos extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't13_bex_estadopedidos';
-protected $fillable = ['bex_id', 'cantfac', 'cantfacped', 'cantped', 'codcliente', 'codemp', 'codpro', 'codvend', 'codvendedor', 'descrip', 'estado', 'estadoenc', 'factura', 'fecped', 'ivabrufac', 'ivabruped', 'nitcli', 'numped', 'obsped', 'ordenfac', 'ordenped', 'refer', 'rowid', 'succli', 'tipo', 'tipofac', 'tipoped', 'vlrbrufac', 'vlrbruped', 'vlrnetofac', 'vlrnetoped', 'ws_id'];
+protected $fillable = ['codemp', 'codvend', 'tipoped', 'numped', 'nitcli', 'succli', 'fecped', 'ordenped', 'codpro', 'refer', 'descrip', 'cantped', 'vlrbruped', 'ivabruped', 'vlrnetoped', 'cantfacped', 'estado', 'tipo', 'tipofac', 'factura', 'ordenfac', 'cantfac', 'vlrbrufac', 'ivabrufac', 'vlrnetofac', 'obsped', 'ws_id', 'codcliente', 'rowid', 'bex_id', 'codvendedor', 'estadoenc'];
 public $timestamps = false;
 }

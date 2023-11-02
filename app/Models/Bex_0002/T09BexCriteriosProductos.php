@@ -11,6 +11,6 @@ class T09BexCriteriosProductos extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't09_bex_criterios_productos';
-protected $fillable = ['descripcion', 'estado', 'pro_criteriomayor', 'pro_plancriterios'];
+protected $fillable = ['pro_plancriterios', 'pro_criteriomayor', 'descripcion', 'estado'];
 public $timestamps = false;
 }

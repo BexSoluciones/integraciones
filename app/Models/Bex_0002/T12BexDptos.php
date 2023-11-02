@@ -11,6 +11,6 @@ class T12BexDptos extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't12_bex_dptos';
-protected $fillable = ['coddpto', 'codpais', 'descripcion'];
+protected $fillable = ['codpais', 'coddpto', 'descripcion'];
 public $timestamps = false;
 }

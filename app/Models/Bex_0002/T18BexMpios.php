@@ -11,6 +11,6 @@ class T18BexMpios extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't18_bex_mpios';
-protected $fillable = ['coddpto', 'codmpio', 'codpais', 'descripcion', 'indicador'];
+protected $fillable = ['codpais', 'coddpto', 'codmpio', 'descripcion', 'indicador'];
 public $timestamps = false;
 }

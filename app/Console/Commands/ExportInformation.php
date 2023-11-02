@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use App\Models\Ws_Consulta;
 
+use App\Custom\Insert_fyel_Custom;
+
 use App\Traits\ConnectionTrait;
 
 use Illuminate\Console\Command;
@@ -47,18 +49,14 @@ class ExportInformation extends Command
         foreach ($availableModels as $modelClass => $tableName) {
             $modelInstance = new $modelClass();
             $datosAInsertar = $modelInstance::get();
-            
+
             if($tableName == 't37_bex_amovil'){
-                $configDB = $this->connectionDB($conectionBex, $area);
-                // Itera sobre los datos y realiza inserciones individuales
-                foreach ($datosAInsertar as $dato) {
-                    $datoArray = (array) $dato;
-                    DB::connection($conectionBex)->table('tbldamovil')->insert($datoArray);
-                }
-                $this->info('datos insetados');
-                dd('parar');
+                $this->connectionDB($conectionBex, $area);
+                $insert = new Insert_fyel_Custom();
+                $insert->InsertFyelCustom($conectionBex, $datosAInsertar, $modelInstance);
             }
         }
         
     }
 }
+

@@ -11,6 +11,6 @@ class T22BexPortafolio extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't22_bex_portafolio';
-protected $fillable = ['codportafolio', 'estadoportafolio', 'nomportafolio'];
+protected $fillable = ['codportafolio', 'nomportafolio', 'estadoportafolio'];
 public $timestamps = false;
 }

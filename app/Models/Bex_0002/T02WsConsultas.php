@@ -11,6 +11,6 @@ class T02WsConsultas extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't02_ws_consultas';
-protected $fillable = ['cuantos', 'descripcion', 'desde', 'estado', 'id', 'IdConsulta', 'parametro', 'prioridad', 'sentencia', 'tabla_destino'];
+protected $fillable = ['id', 'IdConsulta', 'parametro', 'tabla_destino', 'estado', 'descripcion', 'prioridad', 'desde', 'cuantos', 'sentencia'];
 public $timestamps = false;
 }
