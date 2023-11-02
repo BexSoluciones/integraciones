@@ -11,6 +11,6 @@ class T10TblLog extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't10_tbl_log';
-protected $fillable = ['codigo', 'created_at', 'descripcion', 'updated_at'];
+protected $fillable = ['codigo', 'descripcion', 'created_at', 'updated_at'];
 public $timestamps = false;
 }

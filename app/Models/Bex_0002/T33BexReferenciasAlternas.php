@@ -11,6 +11,6 @@ class T33BexReferenciasAlternas extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't33_bex_referencias_alternas';
-protected $fillable = ['cia', 'fecha', 'item', 'referencia'];
+protected $fillable = ['fecha', 'cia', 'item', 'referencia'];
 public $timestamps = false;
 }

@@ -11,6 +11,6 @@ class T29BexProductos extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't29_bex_productos';
-protected $fillable = ['codigo', 'codindadventa', 'codproveedor', 'codunidademp', 'descripcion', 'estado', 'estado_unidademp', 'estadoproveedor', 'nomproveedor', 'peso', 'unidadventa'];
+protected $fillable = ['codigo', 'descripcion', 'codunidademp', 'peso', 'codproveedor', 'nomproveedor', 'unidadventa', 'codindadventa', 'estado', 'estado_unidademp', 'estadoproveedor'];
 public $timestamps = false;
 }

@@ -11,6 +11,6 @@ class T26BexPrepacks extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't26_bex_prepacks';
-protected $fillable = ['cajas', 'codprepack', 'codproducto', 'estado', 'nomprepack', 'unidades'];
+protected $fillable = ['codprepack', 'codproducto', 'cajas', 'unidades', 'nomprepack', 'estado'];
 public $timestamps = false;
 }

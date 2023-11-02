@@ -11,6 +11,6 @@ class T35BexUltped extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't35_bex_ultped';
-protected $fillable = ['cantidad', 'codcliente', 'codempresa', 'codproducto', 'nitcliente', 'succliente', 'tercvendedor'];
+protected $fillable = ['codempresa', 'tercvendedor', 'nitcliente', 'succliente', 'codproducto', 'cantidad', 'codcliente'];
 public $timestamps = false;
 }

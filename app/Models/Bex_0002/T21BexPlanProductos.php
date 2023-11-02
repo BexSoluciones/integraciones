@@ -11,6 +11,6 @@ class T21BexPlanProductos extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't21_bex_plan_productos';
-protected $fillable = ['descripcion', 'estado', 'pro_plancriterios'];
+protected $fillable = ['pro_plancriterios', 'descripcion', 'estado'];
 public $timestamps = false;
 }

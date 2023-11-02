@@ -11,6 +11,6 @@ class T23BexPortafoliod extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't23_bex_portafoliod';
-protected $fillable = ['codportafolio', 'codproducto'];
+protected $fillable = ['codproducto', 'codportafolio'];
 public $timestamps = false;
 }

@@ -11,6 +11,6 @@ class T32BexPromoDsctosTope extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't32_bex_promo_dsctos_tope';
-protected $fillable = ['cantbaseobsequio', 'cantobsequio', 'co', 'codigoobsequi', 'codproducto', 'condpago', 'criteriomayorcli1', 'criteriomayorcli2', 'criteriomayoritem1', 'criteriomayoritem2', 'cupo', 'dctoval', 'descripcion', 'estado', 'estado1', 'factor', 'ffin', 'fini', 'grupodctocli', 'grupodctoitem', 'idcia', 'listaprecios', 'motivoobsequio', 'nitcliente', 'plancli1', 'plancli2', 'planitem1', 'planitem2', 'porcdcto', 'puntoenvio', 'rowid', 'succliente', 'tipocli', 'tipoinv', 'umobsequio', 'x'];
+protected $fillable = ['idcia', 'rowid', 'estado', 'estado1', 'fini', 'ffin', 'co', 'codproducto', 'porcdcto', 'tipoinv', 'grupodctoitem', 'nitcliente', 'succliente', 'puntoenvio', 'tipocli', 'grupodctocli', 'condpago', 'listaprecios', 'planitem1', 'criteriomayoritem1', 'planitem2', 'criteriomayoritem2', 'plancli1', 'criteriomayorcli1', 'plancli2', 'criteriomayorcli2', 'codigoobsequi', 'motivoobsequio', 'umobsequio', 'cantobsequio', 'cantbaseobsequio', 'descripcion', 'factor', 'cupo', 'dctoval', 'x'];
 public $timestamps = false;
 }

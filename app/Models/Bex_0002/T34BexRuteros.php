@@ -11,6 +11,6 @@ class T34BexRuteros extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't34_bex_ruteros';
-protected $fillable = ['cliente', 'dia', 'dia_descrip', 'dv', 'estadodiarutero', 'inactivo', 'secuencia', 'sucursal', 'tercvendedor'];
+protected $fillable = ['tercvendedor', 'dia', 'dia_descrip', 'cliente', 'dv', 'sucursal', 'secuencia', 'inactivo', 'estadodiarutero'];
 public $timestamps = false;
 }
