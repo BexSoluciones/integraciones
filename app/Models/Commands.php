@@ -5,17 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Custom_Migration extends Model
+class Commands extends Model
 {
     use HasFactory;
-
-    protected $connection = 'dynamic_connection';
-    protected $table = 'custom_migrations';
-
+    protected $table = 'commands';
     protected $fillable = [
-        'id', 
-        'name',
-        'command'
+        'alias', 
+        'command',
+        'name_db',
+        'cron_expression',
+        'area',
+        'cod_area',
+        'estado'
     ];
 
     public static function getAll(){
