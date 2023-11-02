@@ -11,6 +11,6 @@ class T01WsConfig extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't01_ws_config';
-protected $fillable = ['AreaTrabajo', 'Clave', 'claveinterno', 'ConecctionType', 'estado', 'id', 'IdCia', 'IdConsulta', 'IdProveedor', 'ipinterno', 'NombreConexion', 'proxy_host', 'proxy_port', 'separador', 'url', 'Usuario', 'usuariointerno'];
+protected $fillable = ['id', 'url', 'NombreConexion', 'IdCia', 'IdProveedor', 'Usuario', 'separador', 'Clave', 'AreaTrabajo', 'estado', 'usuariointerno', 'claveinterno', 'ipinterno', 'IdConsulta', 'ConecctionType', 'proxy_host', 'proxy_port'];
 public $timestamps = false;
 }

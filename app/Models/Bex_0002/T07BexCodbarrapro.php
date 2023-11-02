@@ -11,6 +11,6 @@ class T07BexCodbarrapro extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't07_bex_codbarrapro';
-protected $fillable = ['cant_asociada', 'codbar', 'codproducto'];
+protected $fillable = ['codbar', 'codproducto', 'cant_asociada'];
 public $timestamps = false;
 }
