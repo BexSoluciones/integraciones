@@ -3,11 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\Ws_Consulta;
-
-use App\Custom\Insert_fyel_Custom;
-
 use App\Traits\ConnectionTrait;
-
+use App\Custom\Insert_fyel_Custom;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -30,7 +27,11 @@ class ExportInformation extends Command
         if($configDB == false){
             return;
         }
-
+        // $ano_act = date("Y", mktime(0, 0, 0, date("m")-25, date("d"), date("Y")));
+        // echo($ano_act." Paso por aqui");
+        // $ano_act = date("Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+        // echo($ano_act." Paso por aqui dos");
+        // dd();
         //Folder of Models
         $baseNamespace = 'App\\Models\\'.ucfirst($tenantDB).'\\';
         //All models
@@ -44,18 +45,30 @@ class ExportInformation extends Command
                 //extracts the model name and stores it in the $availableModels array
                 $availableModels[$routeName] = (new $routeName())->getTable();
             }
-        }
-
+        }     
+        
         foreach ($availableModels as $modelClass => $tableName) {
             $modelInstance = new $modelClass();
             $datosAInsertar = $modelInstance::get();
 
+            if($tableName == 't05_bex_clientes'){
+                $this->connectionDB($conectionBex, $area);
+                $insert = new Insert_fyel_Custom();
+                $insert->InsertClientesCustom($conectionBex, $datosAInsertar, $modelInstance);
+                $this->info('Tabla Clinetes Actualizada');
+                // dd('Termino el proceso de clientes');
+            }
+
             if($tableName == 't37_bex_amovil'){
                 $this->connectionDB($conectionBex, $area);
                 $insert = new Insert_fyel_Custom();
-                $insert->InsertFyelCustom($conectionBex, $datosAInsertar, $modelInstance);
+                $insert->InsertAmovilCustom($conectionBex, $datosAInsertar, $modelInstance);
+                $this->info('Tabla amovil Actualizada');
+                // dd('Termino el proceso');
             }
         }
+        $this->info('Base de Datos Actualizada');
+        dd('parar');
         
     }
 }
