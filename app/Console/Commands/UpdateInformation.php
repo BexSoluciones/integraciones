@@ -35,7 +35,6 @@ class UpdateInformation extends Command {
             dd('Ya puedes ejecutar el comando: php artisan command:update-information '.$db);
         }
 
-        
         //Function to extract data through WS (DataImportTrait).
         $config = Ws_Config::getConnectionForId(1);
 
@@ -45,7 +44,7 @@ class UpdateInformation extends Command {
         } elseif($config->ConecctionType == 'ws') {
             $archivosPlanos = $this->importData($db);
         }
-      
+        
         //Function to configure and migrate tables (MigrateTrait).
         if($archivosPlanos == true){
             $this->preMigration($db);
