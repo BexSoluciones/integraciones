@@ -37,7 +37,7 @@ trait ReadExportDataTrait {
                 foreach ($availableModels as $modelClass => $tableName) {
                     if ($filenameWithoutExtension === $tableName) {
                         $this->info("◘ El archivo plano $filenameWithoutExtension coincide con el modelo: $tableName");
-                        $this->processFileContent($modelClass, $content);
+                        $this->processFileContent($modelClass, $content, $tableName);
                     }
                 }
             }
@@ -48,7 +48,7 @@ trait ReadExportDataTrait {
     }
 
 
-    private function processFileContent($modelClass, $content) {
+    private function processFileContent($modelClass, $content, $tableName) {
         $modelInstance = new $modelClass();
         $columnsModelo = $modelInstance->getFillable();
     
@@ -59,6 +59,8 @@ trait ReadExportDataTrait {
     
         // Split the content into lines
         $lines = explode("\n", $content);
+        //Se utiliza para archivos planos que tengan indices autoincrementables
+        $autoIncrement = 1;
         foreach ($lines as $line) {
             // Split each line into columns using the |
             $columns = explode("|", $line);
@@ -68,11 +70,20 @@ trait ReadExportDataTrait {
     
             // Fill dataToInsert with values from $columns, up to the number of fillable columns
             for ($i = 0; $i < count($columns); $i++) {
-                $dataToInsert[$columnsModelo[$i]] = isset($columns[$i]) ? trim($columns[$i]) : null;
+                if($tableName == 't05_bex_clientes'){
+                    $j = $i+1;
+                }else{{
+                    $j = $i; 
+                }}
+                $dataToInsert[$columnsModelo[$j]] = isset($columns[$i]) ? trim($columns[$i]) : null;
             }
-    
+            
             // Insert the data into the corresponding model
             if ($modelInstance) {
+                //Inserta un autoincrement
+                if($tableName == 't05_bex_clientes'){
+                    $dataToInsert['consecutivo'] = $autoIncrement++;
+                }
                 // Insert data in the model
                 $modelInstance->create($dataToInsert);
     

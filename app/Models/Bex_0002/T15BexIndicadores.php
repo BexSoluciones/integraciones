@@ -11,6 +11,6 @@ class T15BexIndicadores extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't15_bex_indicadores';
-protected $fillable = ['detmensaje', 'tercvendedor'];
+protected $fillable = ['tercvendedor', 'detmensaje'];
 public $timestamps = false;
 }

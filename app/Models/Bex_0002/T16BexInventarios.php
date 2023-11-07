@@ -11,6 +11,6 @@ class T16BexInventarios extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't16_bex_inventarios';
-protected $fillable = ['bodega', 'estadobodega', 'estadoimpuesto', 'inventario', 'iva', 'producto'];
+protected $fillable = ['bodega', 'iva', 'producto', 'inventario', 'estadoimpuesto', 'estadobodega'];
 public $timestamps = false;
 }

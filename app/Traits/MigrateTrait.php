@@ -102,11 +102,20 @@ trait MigrateTrait {
                     if (!is_dir(dirname($modelPath))) { 
                         mkdir(dirname($modelPath), 0777, true);
                     }
-                    $columnNames = Schema::connection('dynamic_connection')->getColumnListing($migration->name_table);
+
+                    $consulta = "SHOW COLUMNS FROM $migration->name_table";
+
+                    // Ejecuta la consulta
+                    $resultado = DB::connection('dynamic_connection')->select($consulta);
+
+                    // Procesa el resultado para obtener los nombres de las columnas en el orden correcto
+                    $columnNames = array_map(function ($column) {
+                        return $column->Field;
+                    }, $resultado);
 
                     // Convierte el array de nombres de columnas en una cadena
                     $fillableString = "['" . implode("', '", $columnNames) . "']";
-                    
+                  
                     // Luego, en el código para generar el modelo
                     $modelContent = file_get_contents($modelPath);
                     $modelContent = str_replace(

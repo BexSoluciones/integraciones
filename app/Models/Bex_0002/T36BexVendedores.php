@@ -11,6 +11,6 @@ class T36BexVendedores extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't36_bex_vendedores';
-protected $fillable = ['centroop', 'compania', 'estado', 'tercvendedor', 'tipodoc'];
+protected $fillable = ['compania', 'tercvendedor', 'centroop', 'tipodoc', 'estado'];
 public $timestamps = false;
 }

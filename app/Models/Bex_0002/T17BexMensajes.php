@@ -11,6 +11,6 @@ class T17BexMensajes extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't17_bex_mensajes';
-protected $fillable = ['codmensaje', 'nommensaje', 'tipomensaje'];
+protected $fillable = ['codmensaje', 'tipomensaje', 'nommensaje'];
 public $timestamps = false;
 }

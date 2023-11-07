@@ -157,7 +157,6 @@ class Insert_fyel_Custom
 
             // Insertar los datos en lotes
             DB::connection($conectionBex)->table('tbldamovil')->insert($dataToInsert);
-        }    
+        }  
     }
-
 }

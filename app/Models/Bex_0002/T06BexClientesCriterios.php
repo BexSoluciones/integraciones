@@ -11,6 +11,6 @@ class T06BexClientesCriterios extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't06_bex_clientes_criterios';
-protected $fillable = ['cli_criteriomayor', 'cli_dvcliente', 'cli_grupodscto', 'cli_nitcliente', 'cli_plancriterios', 'cli_succliente', 'cli_tipocli', 'cli_vendedor', 'codcliente', 'codclientealt'];
+protected $fillable = ['cli_nitcliente', 'cli_dvcliente', 'cli_succliente', 'cli_vendedor', 'cli_plancriterios', 'cli_criteriomayor', 'cli_grupodscto', 'cli_tipocli', 'codclientealt', 'codcliente'];
 public $timestamps = false;
 }

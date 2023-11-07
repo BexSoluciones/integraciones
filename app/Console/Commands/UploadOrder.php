@@ -3,12 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Traits\ConnectionTrait;
-use App\Traits\GetorderTrait;
+use App\Traits\GetOrderTrait;
 use Illuminate\Console\Command;
 
 class UploadOrder extends Command
 {
-    use ConnectionTrait, GetorderTrait;
+    use ConnectionTrait, GetOrderTrait;
 
     protected $signature = 'command:upload-order {database} {area}';
 
