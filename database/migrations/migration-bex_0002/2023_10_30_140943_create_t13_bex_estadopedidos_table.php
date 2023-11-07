@@ -41,7 +41,7 @@ class CreateT13BexEstadopedidosTable extends Migration
             $table->string('vlrnetofac')->nullable();
             $table->string('obsped')->nullable();
             $table->string('ws_id')->nullable();
-            $table->bigInteger('codcliente')->nullable()->index('codcliente');
+            $table->string('codcliente', 20)->nullable()->index('codcliente');
             $table->string('rowid')->nullable()->index('in5');
             $table->string('bex_id')->nullable();
             $table->string('codvendedor', 4)->nullable()->index('codvendedor');
