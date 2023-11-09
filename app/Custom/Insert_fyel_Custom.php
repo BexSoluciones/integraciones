@@ -5,6 +5,7 @@ namespace App\Custom;
 use App\Custom\WebServiceSiesa;
 use App\Models\Ws_Unoee_Config;
 use App\Models\Bex_0002\T29BexProductos;
+use App\Models\Bex_0002\T16BexInventarios;
 use App\Traits\ConnectionTrait;
 
 use Illuminate\Support\Carbon;
@@ -213,6 +214,46 @@ class Insert_fyel_Custom
             print '¡Ocurrió un error en insertProductsCustom: ' . $e->getMessage() . PHP_EOL;
         }
     }
+    
+    public function insertInventarioCustom($conectionBex, $datosAInsertar, $modelInstance, $tableName){
+        try {
+            //Insertar datos en la tabla tblmimpuesto 
+            $insertDataTblmimpuesto = T16BexInventarios::insertDataTblmimpuesto()->get();
+            DB::connection($conectionBex)
+                ->table('tblmimpuesto')
+                ->insert($insertDataTblmimpuesto->toArray());
+            print '◘ Datos insertados con exito en la tabla tblmimpuesto' . PHP_EOL;
+            
+            //Insertar datos en la tabla tbldstock
+            $insertDataTbldstock = T16BexInventarios::insertDataTbldstock()->get();
+            $codigosProductos = $insertDataTbldstock->pluck('codproducto')->toArray();
 
+            // Obtener datos de tblmproducto en una sola consulta
+            $productosData = DB::connection($conectionBex)
+                ->table('tblmproducto')
+                ->whereIn('CODPRODUCTO', $codigosProductos)
+                ->get();
+
+            $dataToInsert = [];
+            foreach ($insertDataTbldstock as $data) {
+                // Buscar los datos correspondientes en $productosData
+                $productoData = $productosData->firstWhere('CODPRODUCTO', $data->codproducto);
+
+                if ($productoData) {
+                    $dataToInsert[] = [
+                        'codproducto' => $data->codproducto,
+                        'codbodega' => $data->codbodega,
+                        'codimpuesto' => $data->codimpuesto,
+                        'existencia_stock' => $data->existencia_stock
+                    ];
+                }
+            }
+            DB::connection($conectionBex)->table('tbldstock')->insert($dataToInsert);
+            print '◘ Datos insertados con éxito en la tabla tbldstock' . PHP_EOL;
+
+        } catch (\Exception $e) {
+            print '¡Ocurrió un error en insertInventarioCustom: ' . $e->getMessage() . PHP_EOL;
+        }
+    }
     
 }
