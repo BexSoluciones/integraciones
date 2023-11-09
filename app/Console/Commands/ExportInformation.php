@@ -59,9 +59,16 @@ class ExportInformation extends Command
                 // dd('Termino el proceso de clientes');
             }
 
+            if($tableName == 't16_bex_inventarios'){
+                $insert = new Insert_fyel_Custom();
+                $insert->insertInventarioCustom($conectionBex, $datosAInsertar, $modelInstance, $tableName);
+                $this->info('◘ Proceso inventario finalizado');
+            }
+
             if($tableName == 't29_bex_productos'){
                 $insert = new Insert_fyel_Custom();
                 $insert->insertProductsCustom($conectionBex, $datosAInsertar, $modelInstance, $tableName);
+                $this->info('◘ Proceso productos finalizado');
             }
 
             if($tableName == 't37_bex_amovil'){
