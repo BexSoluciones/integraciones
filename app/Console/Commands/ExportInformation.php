@@ -55,8 +55,13 @@ class ExportInformation extends Command
                 $this->connectionDB($conectionBex, $area);
                 $insert = new Insert_fyel_Custom();
                 $insert->InsertClientesCustom($conectionBex, $datosAInsertar, $modelInstance);
-                $this->info('Tabla Clinetes Actualizada');
+                $this->info('Tabla Clientes Actualizada');
                 // dd('Termino el proceso de clientes');
+            }
+
+            if($tableName == 't29_bex_productos'){
+                $insert = new Insert_fyel_Custom();
+                $insert->insertProductsCustom($conectionBex, $datosAInsertar, $modelInstance, $tableName);
             }
 
             if($tableName == 't37_bex_amovil'){
