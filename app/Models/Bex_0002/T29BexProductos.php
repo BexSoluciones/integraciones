@@ -28,15 +28,17 @@ class T29BexProductos extends Model
     ];
     public $timestamps = false;
 
-    public function scopeDataInsertTblmunidademp($query){
-        return $query->select('codunidademp as codunidademp', 'codunidademp as nomunidademp')
+    public function scopeDataToInsertUnidadEmp($query){
+        return $query->select('codunidademp', 'codunidademp as NOMUNIDADEMP')
+            ->where('codigo','!=','')
             ->where('estado_unidademp', 'A')
-            ->groupBy('codunidademp', 'estado_unidademp');
+            ->groupBy('codunidademp'); 
     }
 
-    public function scopeDataInsertTblmproveedor($query){
+    public function scopeDataToInsertTblmproveedor($query){
         return $query->select('codproveedor', 'nomproveedor')
             ->where('estadoproveedor', 'A')
+            ->where('codigo', '!=', '')
             ->groupBy('codproveedor', 'nomproveedor');
     }
 
