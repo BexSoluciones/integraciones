@@ -32,4 +32,10 @@ class T16BexInventarios extends Model
         return $query->join('t29_bex_productos', 't16_bex_inventarios.producto', '=', 't29_bex_productos.codigo')
             ->select('producto as codproducto', 'bodega as codbodega', 'iva as codimpuesto', 'inventario as existencia_stock');
     }
+
+    public function scopeInsertDataToTblmbodega($query){
+        return $query->select('bodega as codbodega', DB::raw("concat('BODEGA ', bodega) as nombodega"), DB::raw("'N' as ctlstockbodega"))
+        ->where('estadobodega', 'A')
+        ->groupBy('bodega');
+    }
 }
