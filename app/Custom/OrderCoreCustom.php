@@ -151,7 +151,7 @@ class OrderCoreCustom
                 $lines = explode("\n", $chain);
 
                 $namefile = $order['NUMCIERRE'].'_'.$order['NUMMOV']. '.txt';
-                Storage::disk('local')->put('pandapan/pedidos_txt/' . $namefile, $chain); // CAMBIAR EL NOMBRE DE LA COMPAÑIA
+                Storage::disk('public')->put('public/pandapan/pedidos_txt/' . $namefile, $chain); // CAMBIAR EL NOMBRE DE LA COMPAÑIA
                 $xmlOrder = $this->crearXmlPedido($lines, $order['NUMMOV']);
 
                 if (!$this->existePedidoSiesa($cia['IdCia'], $order['TIPODOC'], str_pad($order['NUMMOV'], 15, "Y", STR_PAD_LEFT)) && $import === true) {
