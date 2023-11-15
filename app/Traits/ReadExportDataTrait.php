@@ -85,7 +85,8 @@ trait ReadExportDataTrait {
                     $dataToInsert['consecutivo'] = $autoIncrement++;
                 }
                 // Insert data in the model
-                $modelInstance->create($dataToInsert);
+                $encodedData = array_map('utf8_encode', $dataToInsert);
+                $modelInstance->create($encodedData);
     
                 $this->info("◘ Datos insertados en el modelo " . get_class($modelInstance));
             } else {
