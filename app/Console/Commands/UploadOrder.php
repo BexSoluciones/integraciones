@@ -10,29 +10,30 @@ class UploadOrder extends Command
 {
     use ConnectionTrait, GetOrderTrait;
 
-    protected $signature = 'command:upload-order {database} {area}';
-
+    protected $signature = 'command:upload-order {database} {area} {closing}';
     protected $description = 'Command upload order to ERP';
-
 
     public function handle()
     {
         $db = $this->argument('database');
         $area = $this->argument('area');
+        $closing = $this->argument('closing');
 
         $configDB = $this->connectionDB($db,$area); 
         if($configDB == false){
             return;
         }
 
-        $orders=$this->getOrderHeder('0','4');
-        // print_r($orders);
-        // dd();
+        $orders=$this->getOrderHeder($db,$area,$closing);
+        if($orders == true){
+            $this->info('◘ Proceso getOrderHeder finalizado');
+            return;
+        }
+      
         if(!empty($orders)){
             $orderDetails =$this->getOrderDetail($orders);
-            
-             print_r($orderDetails);
-             dd('Ya termino');
+            $this->info('◘ Proceso getOrderDetail finalizado');
+            return;
         }   
     }
 }
