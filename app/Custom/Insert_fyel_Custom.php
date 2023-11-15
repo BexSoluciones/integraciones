@@ -389,6 +389,13 @@ class Insert_fyel_Custom
                                     ->where('preciomov','<',0)
                                     ->update(['preciomov' => DB::raw('preciomov * (-1)')]);
 
+        // DB::connection($conectionBex)->statement('CREATE TABLE IF NOT EXISTS s1e_dptos (
+        //                                             codpais varchar(5),
+        //                                             coddpto varchar(5),
+        //                                             descripcion varchar(50)                          
+        //                                                 )');
+
+        // DB::connection($conectionBex)->statement('DROP TABLE IF EXISTS s1e_dptos');
     }
 
     public function InsertEstadoPedidosCustom($conectionBex, $datosAInsertar, $modelInstance)
@@ -554,22 +561,24 @@ class Insert_fyel_Custom
 
             //Update estadoproveedor tabla t29_bex_productos
             $tblmproveedor = DB::connection($conectionBex)->table('tblmproveedor')->get();
-            $codProveedor  = $tblmproveedor->pluck('codproveedor')->toArray();
-
+            $codProveedor  = $tblmproveedor->pluck('CODPROVEEDOR')->toArray();
+            $provee = count($codProveedor);
             if (!empty($codProveedor)) {
-                $t29BexProductos = T29BexProductos::whereIn('codproveedor', $codUnidadEmp)
-                    ->update(['estadoproveedor' => 'C']);
-                if($t29BexProductos == 1){
-                    print '◘ Columna "estadoproveedor" actualizada en al tabla t29_bex_productos' . PHP_EOL;
-                }else{
-                    print '◘ No se acutalizo columna "estadoproveedor" en al tabla t29_bex_productos' . PHP_EOL;
+                for($i=0;$i<$provee;$i++){
+                    $t29BexProductos = T29BexProductos::where('codproveedor', $codProveedor[$i])
+                        ->update(['estadoproveedor' => 'C']);
+                    // if($t29BexProductos == 1){
+                    //     print '◘ Columna "estadoproveedor" actualizada en al tabla t29_bex_productos' . PHP_EOL;
+                    // }else{
+                    //     print '◘ No se acutalizo columna "estadoproveedor" en al tabla t29_bex_productos' . PHP_EOL;
+                    // }
                 }
             }
 
             //Inserta datos en estado A en la tabla t29_bex_productos
             $dataToInsertTblmproveedor = T29BexProductos::dataToInsertTblmproveedor()->get();
             if(sizeof($dataToInsertTblmproveedor) > 0){
-                DB::connection($conectionBex)->table('tblmunidademp')->insert($dataToInsertTblmproveedor->toArray());
+                DB::connection($conectionBex)->table('tblmproveedor')->insert($dataToInsertTblmproveedor->toArray());
                 print '◘ Datos insertados con exito en la tabla t29_bex_productos' . PHP_EOL;
             }
 
@@ -617,21 +626,26 @@ class Insert_fyel_Custom
                 ->first();
             
             //Update estadoimpuesto tabla t16_bex_inventarios
-            $tblmimpuesto = DB::connection($conectionBex)->table('tblmimpuesto')->get();
-            $iva          = $tblmimpuesto->pluck('iva')->toArray();
+            $tblmimpuesto = DB::connection($conectionBex)->table('tblmimpuesto')
+                                                        ->select('codimpuesto')->get();
+             $iva          = $tblmimpuesto->pluck('codimpuesto')->toArray();
+             $imp = count($tblmimpuesto);
 
             if (!empty($iva)) {
-                $t16BexInventarios = T16BexInventarios::whereIn('iva', $iva)
-                    ->update(['estadoimpuesto' => 'C']);
-                if($t16BexInventarios == 1){
-                    print '◘ Columna "estadoimpuesto" actualizada en al tabla t16_bex_inventarios' . PHP_EOL;
-                }else{
-                    print '◘ No se acutalizo columna "estadoimpuesto" en al tabla t16_bex_inventarios' . PHP_EOL;
+                for($i=0; $i<$imp; $i++){
+                    $t16BexInventarios = T16BexInventarios::where('iva', $iva[$i])
+                        ->update(['estadoimpuesto' => 'C']);
+                    if($t16BexInventarios > 0){
+                        print '◘ Columna "estadoimpuesto" actualizada en al tabla t16_bex_inventarios' . PHP_EOL;
+                    }else{
+                        print '◘ No hay acutalizaciones en la columna "estadoimpuesto" en al tabla t16_bex_inventarios' . PHP_EOL;
+                    }
                 }
             }
 
             //Inserta datos en estado A en la tabla tblmimpuesto
             $insertDataTblmimpuesto = T16BexInventarios::insertDataTblmimpuesto()->get();
+
             if(sizeof($insertDataTblmimpuesto) > 0){
                 DB::connection($conectionBex)->table('tblmimpuesto')->insert($insertDataTblmimpuesto->toArray());
                 print '◘ Datos insertados con exito en la tabla tblmimpuesto' . PHP_EOL;
@@ -639,34 +653,26 @@ class Insert_fyel_Custom
 
             //Update estadobodega tabla t16_bex_inventarios
             $tblmbodega = DB::connection($conectionBex)->table('tblmbodega')->get();
-            $codBodega = $tblmbodega->pluck('codbodega')->toArray();
+            $codBodega = $tblmbodega->pluck('CODBODEGA')->toArray();
+            $bod = count($codBodega);
 
             if (!empty($codBodega)) {
-                $t16BexInventarios = T16BexInventarios::whereIn('bodega', $codBodega)
-                    ->update(['estadobodega' => 'C']);
-                if($t16BexInventarios == 1){
-                    print '◘ Columna "estadoimpuesto" actualizada en al tabla t16_bex_inventarios' . PHP_EOL;
-                }else{
-                    print '◘ No se acutalizo columna "estadoimpuesto" en al tabla t16_bex_inventarios' . PHP_EOL;
+                for($i=0; $i<$bod; $i++){
+                    $t16BexInventarios = T16BexInventarios::where('bodega', $codBodega[$i])
+                        ->update(['estadobodega' => 'C']);
+                    if($t16BexInventarios > 0){
+                        print '◘ Columna "estadobodega" actualizada en al tabla t16_bex_inventarios' . PHP_EOL;
+                    }else{
+                        print '◘ No se acutalizo columna "estadobodega" en al tabla t16_bex_inventarios' . PHP_EOL;
+                    }
                 }
             }
-            
+
             //Inserta datos en estado A en la tabla tblmbodega
             $insertDataToTblmbodega = T16BexInventarios::insertDataToTblmbodega()->get();
             if(sizeof($insertDataToTblmbodega) > 0){
                 DB::connection($conectionBex)->table('tblmbodega')->insert($insertDataToTblmbodega->toArray());
                 print '◘ Datos insertados con exito en la tabla tblmbodega' . PHP_EOL;
-            }
-
-            $impuesto = $modelInstance::select('iva as codimpuesto', DB::raw("concat('IVA ', iva) as nomimpuesto"), 'iva as porcimpuesto')
-                                 ->where('estadoimpuesto','=','A')
-                                 ->groupBy('iva')
-                                 ->get();
-
-            if(sizeof($impuesto) > 0){
-                DB::connection($conectionBex)
-                ->table('tblmimpuesto')
-                ->insert($impuesto->toArray());
             }
             
             if($tblslicencias->borrardstockimportando == "S"){
