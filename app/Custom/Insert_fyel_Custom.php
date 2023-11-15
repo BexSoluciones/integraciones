@@ -25,35 +25,34 @@ class Insert_fyel_Custom
     public function InsertClientesCustom($conectionBex, $datosAInsertar, $modelInstance)
     {   
         $fechaActual = Carbon::now();
-      
         $resultado = DB::connection($conectionBex)->table('tblmfpagovta')->get();
 
         foreach($resultado as $resul){
-            
-           
             $modelInstance::where('conpag', '=', $resul->CODFPAGOVTA)
                            ->update(['estadofpagovta' => 'C']);
         }
-        // dd('PARAR');
+    
         $codpago = $modelInstance::select('conpag','periodicidad')
                                  ->where('estadofpagovta','=','A')
+                                 ->where('codigo','!=','')
                                  ->groupBy('conpag','periodicidad')
                                  ->get();
 
-        $dataToInsert = [];
-        foreach($codpago as $dato){
-            // dd($dato->conpag);
-            $dataToInsert[] = [
-                    'codfpagovta' => $dato->conpag,
-                    'nomfpagovta' => 'CONDICION '.$dato->conpag,
-                    'perfpagovta' => $dato->periodicidad
-                ];
-        }    
-        DB::connection($conectionBex)->table('tblmfpagovta')->insert($dataToInsert);
-     
+        if(sizeof($codpago) != 0){
+            $dataToInsert = [];
+            foreach($codpago as $dato){
+                // dd($dato->conpag);
+                $dataToInsert[] = [
+                        'codfpagovta' => $dato->conpag,
+                        'nomfpagovta' => 'CONDICION '.$dato->conpag,
+                        'perfpagovta' => $dato->periodicidad
+                    ];
+            }  
+            DB::connection($conectionBex)->table('tblmfpagovta')->insert($dataToInsert);
+        }
         DB::connection($conectionBex)->table('s1e_clientes')->truncate();
 
-         $Insert = [];
+        $Insert = [];
         foreach ($datosAInsertar as $dato) {
             $Insert[] = [
                 'codigo'        => $dato->codigo,
