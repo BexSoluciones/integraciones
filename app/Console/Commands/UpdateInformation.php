@@ -44,11 +44,11 @@ class UpdateInformation extends Command {
         } elseif($config->ConecctionType == 'ws') {
             $archivosPlanos = $this->importData($db);
         }
-        /*
+    
         //Function to configure and migrate tables (MigrateTrait).
         if($archivosPlanos == true){
             $this->preMigration($db);
-        }*/
+        }
        
         //Function to read and export flat file to tenant DB
         $this->readFlatFile($db);
