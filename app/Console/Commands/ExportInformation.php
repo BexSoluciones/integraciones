@@ -19,7 +19,7 @@ class ExportInformation extends Command
     public function handle()
     {
         $tenantDB = $this->argument('tenantDB'); 
-        $conectionBex = 'fyel-local';
+        $conectionBex = 'fyel';
         $area = 'bexmovil';
 
         //Function that configures the database (ConnetionTrait).
