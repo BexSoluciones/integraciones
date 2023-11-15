@@ -36,7 +36,7 @@ class CommandController extends Controller
         try{
             set_time_limit(0);
             Artisan::call('command:upload-order', [
-                'database' => $request->name_db,
+                'database' => $request->alias_db,
                 'area' => $request->area,
                 'closing' => $request->closing,
             ]);
