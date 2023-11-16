@@ -5,6 +5,7 @@ namespace App\Custom;
 use App\Models\Bex_0002\T25BexPrecios;
 use App\Models\Bex_0002\T29BexProductos;
 use App\Models\Bex_0002\T16BexInventarios;
+use App\Models\Bex_0002\T05BexClientes;
 use App\Traits\ConnectionTrait;
 
 use Illuminate\Support\Carbon;
@@ -24,7 +25,7 @@ class Insert_fyel_Custom
     }
     public function InsertClientesCustom($conectionBex, $datosAInsertar, $modelInstance)
     {   
-        $fechaActual = Carbon::now();
+        $fechaActual = date('Ymd');
         $resultado = DB::connection($conectionBex)->table('tblmfpagovta')->get();
 
         foreach($resultado as $resul){
@@ -50,49 +51,63 @@ class Insert_fyel_Custom
             }  
             DB::connection($conectionBex)->table('tblmfpagovta')->insert($dataToInsert);
         }
+
         DB::connection($conectionBex)->table('s1e_clientes')->truncate();
 
-        $Insert = [];
-        foreach ($datosAInsertar as $dato) {
-            $Insert[] = [
-                'codigo'        => $dato->codigo,
-                'dv'            => $dato->dv,
-                'sucursal'      => $dato->sucursal,
-                'razsoc'        => utf8_encode($dato->razsoc),
-                'representante' => utf8_encode($dato->representante),
-                'direccion'     => $dato->direccion,
-                'telefono'      => $dato->telefono,
-                'precio'        => $dato->precio,
-                'conpag'        => $dato->conpag,
-                'periodicidad'  => $dato->periodicidad,
-                'codvendedor'   => $dato->tercvendedor,
-                'cupo'          => $dato->cupo,
-                'codgrupodcto'  => $dato->codgrupodcto,
-                'email'         => $dato->email,
-                'codcliente'    => '0',
-                'estado'        => $dato->estado,
-                'estadofpagovta'=> $dato->estadofpagovta
-            ];    
+        $datosAInsert = json_decode(json_encode($datosAInsertar,true));
+        
+        if(sizeof($datosAInsert) != 0){
+            foreach (array_chunk($datosAInsert,2000) as $dato)  
+            {
+                    $Insert = [];
+                    $count = count($dato);
+                    for($i=0;$i<$count;$i++) {
+                        $Insert[] = [
+                            'codigo'        => $dato[$i]->codigo,
+                            'dv'            => $dato[$i]->dv,
+                            'sucursal'      => $dato[$i]->sucursal,
+                            'razsoc'        => str_replace('Ñ','N',$dato[$i]->razsoc),
+                            'representante' => str_replace('Ñ','N',$dato[$i]->representante),
+                            'direccion'     => str_replace('Ñ','N',$dato[$i]->direccion),
+                            'telefono'      => $dato[$i]->telefono,
+                            'precio'        => $dato[$i]->precio,
+                            'conpag'        => $dato[$i]->conpag,
+                            'periodicidad'  => $dato[$i]->periodicidad,
+                            'codvendedor'   => $dato[$i]->tercvendedor,
+                            'cupo'          => $dato[$i]->cupo,
+                            'codgrupodcto'  => $dato[$i]->codgrupodcto,
+                            'email'         => $dato[$i]->email,
+                            'codcliente'    => '0',
+                            'estado'        => $dato[$i]->estado,
+                            'estadofpagovta'=> $dato[$i]->estadofpagovta
+                        ];    
+                    }
+                    
+                    DB::connection($conectionBex)->table('s1e_clientes')->insert($Insert);
+                    print '◘ Datos insertados con exito en la tabla s1e_clientes' . PHP_EOL;
+                }
         }
-           
-        DB::connection($conectionBex)->table('s1e_clientes')->insert($Insert);
             
         DB::connection($conectionBex)->table('s1e_clientes')
                                     ->join('tblmcliente','s1e_clientes.codigo','=','tblmcliente.nitcliente')
                                     ->whereColumn('s1e_clientes.sucursal','tblmcliente.succliente')
                                     ->whereColumn('s1e_clientes.dv','tblmcliente.dvcliente')
                                     ->update(['s1e_clientes.codcliente' => DB::raw('tblmcliente.codcliente')]);
-                                                                                       
+        print '◘ Codigo en la tabla s1e_clientes actualizado' . PHP_EOL;                                                                   
+        
         DB::connection($conectionBex)->table('s1e_clientes')
                                      ->join('tblmcliente','s1e_clientes.codcliente','=','tblmcliente.codcliente')
                                      ->whereColumn('s1e_clientes.sucursal','tblmcliente.succliente')
                                      ->whereColumn('s1e_clientes.codigo','tblmcliente.nitcliente')
                                      ->update(['s1e_clientes.estado' => 'C']);
+        print '◘ Estado de s1e_clientes actualizado' . PHP_EOL; 
 
-        $insertClient = DB::connection($conectionBex)->table('s1e_clientes')->where('estado','A')->get();   
+        $insertClient = DB::connection($conectionBex)->table('s1e_clientes')
+                                                    ->where('estado','A')
+                                                    ->where('s1e_clientes.codcliente','<>','')
+                                                    ->get();   
 
         if( count($insertClient) > 0){
-           
             DB::connection($conectionBex)->table('tblmcliente')
                                         ->insertUsing(
                                             ['nitcliente', 'dvcliente','succliente','razcliente','nomcliente','dircliente','telcliente',
@@ -101,6 +116,7 @@ class Insert_fyel_Custom
                                                 $query->select('codigo','dv','sucursal','razsoc','representante','direccion','telefono',
                                                 'periodicidad','periodicidad','conpag','precio','dv','email')
                                                 ->from('s1e_clientes')
+                                                ->where('s1e_clientes.codcliente','<>','')
                                                 ->where('estado', 'A');
                                             }
                 );
@@ -122,7 +138,7 @@ class Insert_fyel_Custom
 
             echo 'PASO POR LA ACTUALIZACION!!!!!!............';
         }      
-        
+
         DB::connection($conectionBex)->table('tblmcliente')
                                     ->join('s1e_clientes','tblmcliente.codcliente','=','s1e_clientes.codcliente')
                                     ->whereColumn('tblmcliente.nitcliente','s1e_clientes.codigo')
@@ -133,7 +149,7 @@ class Insert_fyel_Custom
                                               'tblmcliente.CODFPAGOVTA' => DB::raw('s1e_clientes.conpag'),
                                               'tblmcliente.CODPRECIO' => DB::raw('s1e_clientes.precio'),
                                               'tblmcliente.EMAIL' => DB::raw('s1e_clientes.email') ]);
-        
+          print '◘ Datos Actualizados con exito en la tabla tblmcliente' . PHP_EOL;
     }
 
     public function InsertVendedoresCustom($conectionBex, $datosAInsertar, $modelInstance)
@@ -265,7 +281,7 @@ class Insert_fyel_Custom
                 }
                 DB::connection($conectionBex)->table('tbldusuarioempresa')->insert($dataToInsert);
             }
-
+            print '◘ Datos Actualizados con exito en la tabla tblmvendedor' . PHP_EOL;
             // dd('finalizo segundo dd');
         }
 
@@ -301,6 +317,7 @@ class Insert_fyel_Custom
                                 ->select(['dia','dia_descrip'])
                                 ->distinct()
                                 ->where('estadodiarutero', 'A')
+                                ->where('cliente','<>','')
                                 ->get();
 
         if(count($ruteroDias) > 0){
@@ -320,6 +337,7 @@ class Insert_fyel_Custom
                                      ->join('tblmvendedor','s1e_ruteros.codvendedor','=','tblmvendedor.CODVENDEDOR')
                                      ->join('tblmdiarutero','s1e_ruteros.dia','=','tblmdiarutero.diarutero')
                                      ->whereColumn('s1e_ruteros.sucursal','s1e_clientes.sucursal')
+                                     ->where('s1e_ruteros.cliente','<>','')
                                      ->select('tblmvendedor.codvendedor','s1e_ruteros.dia','s1e_ruteros.secuencia',
                                               's1e_clientes.codcliente','s1e_clientes.cupo','s1e_clientes.precio','s1e_clientes.codgrupodcto')
                                      ->distinct()->get();
@@ -327,7 +345,7 @@ class Insert_fyel_Custom
         DB::connection($conectionBex)->table('tblmrutero')
                                      ->join('s1e_clientes','tblmrutero.CODCLIENTE','=','s1e_clientes.codcliente')
                                      ->update(['tblmrutero.CUPO' => DB::raw('s1e_clientes.cupo')]);
- 
+            print '◘ Datos Actualizados con exito en la tabla tblmrutero' . PHP_EOL;
         }else{
             dd('No se ejecuto');
         }
@@ -497,118 +515,181 @@ class Insert_fyel_Custom
     }
 
     public function InsertAmovilCustom($conectionBex, $datosAInsertar, $modelInstance)
-    {
+    {   
+        print '◘ Inicia la Actualizacion en la tabla tbldamovil' . PHP_EOL;
          $inset=(count($datosAInsertar));
         //  dd('PARAR');
         if($inset > 0){
- 
-            for($i=0;$i<$inset;$i++){
 
-                $resultado = DB::connection($conectionBex)->table('tblmcliente')
-                                                          ->where('nitcliente', $datosAInsertar[$i]->nitcliente)
-                                                          ->where('succliente', $datosAInsertar[$i]->succliente)->first();
-                
-                $modelInstance::where('nitcliente', $resultado->NITCLIENTE)
-                               ->where('succliente', $resultado->SUCCLIENTE)
-                               ->update(['codcliente' => $resultado->CODCLIENTE]);
-            }
-                
             DB::connection($conectionBex)->table('tbldamovil')->truncate();
-                
 
-            $dataToInsert = [];
-            foreach ($datosAInsertar as $dato) {
-                $dataToInsert[] = [
-                    'nitcliente'  => $dato->nitcliente,
-                    'succliente'  => $dato->succliente,
-                    'ano'         => $dato->ano,
-                    'mes'         => $dato->mes,
-                    'valor'       => $dato->valor,
-                    'codvendedor' => $dato->tercvendedor,
-                    'codcliente'  => $dato->codcliente
-                ];
-            }
+            $datosAInsert = json_decode(json_encode($datosAInsertar,true));
 
             // Insertar los datos en lotes
-            DB::connection($conectionBex)->table('tbldamovil')->insert($dataToInsert);
-        }  
+            if(sizeof($datosAInsertar) > 0){
+                foreach (array_chunk($datosAInsert,3000) as $dato)  
+                {
+                        $Insert = [];
+                        $count = count($dato);
+                        for($i=0;$i<$count;$i++) {
+                            $Insert[] = [
+                                'nitcliente'  => $dato[$i]->nitcliente,
+                                'succliente'  => $dato[$i]->succliente,
+                                'ano'         => $dato[$i]->ano,
+                                'mes'         => $dato[$i]->mes,
+                                'valor'       => $dato[$i]->valor,
+                                'codvendedor' => $dato[$i]->tercvendedor,
+                                'codcliente'  => NULL
+                            ];    
+                        }
+                        
+                        DB::connection($conectionBex)->table('tbldamovil')->insert($Insert);
+                        print '◘ Datos insertados con exito en la tabla tbldamovil' . PHP_EOL;
+                    }
+            }
+ 
+            DB::connection($conectionBex)->table('tbldamovil')
+                            ->join('tblmcliente','tbldamovil.nitcliente','=','tblmcliente.nitcliente')
+                            ->whereColumn('tbldamovil.succliente','tblmcliente.succliente')
+                            ->update(['tbldamovil.codcliente' => DB::raw('tblmcliente.codcliente')]);
+
+
+            print '◘ Datos Actualizados con exito en la tabla tbldamovil' . PHP_EOL;
+        }else{
+            print '◘ No hay datos para Actualizar en la tabla tbldamovil' . PHP_EOL;
+        } 
     }
 
-    public function insertProductsCustom($conectionBex)
+    public function insertProductsCustom($conectionBex, $datosAInsertar, $modelInstance)
     {
         try {
-            //Update estado_unidademp tabla t29_bex_productos
-            $tblmunidademp = DB::connection($conectionBex)->table('tblmunidademp')->get();
-            $codUnidadEmp  = $tblmunidademp->pluck('codunidademp')->toArray();
+            DB::connection($conectionBex)->table('s1e_productos')->truncate();
 
-            if (!empty($codUnidadEmp)) {
-                $t29BexProductos = T29BexProductos::whereIn('codunidademp', $codUnidadEmp)
-                    ->update(['estado_unidademp' => 'C']);
-                if($t29BexProductos == 1){
-                    print '◘ Columna "estado_unidademp" actualizada en al tabla t29_bex_productos' . PHP_EOL;
-                }else{
-                    print '◘ No se acutalizo columna "estado_unidademp" en al tabla t29_bex_productos' . PHP_EOL;
-                }
+            $datosAInsert = json_decode(json_encode($datosAInsertar,true));
+            
+            if(sizeof($datosAInsertar) > 0){
+                foreach (array_chunk($datosAInsert,3000) as $dato)  
+                {
+                        $Insert = [];
+                        $count = count($dato);
+                        for($i=0;$i<$count;$i++) {
+                            $Insert[] = [
+                                'codigo'          => $dato[$i]->codigo,
+                                'descripcion'     => $dato[$i]->descripcion,
+                                'codunidademp'    => $dato[$i]->codunidademp,
+                                'peso'            => $dato[$i]->peso,
+                                'codproveedor'    => $dato[$i]->codproveedor,
+                                'nomproveedor'    => $dato[$i]->nomproveedor,
+                                'unidadventa'     => $dato[$i]->unidadventa,
+                                'estado'          => $dato[$i]->estado,
+                                'estadounidademp' => $dato[$i]->estado_unidademp,
+                                'estadoproveedor' => $dato[$i]->estadoproveedor
+                            ];    
+                        }
+                        
+                        DB::connection($conectionBex)->table('s1e_productos')->insert($Insert);
+                        print '◘ Datos insertados con exito en la tabla s1e_productos' . PHP_EOL;
+                    }
             }
+
+              //Update estado_unidademp tabla s1e_productos
+            DB::connection($conectionBex)->table('s1e_productos')
+                                    ->join('tblmunidademp','s1e_productos.codunidademp','=','tblmunidademp.codunidademp')
+                                    ->update(['s1e_productos.estadounidademp' => 'C']);
+            print '◘ Estados actualizados con exito en la columna "estadounidademp"' . PHP_EOL;
+                                                                                       
+            $insertUndemp = DB::connection($conectionBex)->table('s1e_productos')
+                                                        ->where('estadounidademp','A')
+                                                        ->where('codigo','<>','')
+                                                        ->get();   
+
+             //Inserta datos en estado A en la tabla tblmunidademp
+            if( count($insertUndemp) > 0){
+               
+                DB::connection($conectionBex)->table('tblmunidademp')
+                                            ->insertUsing(
+                                                ['codunidademp', 'NOMUNIDADEMP'],
+                                                function ($query) {
+                                                    $query->selectRaw('codunidademp,codunidademp as NOMUNIDADEMP')
+                                                    ->from('s1e_productos')
+                                                    ->where('estadounidademp', 'A')
+                                                    ->where('codigo','<>','')
+                                                    ->get();
+                                                }
+                    );
+            }
+            print '◘ Datos Actualizados con exito en la tabla tblmunidademp' . PHP_EOL;
+
+            DB::connection($conectionBex)->table('s1e_productos')
+                                        ->join('tblmproveedor','s1e_productos.codproveedor','=','tblmproveedor.CODPROVEEDOR')
+                                        ->update(['s1e_productos.estadoproveedor' => 'C']);
+            print '◘ Estados actualizados con exito en la columna "estadoproveedor"' . PHP_EOL;
+                                                                        
+            $insertProveed = DB::connection($conectionBex)->table('s1e_productos')
+                                            ->where('estadoproveedor','A')
+                                            ->where('codigo','<>','')
+                                            ->get();   
 
             //Inserta datos en estado A en la tabla tblmunidademp
-            $dataToInsertUnidadEmp = T29BexProductos::dataToInsertUnidadEmp()->get();
-            if(sizeof($dataToInsertUnidadEmp) > 0){
-                DB::connection($conectionBex)->table('tblmunidademp')->insert($dataToInsertUnidadEmp->toArray());
-                print '◘ Datos insertados con exito en la tabla tblmunidademp' . PHP_EOL;
-            }
+            if( count($insertProveed) > 0){
 
-            //Update estadoproveedor tabla t29_bex_productos
-            $tblmproveedor = DB::connection($conectionBex)->table('tblmproveedor')->get();
-            $codProveedor  = $tblmproveedor->pluck('CODPROVEEDOR')->toArray();
-            $provee = count($codProveedor);
-            if (!empty($codProveedor)) {
-                for($i=0;$i<$provee;$i++){
-                    $t29BexProductos = T29BexProductos::where('codproveedor', $codProveedor[$i])
-                        ->update(['estadoproveedor' => 'C']);
-                    // if($t29BexProductos == 1){
-                    //     print '◘ Columna "estadoproveedor" actualizada en al tabla t29_bex_productos' . PHP_EOL;
-                    // }else{
-                    //     print '◘ No se acutalizo columna "estadoproveedor" en al tabla t29_bex_productos' . PHP_EOL;
-                    // }
-                }
+                DB::connection($conectionBex)->table('tblmproveedor')
+                                    ->insertUsing(
+                                        ['CODPROVEEDOR', 'NOMPROVEEDOR'],
+                                        function ($query) {
+                                            $query->selectRaw('codunidademp,codunidademp as NOMUNIDADEMP')
+                                            ->from('s1e_productos')
+                                            ->where('estadoproveedor', 'A')
+                                            ->where('codigo','<>','')
+                                            ->get();
+                                        }
+                                    );
             }
+            print '◘ Datos Actualizados con exito en la tabla tblmproveedor' . PHP_EOL;
 
-            //Inserta datos en estado A en la tabla t29_bex_productos
-            $dataToInsertTblmproveedor = T29BexProductos::dataToInsertTblmproveedor()->get();
-            if(sizeof($dataToInsertTblmproveedor) > 0){
-                DB::connection($conectionBex)->table('tblmproveedor')->insert($dataToInsertTblmproveedor->toArray());
-                print '◘ Datos insertados con exito en la tabla t29_bex_productos' . PHP_EOL;
-            }
-
-            //Actualizar tabla tblmproducto
-            $dataUpdateTblmproducto = T29BexProductos::dataUpdateTblmproducto()->get();
-            foreach ($dataUpdateTblmproducto as $data) {
-                DB::connection($conectionBex)
-                    ->table('tblmproducto')
-                    ->where('CODPRODUCTO', $data->PLUPRODUCTO)
-                    ->update($data->toArray());
-            }
+            DB::connection($conectionBex)->table('tblmproducto')
+                                ->join('s1e_productos','tblmproducto.CODPRODUCTO','=','s1e_productos.codigo')
+                                ->where('s1e_productos.codigo','<>','')
+                                ->update(['tblmproducto.NOMPRODUCTO' => DB::raw('s1e_productos.descripcion'),
+                                        'tblmproducto.PLUPRODUCTO' => DB::raw('s1e_productos.codigo'),
+                                        'tblmproducto.codunidademp' => DB::raw('s1e_productos.codunidademp'),
+                                        'tblmproducto.PESO' => DB::raw('s1e_productos.peso'),
+                                        'tblmproducto.CODPROVEEDOR' => DB::raw('s1e_productos.codproveedor'),
+                                        'tblmproducto.unidadventa' => DB::raw('s1e_productos.unidadventa')]);
             print '◘ Datos actualizados con exito en la tabla tblmproducto' . PHP_EOL;
 
             // Códigos de productos que necesitan actualizarse
-            $dataUpdateT29BexProductos = DB::connection($conectionBex)
-                                            ->table('tblmproducto')
-                                            ->select('codproducto')
-                                            ->get()
-                                            ->pluck('codproducto');
-
-            // Actualiza los registros en T29BexProductos
-            T29BexProductos::whereIn('codigo', $dataUpdateT29BexProductos)
-                            ->update(['estado' => 'C']);
-            print '◘ Tabla t29_bex_productos actualizada a estado C exitosamente' . PHP_EOL;
+            DB::connection($conectionBex)->table('s1e_productos')
+                                    ->join('tblmproducto','s1e_productos.codigo','=','tblmproducto.CODPRODUCTO')
+                                    ->update(['s1e_productos.estado' => 'C']);
+            print '◘ Estados actualizados con exito en la columna "estado de s1e_productos"' . PHP_EOL;
 
             //Ejecutar distint
-            $distintProducts = T29BexProductos::distintProducts()->get();
-            DB::connection($conectionBex)
-                ->table('tblmproducto')
-                ->insert($distintProducts->toArray());
-            print '◘ Sentencia distint ejecutada con exito' . PHP_EOL;
+            $insertProduc = DB::connection($conectionBex)->table('s1e_productos')
+                                            ->where('estado','A')
+                                            ->where('codigo','<>','')
+                                            ->get();   
+
+            //Inserta datos en estado A en la tabla tblmproducto
+            if( count($insertProduc) > 0){
+
+                DB::connection($conectionBex)->table('tblmproducto')
+                                    ->insertUsing(
+                                        ['CODPRODUCTO', 'codempresa','pluproducto','nomproducto','codunidademp','bonentregaproducto',
+                                         'codgrupoproducto','estadoproducto'],
+                                        function ($query) {
+                                            $query->selectRaw('codigo,"001" as codbodega,codigo,descripcion,s1e_productos.codunidademp,
+                                            "0" as bonentregaproducto,"0" as codgrupoproducto,s1e_productos.estado')
+                                            ->distinct()
+                                            ->from('s1e_productos')
+                                            ->where('estado', 'A')
+                                            ->where('codigo','<>','')
+                                            ->get();
+                                        }
+                                    );
+            }
+            print '◘ Datos Actualizados con exito en la tabla tblmproducto' . PHP_EOL;
+
         } catch (\Exception $e) {
             print '¡Ocurrió un error en insertProductsCustom: ' . $e->getMessage() . PHP_EOL;
         }
@@ -711,53 +792,75 @@ class Insert_fyel_Custom
         }
     }
 
-    public function insertPreciosCustom($conectionBex)
+    public function insertPreciosCustom($conectionBex, $datosAInsertar, $modelInstance)
     {
         try {
-            //Actualizar estado t25_bex_precios
-            $codigosPrecio = DB::connection($conectionBex)->table('tblmprecio')->pluck('codprecio')->toArray();
-            T25BexPrecios::whereIn('lista', $codigosPrecio)
-                ->update(['estadoprecio' => 'C']);
-            print '◘ Estados actualizados con exito en la tabla t25_bex_precios' . PHP_EOL;
 
-            //Insertar datos en la tabla tblmprecio
-            $insertDataTblmprecio = T25BexPrecios::insertDataTblmprecio()->get();
-            DB::connection($conectionBex)
-                ->table('tblmprecio')
-                ->insert($insertDataTblmprecio->toArray());
-            print '◘ Datos insertados con exito en la tabla tblmprecio' . PHP_EOL;
+            DB::connection($conectionBex)->table('s1e_precios')->truncate();
 
-            //Delete a la tabla tbldproductoprecio
-            DB::connection($conectionBex)->table('tbldproductoprecio')->truncate();
-            print '◘ Datos eliminados con exito en la tabla tbldproductoprecio' . PHP_EOL;
-
-            //Insertar datos en la tabla tbldproductoprecio
-            $t25_bex_precios = T25BexPrecios::preciosAll()->get();
-            $codigosProductos = $t25_bex_precios->pluck('codproducto')->toArray();
-
-            $productosData = DB::connection($conectionBex)
-                ->table('tblmproducto')
-                ->whereIn('CODPRODUCTO', $codigosProductos)
-                ->get();
-
-            $dataToInsert = [];
-            foreach($t25_bex_precios as $data){
-                $resultados = $productoData = $productosData->firstWhere('CODPRODUCTO', $data->codproducto);
-                if($resultados){
-                    $dataToInsert[] = [
-                        'codproducto'          => $data->codproducto,
-                        'codprecio'            => $data->codprecio,
-                        'precioproductoprecio' => $data->precioproductoprecio
-                    ];
-                }
+            $datosAInsert = json_decode(json_encode($datosAInsertar,true));
+            
+            if(sizeof($datosAInsertar) > 0){
+                foreach (array_chunk($datosAInsert,3000) as $dato)  
+                {
+                        $Insert = [];
+                        $count = count($dato);
+                        for($i=0;$i<$count;$i++) {
+                            $Insert[] = [
+                                'lista'        => $dato[$i]->lista,
+                                'producto'     => $dato[$i]->producto,
+                                'precio'       => $dato[$i]->precio,
+                                'estadoprecio' => $dato[$i]->estadoprecio
+                            ];    
+                        }
+                        
+                        DB::connection($conectionBex)->table('s1e_precios')->insert($Insert);
+                        print '◘ Datos insertados con exito en la tabla s1e_precios' . PHP_EOL;
+                    }
             }
 
-            // Eliminar duplicados usando array_unique
-            $dataToInsert = array_unique($dataToInsert, SORT_REGULAR);
+            //Actualizar estado t25_bex_precios
+            DB::connection($conectionBex)->table('s1e_precios')
+                                    ->join('tblmprecio','s1e_precios.lista','=','tblmprecio.codprecio')
+                                    ->update(['s1e_precios.estadoprecio' => 'C']);
+            print '◘ Estados actualizados con exito en la tabla s1e_precios' . PHP_EOL;
+                                                                                       
+            $insertPrecio = DB::connection($conectionBex)->table('s1e_precios')->where('estadoprecio','A')->get();   
 
-            DB::connection($conectionBex)->table('tbldproductoprecio')->insert($dataToInsert);
-            print '◘ Datos insertados con éxito en la tabla tbldproductoprecio' . PHP_EOL;
+            //Insertar datos en la tabla tblmprecio
+            if( count($insertPrecio) > 0){
+               
+                DB::connection($conectionBex)->table('tblmprecio')
+                                            ->insertUsing(
+                                                ['codprecio', 'nomprecio'],
+                                                function ($query) {
+                                                    $query->selectRaw('lista,concat("LISTA PRECIO ",lista)')
+                                                    ->from('s1e_precios')
+                                                    ->where('estadoprecio', 'A')
+                                                    ->get();
+                                                }
+                    );
+            }
 
+            //Delete a la tabla tbldproductoprecio
+            if(sizeof($datosAInsertar) > 0){
+                DB::connection($conectionBex)->table('tbldproductoprecio')->truncate();
+                print '◘ Datos eliminados con exito en la tabla tbldproductoprecio' . PHP_EOL;
+
+                DB::connection($conectionBex)->table('tbldproductoprecio')
+                                            ->insertUsing(
+                                                ['CODPRODUCTO', 'codprecio','precioproductoprecio'],
+                                                function ($query) {
+                                                    $query->selectRaw('producto,lista,precio')
+                                                    ->from('s1e_precios')
+                                                    ->join('tblmproducto','s1e_precios.producto','=','tblmproducto.CODPRODUCTO')
+                                                    ->distinct()
+                                                    ->get();
+                                                }
+                    );
+                print '◘ Datos insertados con éxito en la tabla tbldproductoprecio' . PHP_EOL;
+            }
+           
         } catch (\Exception $e) {
             print '¡Ocurrió un error en insertPreciosCustom: ' . $e->getMessage() . PHP_EOL;
         }
