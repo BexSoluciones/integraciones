@@ -25,6 +25,7 @@ class T16BexInventarios extends Model
     public function scopeInsertDataTblmimpuesto($query){
         return $query->select('iva as codimpuesto', DB::raw("concat('IVA ', iva) as nomimpuesto"), 'iva as porcimpuesto')
             ->where('estadoimpuesto', 'A')
+            ->where('producto','<>', '')
             ->groupBy('iva');
     }
 
