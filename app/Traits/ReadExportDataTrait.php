@@ -3,6 +3,7 @@ namespace App\Traits;
 
 use Exception;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 
@@ -47,51 +48,59 @@ trait ReadExportDataTrait {
         }
     }
 
-
     private function processFileContent($modelClass, $content, $tableName) {
-        $modelInstance = new $modelClass();
-        $columnsModelo = $modelInstance->getFillable();
-    
-        if ($content === false) {
-            $this->error("No se pudo leer el archivo plano " . $modelInstance);
-            return;
-        }
-    
-        // Split the content into lines
-        $lines = explode("\n", $content);
-        //Se utiliza para archivos planos que tengan indices autoincrementables
-        $autoIncrement = 1;
-        foreach ($lines as $line) {
-            // Split each line into columns using the |
-            $columns = explode("|", $line);
-            
-            // Construct an associative array of data for insertion
+        try{
+            $modelInstance = new $modelClass();
+            $columnsModelo = $modelInstance->getFillable();
+            $autoIncrement = 1;
+        
+            if ($content === false) {
+                $this->error("No se pudo leer el archivo plano " . $modelInstance);
+                return;
+            }
+        
+            // Split the content into lines
+            $lines = explode("\n", $content);
             $dataToInsert = [];
-    
-            // Fill dataToInsert with values from $columns, up to the number of fillable columns
-            for ($i = 0; $i < count($columns); $i++) {
-                if($tableName == 't05_bex_clientes'){
-                    $j = $i+1;
-                }else{{
-                    $j = $i; 
-                }}
-                $dataToInsert[$columnsModelo[$j]] = isset($columns[$i]) ? trim($columns[$i]) : null;
-            }
-            
-            // Insert the data into the corresponding model
-            if ($modelInstance) {
-                //Inserta un autoincrement
-                if($tableName == 't05_bex_clientes'){
-                    $dataToInsert['consecutivo'] = $autoIncrement++;
+        
+            foreach ($lines as $line) {
+                // Split each line into columns using the |
+                $columns = explode("|", $line);
+        
+                // Construct an associative array of data for insertion
+                $rowData = [];
+        
+                // Fill rowData with values from $columns, up to the number of fillable columns
+                for ($i = 0; $i < count($columns); $i++) {
+                    if($tableName == 't05_bex_clientes'){
+                        $j = $i+1;
+                    } else {
+                        $j = $i; 
+                    }
+                    $rowData[$columnsModelo[$j]] = isset($columns[$i]) ? trim($columns[$i]) : null;
                 }
-                // Insert data in the model
-                $encodedData = array_map('utf8_encode', $dataToInsert);
-                $modelInstance->create($encodedData);
-    
-                $this->info("◘ Datos insertados en el modelo " . get_class($modelInstance));
-            } else {
-                $this->error("Error al insertar datos en la línea: " . $line);
+        
+                // Insert the data into the array to be bulk-inserted
+                if ($tableName == 't05_bex_clientes') {
+                    //Inserta un autoincrement
+                    $rowData['consecutivo'] = $autoIncrement++;
+                }
+        
+                $dataToInsert[] = array_map('utf8_encode', $rowData);
             }
+        
+            // Bulk insert the data into the corresponding model
+            if ($modelInstance && !empty($dataToInsert)) {
+                $chunks = array_chunk($dataToInsert, 1000); // Divide en lotes de 1000 registros
+                foreach ($chunks as $chunk) {
+                    $modelInstance->insert($chunk);
+                }
+                $this->info("◘ Datos insertados en la tabla " . $tableName);
+            } else {
+                $this->error("Error al insertar datos en la tabla " . $tableName);
+            }
+        } catch (\Exception $e) {
+            $this->error("Ha ocurrido un error: " . $e->getMessage());
         }
     }
 }
