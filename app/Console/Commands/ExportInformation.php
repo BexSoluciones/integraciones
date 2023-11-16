@@ -13,14 +13,14 @@ class ExportInformation extends Command
 {
     use ConnectionTrait;
 
-    protected $signature   = 'command:export-information {tenantDB}';
+    protected $signature   = 'command:export-information {tenantDB} {alias} {area}';
     protected $description = 'Export information to bex solutions databases';
 
     public function handle()
     {
-        $tenantDB = $this->argument('tenantDB'); 
-        $conectionBex = 'fyel';
-        $area = 'bexmovil';
+        $tenantDB     = $this->argument('tenantDB'); 
+        $conectionBex = $this->argument('alias');
+        $area         = $this->argument('area');
 
         //Function that configures the database (ConnetionTrait).
         $configDB = $this->connectionDB($tenantDB); 
