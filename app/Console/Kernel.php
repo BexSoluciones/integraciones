@@ -24,7 +24,11 @@ class Kernel extends ConsoleKernel
                 $event = $schedule->command($parameter->command, [
                     $parameter->name_db
                 ])->cron($parameter->cron_expression)->onSuccess(function (Stringable $output) {
-                    Artisan::call('command:export-information');
+                    Artisan::call('command:export-information', [
+                        $parameter->name_db,
+                        $parameter->alias,
+                        $parameter->area
+                    ]);
                 })
                 ->onFailure(function (Stringable $output) {
                     echo $output;

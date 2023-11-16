@@ -52,6 +52,6 @@ class UpdateInformation extends Command {
        
         //Function to read and export flat file to tenant DB
         $this->readFlatFile($db);
-        $this->info('La ejecucion "command:update-information '.$db.'" ha finalizado con éxito.');
+        $this->info('La ejecucion "command:update-information '.$db.'" ha finalizado.');
     }
 }
