@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Command;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
@@ -19,7 +20,16 @@ class CommandController extends Controller
             Artisan::call('command:update-information '.$request->name_db);
             $output = Artisan::output();
             if($output){
-                Artisan::call('command:export-information '.$request->name_db);
+                $parameters = Command::getAll()
+                                    ->where('name_db', $request->name_db)
+                                    ->where('area', $request->area)
+                                    ->first();
+        
+                Artisan::call('command:export-information', [
+                    'tenantDB' => $parameters->name_db,
+                    'alias' => $parameters->alias,
+                    'area' => $parameters->area,
+                ]);
             }
             $output = Artisan::output();
             if(empty($output)){
