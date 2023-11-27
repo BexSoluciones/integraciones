@@ -22,12 +22,15 @@ class Kernel extends ConsoleKernel
             $parameters = Command::getAll()->get();
 
             foreach ($parameters as $parameter) {
-                // Se cambia el state a 2 para saber que se esta ejecutando
-                $parameter->updateOrInsert(['name_db' => $parameter->name_db], ['state' => '2']);
+                
                 // Ejecuta el comando
                 $schedule->command($parameter->command, [
-                    $parameter->name_db
+                    $parameter->name_db 
                 ])
+                ->before(function () {
+                    // Se cambia el state a 2 para saber que se esta ejecutando
+                    $parameter->updateOrInsert(['name_db' => $parameter->name_db], ['state' => '2']);
+                })
                 // Si todo sale bien ejecuta el siguiente comando
                 ->cron($parameter->cron_expression)->onSuccess(function (Stringable $output) use ($parameter) {
                     // Llamar a otro comando si es necesario
