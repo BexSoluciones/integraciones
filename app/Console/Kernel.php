@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
                 $schedule->command($parameter->command, [
                     $parameter->name_db 
                 ])
-                ->before(function () {
+                ->before(function () use ($parameter) {
                     // Se cambia el state a 2 para saber que se esta ejecutando
                     $parameter->updateOrInsert(['name_db' => $parameter->name_db], ['state' => '2']);
                 })
