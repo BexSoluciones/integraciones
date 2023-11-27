@@ -23,11 +23,11 @@ Route::group(['prefix' => 'prueba','middleware' => ['auth:sanctum']], function()
 
 //Rutas para ejecutar comandos
 Route::group(['prefix' => 'commands'], function(){
-    Route::post('/fyel/update/information', [CommandController::class, 'updateInformation']);
-    Route::post('/fyel/upload/order', [CommandController::class, 'uploadOrder']);
+    Route::post('/bex_0002/update/information', [CommandController::class, 'updateInformation']);
+    Route::post('/bex_0002/upload/order', [CommandController::class, 'uploadOrder']);
 });
 
 //Rutas para descargar archivos planos de pedidos
 Route::group(['prefix' => 'flatfile'], function(){
-    Route::post('/fyel/download/pedido', [FlatFileController::class, 'download']);
+    Route::post('/bex_0002/download/pedido', [FlatFileController::class, 'download']);
 });

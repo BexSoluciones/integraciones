@@ -9,9 +9,14 @@ class Tbl_Log extends Model {
     
     use HasFactory;
 
-    protected $connection = 'dynamic_connection';
-    protected $table = 't10_tbl_log';
-
+    protected $connection;
+    protected $table;
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->connection = defined('dynamic_connection') ? 'dynamic_connection' : 'mysql';
+        $this->table = ($this->connection === 'mysql') ? 'tbl_log' : 't10_tbl_log';
+    }
     protected $fillable = [
         'codigo', 
         'descripcion',

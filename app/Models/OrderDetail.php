@@ -9,7 +9,6 @@ class OrderDetail extends Model
 {
     use HasFactory;
     protected $connection = 'dynamic_connection';
-
     protected $table="tbldmovdet";
     protected $fillable = [
         'CODMOVDET',
