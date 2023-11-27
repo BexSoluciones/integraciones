@@ -8,12 +8,13 @@ use App\Traits\MigrateTrait;
 use App\Traits\ConnectionTrait;
 use App\Traits\DataImportTrait;
 use App\Traits\ReadExportDataTrait;
+use App\Traits\BackupFlatFileTrait;
 
 use Illuminate\Console\Command;
 
 class UpdateInformation extends Command {
 
-    use MigrateTrait, ConnectionTrait, DataImportTrait, ReadExportDataTrait;
+    use MigrateTrait, ConnectionTrait, DataImportTrait, ReadExportDataTrait, BackupFlatFileTrait;
 
     protected $signature = 'command:update-information {database} {status?}';
     protected $description = "Extract, generate drawings, and store information in the tenant's database";
@@ -52,6 +53,15 @@ class UpdateInformation extends Command {
        
         //Function to read and export flat file to tenant DB
         $this->readFlatFile($db);
-        $this->info('La ejecucion "command:update-information '.$db.'" ha finalizado.');
+
+        //Realizar copia de seguridad para tipo de conexion "planoa"
+        if ($config->ConecctionType == 'planos') {
+            //backup txt files
+            $backupFlatFile = $this->backupFlatFile($db, true);
+            if($backupFlatFile != true){
+                dd($info->error('Error copia de seguridad archivos panos'));
+            }
+        }
+        $this->info('◘ La ejecucion "command:update-information '.$db.'" ha finalizado.');
     }
 }

@@ -49,46 +49,49 @@ trait ReadExportDataTrait {
     }
 
     private function processFileContent($modelClass, $content, $tableName) {
-        try{
+        try {
             $modelInstance = new $modelClass();
             $columnsModelo = $modelInstance->getFillable();
             $autoIncrement = 1;
-        
+    
             if ($content === false) {
                 $this->error("No se pudo leer el archivo plano " . $modelInstance);
                 return;
             }
-        
+    
             // Split the content into lines
             $lines = explode("\n", $content);
             $dataToInsert = [];
-        
+    
             foreach ($lines as $line) {
-                // Split each line into columns using the |
-                $columns = explode("|", $line);
-        
-                // Construct an associative array of data for insertion
-                $rowData = [];
-        
-                // Fill rowData with values from $columns, up to the number of fillable columns
-                for ($i = 0; $i < count($columns); $i++) {
-                    if($tableName == 't05_bex_clientes'){
-                        $j = $i+1;
-                    } else {
-                        $j = $i; 
+                // Verificar si la línea no está vacía antes de procesarla
+                if (!empty($line)) {
+                    // Split each line into columns using the |
+                    $columns = explode("|", $line);
+    
+                    // Construct an associative array of data for insertion
+                    $rowData = [];
+    
+                    // Fill rowData with values from $columns, up to the number of fillable columns
+                    for ($i = 0; $i < count($columns); $i++) {
+                        if ($tableName == 't05_bex_clientes') {
+                            $j = $i + 1;
+                        } else {
+                            $j = $i;
+                        }
+                        $rowData[$columnsModelo[$j]] = isset($columns[$i]) ? trim($columns[$i]) : null;
                     }
-                    $rowData[$columnsModelo[$j]] = isset($columns[$i]) ? trim($columns[$i]) : null;
+
+                    // Insert the data into the array to be bulk-inserted
+                    if ($tableName == 't05_bex_clientes' && !empty($rowData)) {
+                        //Inserta un autoincrement
+                        $rowData['consecutivo'] = $autoIncrement++;
+                    }
+    
+                    $dataToInsert[] = array_map('utf8_encode', $rowData);
                 }
-        
-                // Insert the data into the array to be bulk-inserted
-                if ($tableName == 't05_bex_clientes') {
-                    //Inserta un autoincrement
-                    $rowData['consecutivo'] = $autoIncrement++;
-                }
-        
-                $dataToInsert[] = array_map('utf8_encode', $rowData);
             }
-        
+    
             // Bulk insert the data into the corresponding model
             if ($modelInstance && !empty($dataToInsert)) {
                 $chunks = array_chunk($dataToInsert, 1000); // Divide en lotes de 1000 registros
