@@ -22,6 +22,7 @@ class Kernel extends ConsoleKernel
             $parameters = Command::getAll()->get();
 
             foreach ($parameters as $parameter) {
+                
                 // Ejecuta el comando
                 $schedule->command($parameter->command, [
                     $parameter->name_db 
