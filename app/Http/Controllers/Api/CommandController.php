@@ -20,17 +20,27 @@ class CommandController extends Controller
 
     public function updateInformation(Request $request){
         try {
+
+            // Valida que no supere el numero de importaciónes permitidos por dia
+            $NumberOfAttemptsPerDay = Importation_Demand::NumberOfAttemptsPerDay($request->name_db);
+            if($NumberOfAttemptsPerDay >= 3){
+                return response()->json([
+                    'status'   => 500, 
+                    'response' => 'Usted ya supero el limite de importaciones por dia.'
+                ]);
+            }
+
             $configDB = $this->connectionDB($request->name_db);
             if($configDB == false){
                 return response()->json([
                     'status'   => 500, 
-                    'response' => 'Ocurrio un error en la configuracion de BD.'
+                    'response' => 'Ocurrio un error en la configuración de BD.'
                 ]);
             }
 
             $currentDate = Carbon::now()->toDateString();
             if($request->hour == null){
-                // Primero revisa que una importacion no se este ejecutando
+                // Primero revisa que una importación no se este ejecutando
                 $importation = Command::forNameBD($request->name_db, $request->area)->first();
                 if($importation->state == '2'){
                     return response()->json([
@@ -47,13 +57,30 @@ class CommandController extends Controller
                         'response' => 'Ocurrio un error con la petición.'
                     ]);
                 }
+            }else{
+                // Se mira si la importación se puede ejecutar a la hora que pidio el cliente
+                $importation_hour = $this->calculateTime();
+                $hourUser = Carbon::parse($request->hour);
+                $lastHour = Carbon::parse($importation_hour);
+
+                // Calcula la diferencia en minutos
+                $differenceInMinutes = intval($hourUser->diffInMinutes($lastHour));
+
+                if($differenceInMinutes <= 0){
+                    $importation_hour = $request->hour;
+                }else{
+                    return response()->json([
+                        'status'   => 200, 
+                        'response' => 'La importación no puede ejecutarse a las '.$request->hour.'. Por favor selecciona otra hora.'
+                    ]);
+                }
             }
 
             $importation = Importation_Demand::create([
                 'command' => 'command:update-information',
                 'name_db' => $request->name_db,
                 'area'    => $request->area,
-                'hour'    => $request->hour == null ? $importation_hour : $request->hour,
+                'hour'    => $importation_hour,
                 'date'    => $currentDate,
             ]);
             
@@ -61,11 +88,13 @@ class CommandController extends Controller
             $differenceInMinutes = Carbon::parse($importation->hour)->diffInMinutes(Carbon::now());
 
             // Se registra en la cola de procesos (jobs)
-            ImportationJob::dispatch($importation->id)->onQueue($importation->area)->delay(now()->addMinutes($differenceInMinutes));
+            ImportationJob::dispatch($importation->consecutive)
+                ->onQueue($importation->area)
+                ->delay(now()->addMinutes($differenceInMinutes));
 
             return response()->json([
                 'status'   => 200, 
-                'response' => 'Su importacion se ejecutara a las '.$importation->hour
+                'response' => 'Importación numero: '.$importation->consecutive.'  la cual se ejecutara a las '.$importation->hour
             ]);
         
         } catch (\Exception $e) {
@@ -96,7 +125,7 @@ class CommandController extends Controller
                 /* Si la cola de procesos está llena, la nueva solicitud queda programada para 
                 5 minutos después de la última solicitud registrada*/
                 if ($differenceInMinutes != 0) {
-                    $importation_hour = $lastHour->addMinutes(5)->toTimeString();
+                    $importation_hour = $lastHour->addMinutes(3)->toTimeString();
                 } else {
                     $importation_hour = Carbon::now()->addMinutes(2)->toTimeString();
                 }
