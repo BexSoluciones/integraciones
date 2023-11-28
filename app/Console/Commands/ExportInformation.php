@@ -48,6 +48,27 @@ class ExportInformation extends Command
             foreach ($availableModels as $modelClass => $tableName) {
                 $modelInstance = new $modelClass();
                 $datosAInsertar = $modelInstance::get();
+
+                if($tableName == 't19_bex_paises'){
+                    $insert = new Insert_fyel_Custom();
+                    $insert->InsertPaisCustom($conectionBex, $datosAInsertar, $modelInstance);
+                    $this->info('Tabla Paises Actualizada');
+                    //  dd('Termino el proceso de PAISES');
+                }
+
+                if($tableName == 't12_bex_dptos'){
+                    $insert = new Insert_fyel_Custom();
+                    $insert->InsertDptosCustom($conectionBex, $datosAInsertar, $modelInstance);
+                    $this->info('Tabla Departamentos Actualizada');
+                    //  dd('Termino el proceso de PAISES');
+                }
+                
+                if($tableName == 't18_bex_mpios'){
+                    $insert = new Insert_fyel_Custom();
+                    $insert->InsertMpiosCustom($conectionBex, $datosAInsertar, $modelInstance);
+                    $this->info('Tabla Municipios Actualizada');
+                    //  dd('Termino el proceso de PAISES');
+                }
                 
                 if($tableName == 't04_bex_cartera'){
                     $insert = new Insert_fyel_Custom();
