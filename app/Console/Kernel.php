@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use Carbon\Carbon;
+
 use App\Models\Tbl_Log;
 use App\Models\Command;
 use App\Models\Connection;
@@ -19,7 +21,8 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule): void {
         try {
-            $parameters = Command::getAll()->get();
+            $currentTime = Carbon::now();
+            $parameters  = Command::getAll()->get();
 
             foreach ($parameters as $parameter) {
                 // Ejecuta el comando
@@ -44,7 +47,7 @@ class Kernel extends ConsoleKernel
                     $importationInCurse = Importation_Demand::importationInCurse($parameter->name_db, $parameter->area);
                     if($importationInCurse){
                         Importation_Demand::updateOrInsert(
-                            ['id' => $this->importationId], ['state' => 3, 'updated_at' => $currentTime]
+                            ['id' => $importationInCurse->id], ['state' => 3, 'updated_at' => $currentTime]
                         );
                     }
                 })

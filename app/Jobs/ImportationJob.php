@@ -23,21 +23,21 @@ class ImportationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $importationId;
+    protected $consecutive;
 
-    public function __construct($importationId)
+    public function __construct($consecutive)
     {
-        $this->importationId = $importationId;
+        $this->consecutive = $consecutive;
     }
 
     public function handle(): void
     {
         $currentTime = Carbon::now();
-        $dataImport  = Importation_Demand::forId($this->importationId)->first();
+        $dataImport  = Importation_Demand::forConsecutive($this->consecutive)->first();
 
         if (!$dataImport) {
             Tbl_Log::create([
-                'descripcion' => 'ImportationJob => No existe el Id '.$this->importationId.' en la tabla importation_demand'
+                'descripcion' => 'ImportationJob => No existe el consecutivo '.$this->consecutive.' en la tabla importation_demand'
             ]);
         }
 
@@ -51,7 +51,7 @@ class ImportationJob implements ShouldQueue
 
                 // [Estado:2] => Significa que la importación esta en ejecución
                 Importation_Demand::updateOrInsert(
-                    ['id' => $this->importationId], ['state' => 2, 'updated_at' => $currentTime]
+                    ['consecutive' => $this->consecutive], ['state' => 2, 'updated_at' => $currentTime]
                 );
 
                 Artisan::call($dataImport->command, ['database' => $dataImport->name_db]);
@@ -79,7 +79,7 @@ class ImportationJob implements ShouldQueue
             }else{
                 // [Estado:2] => Significa que la importación esta en ejecución
                 Importation_Demand::updateOrInsert(
-                    ['id' => $this->importationId], ['state' => 2, 'updated_at' => $currentTime]
+                    ['consecutive' => $this->consecutive], ['state' => 2, 'updated_at' => $currentTime]
                 );
             }
         } catch (\Exception $e) {
@@ -88,7 +88,7 @@ class ImportationJob implements ShouldQueue
             ]);
             // [Estado:4] => Significa que ocurrio un error en la importación
             Importation_Demand::updateOrInsert(
-                ['id' => $this->importationId], ['state' => 4, 'updated_at' => $currentTime]
+                ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
             );
         }
     }
