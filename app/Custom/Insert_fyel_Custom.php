@@ -23,6 +23,168 @@ class Insert_fyel_Custom
     public function __construct()
     {
     }
+
+    public function InsertPaisCustom($conectionBex, $datosAInsertar, $modelInstance){
+        $countPais = DB::connection($conectionBex)->table('tblmpais')->get()->count();
+        if($countPais == 0){
+           $dataToInsert = [];
+           $dataToInsert[] = [
+               'CODPAIS' => '0',
+               'NOMPAIS' => 'COLOMBIA'
+           ];
+           DB::connection($conectionBex)->table('tblmpais')->insert($dataToInsert);
+        }
+        if($datosAInsertar->count() > 0){
+            if (Schema::connection($conectionBex)->hasTable('s1e_paises') == false) {
+                DB::connection($conectionBex)->statement('CREATE TABLE IF NOT EXISTS s1e_paises (
+                                                            codpais varchar(5),
+                                                            descripcion varchar(50)
+                                                                )');
+             }
+            DB::connection($conectionBex)->table('s1e_paises')->truncate();
+            foreach ($datosAInsertar as $dato) {
+                $dataToInsert[] = [
+                    'codpais'      => $dato->codpais,
+                    'descripcion'   => $dato->descripcion
+                ];
+            }
+            DB::connection($conectionBex)->table('s1e_paises')->insert($dataToInsert);
+            $InsertPais = DB::connection($conectionBex)->table('s1e_paises')
+                                ->leftJoin('tblmpais', 's1e_paises.codpais', '=', 'tblmpais.CODPAIS')
+                                ->select('s1e_paises.codpais', 's1e_paises.descripcion')
+                                ->whereNull('tblmpais.codpais')
+                                ->get();
+            if(!$InsertPais->isEmpty()){
+                $dataToInsert = [];
+                foreach($InsertPais as $dato){
+                    // dd($dato->conpag);
+                    $dataToInsert[] = [
+                            'CODPAIS' => $dato->codpais,
+                            'NOMPAIS' => $dato->descripcion
+                        ];
+                }
+                DB::connection($conectionBex)->table('tblmpais')->insert($dataToInsert);
+            }
+            DB::connection($conectionBex)->table('tblmpais')
+                                        ->join('s1e_paises','tblmpais.CODPAIS','=','s1e_paises.codpais')
+                                        ->update(['tblmpais.NOMPAIS' => DB::raw('s1e_paises.descripcion')]);
+        }else{
+            print '◘ No hay datos para insertar en la tabla tblmpais' . PHP_EOL;
+        }
+    }
+
+    public function InsertDptosCustom($conectionBex, $datosAInsertar, $modelInstance){
+        $countPais = DB::connection($conectionBex)->table('tblmdpto')->get()->count();
+        if($countPais == 0){
+           $dataToInsert = [];
+           $dataToInsert[] = [
+               'CODDPTO' => '0',
+               'NOMDPTO' => 'ANTIOQUIA',
+               'CODPAIS' => '0'
+           ];
+           DB::connection($conectionBex)->table('tblmdpto')->insert($dataToInsert);
+        }
+        if($datosAInsertar->count() > 0){
+            if (Schema::connection($conectionBex)->hasTable('s1e_dptos') == false) {
+                DB::connection($conectionBex)->statement('CREATE TABLE IF NOT EXISTS s1e_dptos (
+                                                            codpais varchar(5),
+                                                            coddpto varchar(5),
+                                                            descripcion varchar(50)
+                                                                )');
+             }
+            DB::connection($conectionBex)->table('s1e_dptos')->truncate();
+            foreach ($datosAInsertar as $dato) {
+                $dataToInsert[] = [
+                    'codpais'      => $dato->codpais,
+                    'coddpto'      => $dato->coddpto,
+                    'descripcion'   => $dato->descripcion
+                ];
+            }
+            DB::connection($conectionBex)->table('s1e_dptos')->insert($dataToInsert);
+            $InsertDptos = DB::connection($conectionBex)->table('s1e_dptos')
+                                ->leftJoin('tblmdpto', 's1e_dptos.coddpto', '=', 'tblmdpto.CODDPTO')
+                                ->select('s1e_dptos.coddpto', 's1e_dptos.descripcion','s1e_dptos.codpais')
+                                ->whereNull('tblmdpto.coddpto')
+                                ->get();
+            if(!$InsertDptos->isEmpty()){
+                $dataToInsert = [];
+                foreach($InsertDptos as $dato){
+                    // dd($dato->conpag);
+                    $dataToInsert[] = [
+                            'CODDPTO' => $dato->coddpto,
+                            'NOMDPTO' => $dato->descripcion,
+                            'CODPAIS' => $dato->codpais
+                        ];
+                }
+                DB::connection($conectionBex)->table('tblmdpto')->insert($dataToInsert);
+            }
+            DB::connection($conectionBex)->table('tblmdpto')
+                                    ->join('s1e_dptos','tblmdpto.CODDPTO','=','s1e_dptos.coddpto')
+                                    ->whereColumn('tblmdpto.CODPAIS','s1e_dptos.codpais')
+                                    ->update(['tblmdpto.NOMDPTO' => DB::raw('s1e_dptos.descripcion')]);
+        }else{
+            print '◘ No hay datos para insertar en la tabla tblmdpto' . PHP_EOL;
+        }
+    }
+    
+    public function InsertMpiosCustom($conectionBex, $datosAInsertar, $modelInstance){
+        $countMpios = DB::connection($conectionBex)->table('tblmmpio')->get()->count();
+        if($countMpios == 0){
+           $dataToInsert = [];
+           $dataToInsert[] = [
+               'CODDPTO' => '0',
+               'CODMPIO' => '0',
+               'NOMMPIO' => 'N.A.'
+           ];
+           DB::connection($conectionBex)->table('tblmmpio')->insert($dataToInsert);
+        }
+        if($datosAInsertar->count() > 0){
+            if (Schema::connection($conectionBex)->hasTable('s1e_mpios') == false) {
+                DB::connection($conectionBex)->statement('CREATE TABLE IF NOT EXISTS s1e_mpios (
+                                                            codpais varchar(5),
+                                                            coddpto varchar(5),
+                                                            codmpio varchar(5),
+                                                            descripcion varchar(50),
+                                                            indicador varchar(50)
+                                                                )');
+             }
+            DB::connection($conectionBex)->table('s1e_mpios')->truncate();
+            foreach ($datosAInsertar as $dato) {
+                $dataToInsert[] = [
+                    'codpais'     => $dato->codpais,
+                    'coddpto'     => $dato->coddpto,
+                    'codmpio'     => $dato->codmpio,
+                    'descripcion' => $dato->descripcion,
+                    'indicador'   => $dato->indicador
+                ];
+            }
+            DB::connection($conectionBex)->table('s1e_mpios')->insert($dataToInsert);
+            $InsertMpios = DB::connection($conectionBex)->table('s1e_mpios')
+                                ->leftJoin('tblmmpio', 's1e_mpios.coddpto', '=', 'tblmmpio.CODDPTO')
+                                ->select('s1e_mpios.codpais', 's1e_mpios.coddpto','s1e_mpios.codmpio','s1e_mpios.descripcion')
+                                ->whereNull('tblmmpio.codmpio')
+                                ->get();
+            if(!$InsertMpios->isEmpty()){
+                $dataToInsert = [];
+                foreach($InsertMpios as $dato){
+                    // dd($dato->conpag);
+                    $dataToInsert[] = [
+                            'CODDPTO' => $dato->coddpto,
+                            'CODMPIO' => $dato->coddpto.$dato->codmpio,
+                            'NOMMPIO' => $dato->descripcion
+                        ];
+                }
+                DB::connection($conectionBex)->table('tblmmpio')->insert($dataToInsert);
+            }
+            // DB::connection($conectionBex)->table('tblmmpio')
+            //                         ->join('s1e_mpios','tblmmpio.CODMPIO','=','CONCAT(s1e_mpios.coddpto,s1e_mpios.codmpio)')
+            //                         ->whereColumn('tblmmpio.CODDPTO','s1e_mpios.coddpto')
+            //                         ->update(['tblmmpio.NOMMPIO' => DB::raw('s1e_mpios.descripcion')]);
+        }else{
+            print '◘ No hay datos para insertar en la tabla tblmmpio' . PHP_EOL;
+        }
+    }
+
     public function InsertClientesCustom($conectionBex, $datosAInsertar, $modelInstance)
     {   
         $fechaActual = date('Ymd');
