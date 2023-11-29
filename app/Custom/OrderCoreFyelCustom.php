@@ -100,7 +100,7 @@ class OrderCoreFyelCustom
             //   Log::info('=========imprimiendo datos recibidos al job=====');
             //   Log::info($cadena);
             $namefile=$fechaActual.'.txt';
-            Storage::disk('public')->put('export/fyel/pedidos_txt/' . $namefile, $cadena);    
+            Storage::disk('public')->put('export/bex_0002/pedidos_txt/' . $namefile, $cadena);    
             
         } else {
             $error = 'El pedido no tiene productos asignados';

@@ -13,6 +13,8 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
 
 class CommandController extends Controller
 {
@@ -141,15 +143,28 @@ class CommandController extends Controller
 
     public function uploadOrder(Request $request){
         try{
-            set_time_limit(0);
             Artisan::call('command:upload-order', [
                 'database' => $request->alias_db,
                 'area' => $request->area,
                 'closing' => $request->closing,
             ]);
+            
+            $currentTime = Carbon::now()->format('Ymd');
             $output = Artisan::output();
+            $rutaArchivo = 'export/bex_0002/pedidos_txt/'.$currentTime.'.txt';
+            $rutaCompleta = storage_path('app/public/' . $rutaArchivo);
+            if (file_exists($rutaCompleta)) {
+                 // URL pública del archivo
+                $urlArchivo = Storage::url($rutaArchivo);
+                // Agregar el dominio a la URL
+                $urlCompleta = url($urlArchivo);
+            }else{
+                return response()->json(['status' => 200, 'response' => 'Ruta no encontrada']);
+            }
 
-            return response()->json(['status' => 200, 'response' => $output]);
+            if($output){
+                return response()->json(['status' => 200, 'response' => $urlCompleta]);
+            }
         } catch (\Exception $e) {
             //Log::error('Error uploadOrder: ' . $e->getMessage());
             return  'Error uploadOrder: ' . $e->getMessage();
