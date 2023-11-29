@@ -12,7 +12,7 @@ class FlatFileController extends Controller
 {
     public function download(Request $request){
         try{
-            $rutaArchivo = 'export/fyel/pedidos_txt/' . $request->numero.'.txt';
+            $rutaArchivo = 'export/bex_0002/pedidos_txt/' . $request->numero.'.txt';
             $rutaCompleta = storage_path('app/public/' . $rutaArchivo);
             if (file_exists($rutaCompleta)) {
                  // URL pública del archivo
