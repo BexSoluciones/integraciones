@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Tbl_Log;
 use App\Models\Ws_Config;
 
 use App\Traits\MigrateTrait;
@@ -20,48 +21,56 @@ class UpdateInformation extends Command {
     protected $description = "Extract, generate drawings, and store information in the tenant's database";
 
     public function handle() {
-        //name of the database where we are going to migrate
-        $db     = $this->argument('database'); 
-        $status = $this->input->hasArgument('status') ? $this->argument('status') : false;
+        try {
+            //name of the database where we are going to migrate
+            $db     = $this->argument('database'); 
+            $status = $this->input->hasArgument('status') ? $this->argument('status') : false;
 
-        //Function that configures the database (ConnetionTrait).
-        $configDB = $this->connectionDB($db); 
-        if($configDB == false){
-            return;
-        }
-    
-        //Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
-        if($status == 'new'){
-            $this->preMigration($db);
-            dd('Ya puedes ejecutar el comando: php artisan command:update-information '.$db);
-        }
-
-        //Function to extract data through WS (DataImportTrait).
-        $config = Ws_Config::getConnectionForId(1);
-
-        //Cuando el ws_config no tiene informacion es porque los planos se suben automaticamente sin necesidad de conexion
-        if ($config->ConecctionType == 'planos') {
-            $archivosPlanos = true;
-        } elseif($config->ConecctionType == 'ws') {
-            $archivosPlanos = $this->importData($db);
-        }
-    
-        //Function to configure and migrate tables (MigrateTrait).
-        if($archivosPlanos == true){
-            $this->preMigration($db);
-        }
-       
-        //Function to read and export flat file to tenant DB
-        $this->readFlatFile($db);
-
-        //Realizar copia de seguridad para tipo de conexion "planoa"
-        if ($config->ConecctionType == 'planos') {
-            //backup txt files
-            $backupFlatFile = $this->backupFlatFile($db, true);
-            if($backupFlatFile != true){
-                dd($info->error('Error copia de seguridad archivos panos'));
+            //Function that configures the database (ConnetionTrait).
+            $configDB = $this->connectionDB($db); 
+            if($configDB == false){
+                return;
             }
+        
+            //Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
+            if($status == 'new'){
+                $this->preMigration($db);
+                print '◘Ya puedes ejecutar el comando: php artisan command:update-information '.$db . PHP_EOL;
+                return;
+            }
+
+            //Function to extract data through WS (DataImportTrait).
+            $config = Ws_Config::getConnectionForId(1);
+
+            //Cuando el ws_config no tiene informacion es porque los planos se suben automaticamente sin necesidad de conexion
+            if ($config->ConecctionType == 'planos') {
+                $archivosPlanos = true;
+            } elseif($config->ConecctionType == 'ws') {
+                $archivosPlanos = $this->importData($db);
+            }
+        
+            //Function to configure and migrate tables (MigrateTrait).
+            if($archivosPlanos == true){
+                $this->preMigration($db);
+            }
+        
+            //Function to read and export flat file to tenant DB
+            $this->readFlatFile($db);
+
+            //Realizar copia de seguridad para tipo de conexion "planoa"
+            if ($config->ConecctionType == 'planos') {
+                //backup txt files
+                $backupFlatFile = $this->backupFlatFile($db, true);
+                if($backupFlatFile != true){
+                    print '▲ Error copia de seguridad archivos panos ' . PHP_EOL;
+                    return;
+                }
+            }
+            print '◘ La ejecucion "command:update-information '.$db.'" ha finalizado.';
+        } catch (\Exception $e) {
+            Tbl_Log::create([
+                'descripcion' => 'Commands::ExportInformation[handle()] => '.$e->getMessage()
+            ]);
         }
-        $this->info('◘ La ejecucion "command:update-information '.$db.'" ha finalizado.');
     }
 }

@@ -3,28 +3,26 @@
 namespace App\Custom;
 
 use App\Custom\WebServiceSiesa;
-use App\Models\Ws_Unoee_Config;
-use App\Models\DetallePedidoModel;
-use App\Models\BodegasTiposDocModel;
+use App\Models\Tbl_Log;
 use App\Models\ConexionesModel;
+//se App\Models\Ws_Unoee_Config;
+//use App\Models\DetallePedidoModel;
+//use App\Models\BodegasTiposDocModel;
 use App\Models\LogErrorImportacionModel;
 use App\Traits\ConnectionTrait;
-use Illuminate\Support\Facades\Storage;
+
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class OrderCoreCustom
 {
     use ConnectionTrait;
 
-    public function __construct()
-    {
-    }
-
     public function uploadOrder($order, $orderDetails,$cia)
     {
-        if (count($orderDetails) > 0) {
-
-           // {PENDIENTE VENDEDORES Y CLIENTES}
+        try{
+            if (count($orderDetails) > 0) {
+                // {PENDIENTE VENDEDORES Y CLIENTES}
                 $import = true;
                 $chain = "";
                 $chain .= str_pad(1, 7, "0", STR_PAD_LEFT) . "00000001".str_pad($cia['IdCia'],3,"0",STR_PAD_LEFT)."\n"; 
@@ -98,52 +96,48 @@ class OrderCoreCustom
 
                 foreach ($orderDetails as $orderDetail) {
                     //---Declarando variables
-                  
-
-                        //$vendedor=$this->obtenerVendedor($orderDetail['CODBODEGA'],$order['TIPODOC'],$order['CO']);
-
-                        $chain .= str_pad($counter, 7, "0", STR_PAD_LEFT); //Numero consecutivo
-                        $chain .= '0431'; //Tipo registro
-                        $chain .= '00'; //Subtipo registro
-                        $chain .= '02'; //Version del tipo de registro
-                        $chain .= str_pad($cia['IdCia'],3,"0",STR_PAD_LEFT); //compañia
-                        $chain .= $order['CO']; //Centro de operacion
-                        $chain .= $order['TIPODOC']; //Tipo de documento
-                        $chain .= str_pad($order['NUMVISITA'], 8, "0", STR_PAD_LEFT); //Consecutivo de documento
-                        $chain .= str_pad($counterDetailOrder, 10, "0", STR_PAD_LEFT); //Numero de registro --> hacer contador
-                        $chain .= str_pad($orderDetail['CODPRODUCTO'], 7, "0", STR_PAD_LEFT); //Item
-                        $chain .= str_pad('', 50, " ", STR_PAD_LEFT); //Referencia item
-                        $chain .= str_pad('', 20, " ", STR_PAD_LEFT); //Codigo de barras
-                        $chain .= str_pad('', 20, " ", STR_PAD_LEFT); //Extencion 1
-                        $chain .= str_pad('', 20, " ", STR_PAD_LEFT); //Extencion 2
-                        $chain .= $orderDetail['CODBODEGA']; //Bodega
-                        $chain .= '501'; //Concepto
-                        $chain .= '01'; //Motivo
-                        $chain .= '0'; //Indicador de obsequio
-                        $chain .= $order['CO']; //Centro de operacion movimiento
-                        $chain .= str_pad('01', 20, " ", STR_PAD_RIGHT); //Unidad de negocio movimiento
-                        $chain .= str_pad('', 15, " ", STR_PAD_LEFT); //Centro de costo movimiento
-                        $chain .= str_pad('', 15, " ", STR_PAD_LEFT); //Proyecto
-                        if($order['fechorentregacli'] >= $order['FECMOV']){
-                            $chain.=substr($order['fechorentregacli'],0,4).substr($order['fechorentregacli'],5,2).substr($order['fechorentregacli'],8,2); //Fecha de entrega del pedido
-                        }else{
-                            $chain.=substr($order['FECMOV'],0,4).substr($order['FECMOV'],5,2).substr($order['FECMOV'],8,2); //Fecha de entrega del pedido
-                        } 
-                        $chain .= '000'; //Nro. dias de entrega del documento
-                        $chain .= str_pad($order['CODPRECIO'], 3, " ", STR_PAD_RIGHT); //Lista de precio-->{FIJARSE QUE HAY QUE TRAERLA DE LA TABLA MOVENC}
-                        $chain .= str_pad(substr(trim($order['NOMUNIDADEMP']),0,4),4," ",STR_PAD_RIGHT); //Unidad de medida-->pendiente
-                        $chain .= str_pad(intval($orderDetail['CANTIDADMOV']), 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad base
-                        $chain .= str_pad('', 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad adicional
-                        $chain .= str_pad(intval($orderDetail['precio_unitario']), 15, "0", STR_PAD_LEFT) . '.0000'; //Precio unitario {PENDIENTE}
-                        $chain .= '0'; //Impuestos asumidos
-                        $chain .= str_pad('', 255, " ", STR_PAD_LEFT); //Notas
-                        $chain .= str_pad('', 2000, " ", STR_PAD_LEFT); //Descripcion
-                        $chain .= '5'; //Indicador backorder del movimiento
-                        $chain .= '1'; //Indicador de precio
-                        $chain .= "\n";
-                        $counter++;
-                        $counterDetailOrder++;
-                   
+                    //$vendedor=$this->obtenerVendedor($orderDetail['CODBODEGA'],$order['TIPODOC'],$order['CO']);
+                    $chain .= str_pad($counter, 7, "0", STR_PAD_LEFT); //Numero consecutivo
+                    $chain .= '0431'; //Tipo registro
+                    $chain .= '00'; //Subtipo registro
+                    $chain .= '02'; //Version del tipo de registro
+                    $chain .= str_pad($cia['IdCia'],3,"0",STR_PAD_LEFT); //compañia
+                    $chain .= $order['CO']; //Centro de operacion
+                    $chain .= $order['TIPODOC']; //Tipo de documento
+                    $chain .= str_pad($order['NUMVISITA'], 8, "0", STR_PAD_LEFT); //Consecutivo de documento
+                    $chain .= str_pad($counterDetailOrder, 10, "0", STR_PAD_LEFT); //Numero de registro --> hacer contador
+                    $chain .= str_pad($orderDetail['CODPRODUCTO'], 7, "0", STR_PAD_LEFT); //Item
+                    $chain .= str_pad('', 50, " ", STR_PAD_LEFT); //Referencia item
+                    $chain .= str_pad('', 20, " ", STR_PAD_LEFT); //Codigo de barras
+                    $chain .= str_pad('', 20, " ", STR_PAD_LEFT); //Extencion 1
+                    $chain .= str_pad('', 20, " ", STR_PAD_LEFT); //Extencion 2
+                    $chain .= $orderDetail['CODBODEGA']; //Bodega
+                    $chain .= '501'; //Concepto
+                    $chain .= '01'; //Motivo
+                    $chain .= '0'; //Indicador de obsequio
+                    $chain .= $order['CO']; //Centro de operacion movimiento
+                    $chain .= str_pad('01', 20, " ", STR_PAD_RIGHT); //Unidad de negocio movimiento
+                    $chain .= str_pad('', 15, " ", STR_PAD_LEFT); //Centro de costo movimiento
+                    $chain .= str_pad('', 15, " ", STR_PAD_LEFT); //Proyecto
+                    if($order['fechorentregacli'] >= $order['FECMOV']){
+                        $chain.=substr($order['fechorentregacli'],0,4).substr($order['fechorentregacli'],5,2).substr($order['fechorentregacli'],8,2); //Fecha de entrega del pedido
+                    }else{
+                        $chain.=substr($order['FECMOV'],0,4).substr($order['FECMOV'],5,2).substr($order['FECMOV'],8,2); //Fecha de entrega del pedido
+                    } 
+                    $chain .= '000'; //Nro. dias de entrega del documento
+                    $chain .= str_pad($order['CODPRECIO'], 3, " ", STR_PAD_RIGHT); //Lista de precio-->{FIJARSE QUE HAY QUE TRAERLA DE LA TABLA MOVENC}
+                    $chain .= str_pad(substr(trim($order['NOMUNIDADEMP']),0,4),4," ",STR_PAD_RIGHT); //Unidad de medida-->pendiente
+                    $chain .= str_pad(intval($orderDetail['CANTIDADMOV']), 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad base
+                    $chain .= str_pad('', 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad adicional
+                    $chain .= str_pad(intval($orderDetail['precio_unitario']), 15, "0", STR_PAD_LEFT) . '.0000'; //Precio unitario {PENDIENTE}
+                    $chain .= '0'; //Impuestos asumidos
+                    $chain .= str_pad('', 255, " ", STR_PAD_LEFT); //Notas
+                    $chain .= str_pad('', 2000, " ", STR_PAD_LEFT); //Descripcion
+                    $chain .= '5'; //Indicador backorder del movimiento
+                    $chain .= '1'; //Indicador de precio
+                    $chain .= "\n";
+                    $counter++;
+                    $counterDetailOrder++;
                 }
 
                 $chain .= str_pad($counter, 7, "0", STR_PAD_LEFT) . "99990001002";
@@ -156,10 +150,7 @@ class OrderCoreCustom
 
                 if (!$this->existePedidoSiesa($cia['IdCia'], $order['TIPODOC'], str_pad($order['NUMMOV'], 15, "Y", STR_PAD_LEFT)) && $import === true) {
                     // Log::info("ejecutando funcion ".__FUNCTION__." .Pedido = ".$order['NUMMOV']);
-
                     $resp = $this->getWebServiceSiesa(28)->importarXml($xmlOrder);
-
-
                     if (!is_array($resp) && empty($resp)) {
                         $error = 'Ok';
                         $estado = "2";
@@ -195,24 +186,24 @@ class OrderCoreCustom
                     $estado = "2";
                     $this->logErrorImportarPedido($error, $estado, $order['CO'], $orderDetail['CODBODEGA'], $order['TIPODOC'], $order['NUMMOV']);
                 }
-            
-        } else {
-            $error = 'El pedido no tiene productos asignados';
-            $estado = "3";
-            $this->logErrorImportarPedido($error, $estado, $order['CO'],  $order['TIPODOC'], $order['NUMMOV']);
+            } else {
+                $error = 'El pedido no tiene productos asignados';
+                $estado = "3";
+                $this->logErrorImportarPedido($error, $estado, $order['CO'],  $order['TIPODOC'], $order['NUMMOV']);
+            }
+        } catch (\Exception $e) {
+            Tbl_Log::create([
+                'descripcion' => 'Custom::OrderCoreCustom[uploadOrder()] => '.$e->getMessage()
+            ]);
+            return print '▲ Error en uploadOrder';
         }
     }
-
-
-
-
-
+    
     public function getWebServiceSiesa($idConexion)
     {
         return new WebServiceSiesa($idConexion);
     }
-
-
+    
     public function logErrorImportarPedido($mensaje, $estado, $centroOperacion, $tipoDocumento, $numeroPedido)
     {
         $objErrorImpPed = new LogErrorImportacionModel();
@@ -221,27 +212,36 @@ class OrderCoreCustom
 
     public function crearXmlPedido($lines, $idOrder)
     {
-        $datosConexionSiesa = $this->getConexionesModel()->getConexionXid(14);
-        $xmlOrder = "<?xml version='1.0' encoding='utf-8'?>
-        <Importar>
-        <NombreConexion>" . $datosConexionSiesa->siesa_conexion . "</NombreConexion>
-        <IdCia>" . $datosConexionSiesa->siesa_id_cia . "</IdCia>
-        <Usuario>" . $datosConexionSiesa->siesa_usuario . "</Usuario>
-        <Clave>" . $datosConexionSiesa->siesa_clave . "</Clave>
-        <Datos>\n";
-        $data = "";
-        foreach ($lines as $key => $line) {
-            $xmlOrder .= "        <Linea>" . $line . "</Linea>\n";
-            $data .= "        <Linea>" . $line . "</Linea>\n";
+        try{
+            $datosConexionSiesa = $this->getConexionesModel()->getConexionXid(14);
+            $xmlOrder = "<?xml version='1.0' encoding='utf-8'?>
+                <Importar>
+                    <NombreConexion>" . $datosConexionSiesa->siesa_conexion . "</NombreConexion>
+                    <IdCia>" . $datosConexionSiesa->siesa_id_cia . "</IdCia>
+                    <Usuario>" . $datosConexionSiesa->siesa_usuario . "</Usuario>
+                    <Clave>" . $datosConexionSiesa->siesa_clave . "</Clave>
+                    <Datos>\n";
+                        $data = "";
+                        foreach ($lines as $key => $line) {
+                            $xmlOrder .= "        <Linea>" . $line . "</Linea>\n";
+                            $data .= "        <Linea>" . $line . "</Linea>\n";
+                        }
+                        $xmlOrder .= "        
+                    </Datos>
+                </Importar>";
+
+            $namefile = str_pad($idOrder, 15, "Y", STR_PAD_LEFT) . '.xml';
+            Storage::disk('local')->put('pandapan/pedidos/' . $namefile, $xmlOrder);
+
+            return $data;
+        } catch (\Exception $e) {
+            Tbl_Log::create([
+                'descripcion' => 'Custom::OrderCoreCustom[crearXmlPedido()] => '.$e->getMessage()
+            ]);
+            return print '▲ Error en crearXmlPedido';
         }
-        $xmlOrder .= "        </Datos>
-        </Importar>";
-
-        $namefile = str_pad($idOrder, 15, "Y", STR_PAD_LEFT) . '.xml';
-        Storage::disk('local')->put('pandapan/pedidos/' . $namefile, $xmlOrder);
-
-        return $data;
     }
+
     public function getConexionesModel()
     {
         return new ConexionesModel();
@@ -249,17 +249,24 @@ class OrderCoreCustom
 
     public function existePedidoSiesa($idCia, $tipoDocumento, $numDoctoReferencia)
     {
-        $parametros = [
-            ['PARAMETRO1' => $idCia],
-            ['PARAMETRO2' => $tipoDocumento],
-            ['PARAMETRO3' => $numDoctoReferencia],
-        ];
-        $result = $this->getWebServiceSiesa(27)->ejecutarConsulta($parametros);
+        try{
+            $parametros = [
+                ['PARAMETRO1' => $idCia],
+                ['PARAMETRO2' => $tipoDocumento],
+                ['PARAMETRO3' => $numDoctoReferencia],
+            ];
+            $result = $this->getWebServiceSiesa(27)->ejecutarConsulta($parametros);
 
-        if (!empty($result)) {
-            return true;
-        } else {
-            return false;
+            if (!empty($result)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (\Exception $e) {
+            Tbl_Log::create([
+                'descripcion' => 'Custom::OrderCoreCustom[existePedidoSiesa()] => '.$e->getMessage()
+            ]);
+            return print '▲ Error en existePedidoSiesa';
         }
     }
 }

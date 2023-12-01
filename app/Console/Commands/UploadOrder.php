@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Traits\ConnectionTrait;
+use App\Models\Tbl_Log;
 use App\Traits\GetOrderTrait;
+use App\Traits\ConnectionTrait;
+
 use Illuminate\Console\Command;
 
 class UploadOrder extends Command
@@ -15,25 +17,29 @@ class UploadOrder extends Command
 
     public function handle()
     {
-        $db = $this->argument('database');
-        $area = $this->argument('area');
-        $closing = $this->argument('closing');
+        try {
+            $db      = $this->argument('database');
+            $area    = $this->argument('area');
+            $closing = $this->argument('closing');
 
-        $configDB = $this->connectionDB($db,$area); 
-        if($configDB == false){
-            return;
-        }
+            $configDB = $this->connectionDB($db,$area); 
+            if($configDB == false){
+                return;
+            }
 
-        $orders=$this->getOrderHeder($db,$area,$closing);
-        if($orders == true){
-            $this->info('◘ Proceso getOrderHeder finalizado');
-            return;
+            $orders = $this->getOrderHeder($db, $area, $closing);
+            if($orders == true){
+                return;
+            }
+        
+            if(!empty($orders)){
+                $orderDetails =$this->getOrderDetail($orders);
+                return 1;
+            }   
+        }catch (\Exception $e) {
+            Tbl_Log::create([
+                'descripcion' => 'Commands::UploadOrder[handle()] => '.$e->getMessage()
+            ]);
         }
-      
-        if(!empty($orders)){
-            $orderDetails =$this->getOrderDetail($orders);
-            $this->info('◘ Proceso getOrderDetail finalizado');
-            return;
-        }   
     }
 }
