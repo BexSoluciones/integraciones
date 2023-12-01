@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Tbl_Log;
 use App\Traits\ConnectionTrait;
-use App\Custom\Insert_fyel_Custom;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +28,21 @@ class ExportInformation extends Command
             if($configDB == false){
                 return;
             }
+
+            // Llamar un custom de manera dinamica
+            $custom = "App\\Custom\\Insert_{$tenantDB}_Custom";
+  
+            // Verificar si el custom existe
+            if (!class_exists($custom)) {
+                Tbl_Log::create([
+                    'descripcion' => 'Commands::ExportInformation[handle()] => No existe el custom '.$namespace
+                ]);
+                return print '◘ Se ha producido un error en la importación' . PHP_EOL;
+            }
+
+            // Instanciamos el custom
+            $customInstance = app()->make($custom);
+
             // $ano_act = date("Y", mktime(0, 0, 0, date("m")-25, date("d"), date("Y")));
             // $ano_act = date("Y", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
             
@@ -45,97 +60,45 @@ class ExportInformation extends Command
             }  
 
             $this->connectionDB($conectionBex, $area);
+
+            $customMethods = [
+                't04_bex_cartera'       => 'insertCarteraCustom',
+                't05_bex_clientes'      => 'insertClientesCustom',
+                't12_bex_dptos'         => 'insertDptosCustom',
+                't13_bex_estadopedidos' => 'insertEstadoPedidosCustom',
+                't16_bex_inventarios'   => 'insertInventarioCustom',
+                't18_bex_mpios'         => 'insertMpiosCustom',
+                't19_bex_paises'        => 'insertPaisCustom',
+                't25_bex_precios'       => 'insertPreciosCustom',
+                't29_bex_productos'     => 'insertProductsCustom',
+                't34_bex_ruteros'       => 'insertRuteroCustom',
+                't36_bex_vendedores'    => 'insertVendedoresCustom',
+                't37_bex_amovil'        => 'InsertAmovilCustom',
+            ];
+            
             foreach ($availableModels as $modelClass => $tableName) {
                 $modelInstance = new $modelClass();
                 $datosAInsertar = $modelInstance::get();
 
-                if($tableName == 't19_bex_paises'){
-                    $insert = new Insert_fyel_Custom();
-                    $insert->InsertPaisCustom($conectionBex, $datosAInsertar, $modelInstance);
-                    $this->info('Tabla Paises Actualizada');
-                    //  dd('Termino el proceso de PAISES');
-                }
-
-                if($tableName == 't12_bex_dptos'){
-                    $insert = new Insert_fyel_Custom();
-                    $insert->InsertDptosCustom($conectionBex, $datosAInsertar, $modelInstance);
-                    $this->info('Tabla Departamentos Actualizada');
-                    //  dd('Termino el proceso de PAISES');
-                }
-                
-                if($tableName == 't18_bex_mpios'){
-                    $insert = new Insert_fyel_Custom();
-                    $insert->InsertMpiosCustom($conectionBex, $datosAInsertar, $modelInstance);
-                    $this->info('Tabla Municipios Actualizada');
-                    //  dd('Termino el proceso de PAISES');
-                }
-                
-                if($tableName == 't04_bex_cartera'){
-                    $insert = new Insert_fyel_Custom();
-                    $insert->insertCarteraCustom($conectionBex, $datosAInsertar, $modelInstance);
-                    $this->info('Tabla Cartera Actualizada');
-                    // dd('Termino el proceso de clientes');
-                }
-                
-                if($tableName == 't05_bex_clientes'){
-                    $insert = new Insert_fyel_Custom();
-                    $insert->InsertClientesCustom($conectionBex, $datosAInsertar, $modelInstance);
-                    $this->info('Tabla Clientes Actualizada');
-                    // dd('Termino el proceso de clientes');
-                }
-                
-                if($tableName == 't13_bex_estadopedidos'){
-                    $insert = new Insert_fyel_Custom();
-                    $insert->insertEstadoPedidosCustom($conectionBex, $datosAInsertar, $modelInstance);
-                    $this->info('◘ Tabla Estados de los Pedidos Actualizada');
-                }
-                
                 if($tableName == 't16_bex_inventarios'){
                     $conectionSys = 'sys';
                     $this->connectionDB($conectionSys, $area);
-                    $insert = new Insert_fyel_Custom();
-                    $insert->insertInventarioCustom($conectionBex, $conectionSys, $modelInstance);
-                    $this->info('◘ Proceso inventario finalizado');
+                }else{
+                    $conectionSys = null;
                 }
-                
-                if($tableName == 't25_bex_precios'){
-                    $insert = new Insert_fyel_Custom();
-                    $insert->insertPreciosCustom($conectionBex,$datosAInsertar,$modelInstance);
-                    $this->info('◘ Proceso precios finalizado'); 
-                }
-                
-                if($tableName == 't29_bex_productos'){
-                    $insert = new Insert_fyel_Custom();
-                    $insert->insertProductsCustom($conectionBex, $datosAInsertar, $modelInstance);
-                    $this->info('◘ Proceso productos finalizado');
-                }
-                
-                if($tableName == 't34_bex_ruteros'){
-                    $conectionSys = 'sys';
-                    $this->connectionDB($conectionSys,$area);
-                    $insert = new Insert_fyel_Custom();
-                    $insert->insertRuteroCustom($conectionBex, $datosAInsertar, $modelInstance,$conectionSys);
-                    $this->info('Tabla Ruteros Actualizada');
-                    // dd('Termino el proceso de clientes');
-                } 
-
-                if($tableName == 't36_bex_vendedores'){
-                    $insert = new Insert_fyel_Custom();
-                    $insert->InsertVendedoresCustom($conectionBex, $datosAInsertar, $modelInstance);
-                    $this->info('Tabla Vendedores Actualizada');
-                    // dd('Termino el proceso de clientes');
-                }
-                
-                if($tableName == 't37_bex_amovil'){
-                    $insert = new Insert_fyel_Custom();
-                    $insert->InsertAmovilCustom($conectionBex, $datosAInsertar, $modelInstance);
-                    $this->info('Tabla amovil Actualizada');
-                    // dd('Termino el proceso');
+            
+                if (array_key_exists($tableName, $customMethods)) {
+                    $methodName = $customMethods[$tableName];
+                    $insert = new $custom();
+                    $insert->$methodName($conectionBex, $conectionSys, $datosAInsertar, $modelInstance, $tableName);
+                    print "◘ Proceso $methodName Finalizado" . PHP_EOL;
                 }
             }
-            $this->info('◘ Base de Datos '.$conectionBex.' actualizada');
+            print '◘ Información Base de Datos '.$tenantDB.' Exportada.' . PHP_EOL;
         } catch (\Exception $e) {
-            $this->error("Ha ocurrido un error: " . $e->getMessage());
+            Tbl_Log::create([
+                'descripcion' => 'Commands::ExportInformation[handle()] => '.$e->getMessage()
+            ]);
         }
     }
 }
