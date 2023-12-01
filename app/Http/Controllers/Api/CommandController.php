@@ -101,7 +101,7 @@ class CommandController extends Controller
         
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'CommandController[updateInformation()] => '.$e->getMessage()
+                'descripcion' => 'Controller::CommandController[updateInformation()] => '.$e->getMessage()
             ]);
             return response()->json([
                 'status'   => 500, 
@@ -116,7 +116,7 @@ class CommandController extends Controller
 
             if (empty($lastImportationDemand)) {
                 // Si no hay registros, programa la nueva solicitud para 2 minutos después de la hora actual
-                $importation_hour = Carbon::now()->addMinutes(2)->toTimeString();
+                $importation_hour = Carbon::now()->addMinutes(1)->toTimeString();
             } else {
                 $currentTime = Carbon::now();
                 $lastHour = Carbon::parse($lastImportationDemand->hour);
@@ -129,13 +129,13 @@ class CommandController extends Controller
                 if ($differenceInMinutes != 0) {
                     $importation_hour = $lastHour->addMinutes(3)->toTimeString();
                 } else {
-                    $importation_hour = Carbon::now()->addMinutes(2)->toTimeString();
+                    $importation_hour = Carbon::now()->addMinutes(1)->toTimeString();
                 }
             }
             return $importation_hour;
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'CommandController[calculateTime()] => ' . $e->getMessage(),
+                'descripcion' => 'Controller::CommandController[calculateTime()] => ' . $e->getMessage(),
             ]);
             return false;
         }
@@ -148,9 +148,9 @@ class CommandController extends Controller
                 'area' => $request->area,
                 'closing' => $request->closing,
             ]);
-            
-            $currentTime = Carbon::now()->format('Ymd');
+            /*
             $output = Artisan::output();
+            $currentTime = Carbon::now()->format('Ymd');
             $rutaArchivo = 'export/bex_0002/pedidos_txt/'.$currentTime.'.txt';
             $rutaCompleta = storage_path('app/public/' . $rutaArchivo);
             if (file_exists($rutaCompleta)) {
@@ -160,11 +160,8 @@ class CommandController extends Controller
                 $urlCompleta = url($urlArchivo);
             }else{
                 return response()->json(['status' => 200, 'response' => 'Ruta no encontrada']);
-            }
-
-            if($output){
-                return response()->json(['status' => 200, 'response' => $urlCompleta]);
-            }
+            }*/
+            return response()->json(['status' => 200, 'response' => 'Generando plano']);
         } catch (\Exception $e) {
             //Log::error('Error uploadOrder: ' . $e->getMessage());
             return  'Error uploadOrder: ' . $e->getMessage();
