@@ -34,7 +34,6 @@ trait ConnectionTrait {
         try {
             $connectionName = $area != null ? $dataConnection->alias : 'dynamic_connection';
 
-
             // Database configuration
             Config::set('database.connections.' . $connectionName,  [
                     'driver'    => 'mysql',
@@ -47,12 +46,6 @@ trait ConnectionTrait {
                     'prefix'    => '',
                 ],
             );
-
-            $connetion = Config::get('database.connections.dynamic_connection');
-
-            return $connetion;
-
-            DB::purge('mysql');
 
             return true;
         } catch (\Exception $e) {
