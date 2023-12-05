@@ -9,7 +9,7 @@ class Tbl_Log extends Model {
     
     use HasFactory;
 
-    protected $connection = 'tbl_log';
+    protected $table = 'tbl_log';
     // protected $table;
     // public function __construct(array $attributes = [])
     // {
