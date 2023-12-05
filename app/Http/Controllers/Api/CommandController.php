@@ -25,7 +25,8 @@ class CommandController extends Controller
 
             // Valida que no supere el numero de importaciónes permitidos por dia
             $NumberOfAttemptsPerDay = Importation_Demand::NumberOfAttemptsPerDay($request->name_db);
-            if($NumberOfAttemptsPerDay >= 3){
+
+            if($NumberOfAttemptsPerDay >= 10){
                 return response()->json([
                     'status'   => 500, 
                     'response' => 'Usted ya supero el limite de importaciones por dia.'
@@ -62,15 +63,17 @@ class CommandController extends Controller
             }else{
                 // Se mira si la importación se puede ejecutar a la hora que pidio el cliente
                 $importation_hour = $this->calculateTime();
+
+                
                 $hourUser = Carbon::parse($request->hour);
                 $lastHour = Carbon::parse($importation_hour);
 
                 // Calcula la diferencia en minutos
                 $differenceInMinutes = intval($hourUser->diffInMinutes($lastHour));
 
-                if($differenceInMinutes <= 0){
+                if($differenceInMinutes >= 0){
                     $importation_hour = $request->hour;
-                }else{
+                } else{
                     return response()->json([
                         'status'   => 200, 
                         'response' => 'La importación no puede ejecutarse a las '.$request->hour.'. Por favor selecciona otra hora.'
