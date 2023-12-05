@@ -34,6 +34,9 @@ class CommandController extends Controller
             }
 
             $configDB = $this->connectionDB($request->name_db);
+
+            return $configDB;
+            
             if($configDB == false){
                 return response()->json([
                     'status'   => 500, 

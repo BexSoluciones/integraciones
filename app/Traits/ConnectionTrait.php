@@ -48,6 +48,10 @@ trait ConnectionTrait {
                 ],
             );
 
+            $connetion = Config::get('database.connections.dynamic_connection');
+
+            return $connetion;
+
             DB::purge('mysql');
 
             return true;
