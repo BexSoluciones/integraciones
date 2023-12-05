@@ -46,6 +46,9 @@ trait ConnectionTrait {
                     'prefix'    => '',
                 ],
             ]);
+
+            DB::purge('mysql');
+            
             return true;
         } catch (\Exception $e) {
             Tbl_Log::create([
