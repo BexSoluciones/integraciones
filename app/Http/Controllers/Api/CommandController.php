@@ -35,75 +35,73 @@ class CommandController extends Controller
 
             $configDB = $this->connectionDB($request->name_db);
 
-            return $configDB;
+            if($configDB == false){
+                return response()->json([
+                    'status'   => 500, 
+                    'response' => 'Ocurrio un error en la configuración de BD.'
+                ]);
+            }
 
-            // if($configDB == false){
-            //     return response()->json([
-            //         'status'   => 500, 
-            //         'response' => 'Ocurrio un error en la configuración de BD.'
-            //     ]);
-            // }
+            $currentDate = Carbon::now()->toDateString();
+            if($request->hour == null){
+                // Primero revisa que una importación no se este ejecutando
+                $importation = Command::forNameBD($request->name_db, $request->area)->first();
+                if($importation->state == '2'){
+                    return response()->json([
+                        'status'   => 200, 
+                        'response' => 'Ya tienes una importación en curso.'
+                    ]);
+                }
 
-            // $currentDate = Carbon::now()->toDateString();
-            // if($request->hour == null){
-            //     // Primero revisa que una importación no se este ejecutando
-            //     $importation = Command::forNameBD($request->name_db, $request->area)->first();
-            //     if($importation->state == '2'){
-            //         return response()->json([
-            //             'status'   => 200, 
-            //             'response' => 'Ya tienes una importación en curso.'
-            //         ]);
-            //     }
-
-            //     // Calcula el tiempo en el cual se ejecutara una importacion
-            //     $importation_hour = $this->calculateTime();
-            //     if($importation_hour == false){
-            //         return response()->json([
-            //             'status'   => 500, 
-            //             'response' => 'Ocurrio un error con la petición.'
-            //         ]);
-            //     }
-            // }else{
-            //     // Se mira si la importación se puede ejecutar a la hora que pidio el cliente
-            //     $importation_hour = $this->calculateTime();
+                // Calcula el tiempo en el cual se ejecutara una importacion
+                $importation_hour = $this->calculateTime();
+                if($importation_hour == false){
+                    return response()->json([
+                        'status'   => 500, 
+                        'response' => 'Ocurrio un error con la petición.'
+                    ]);
+                }
+            }else{
+                // Se mira si la importación se puede ejecutar a la hora que pidio el cliente
+                $importation_hour = $this->calculateTime();
 
                 
-            //     $hourUser = Carbon::parse($request->hour);
-            //     $lastHour = Carbon::parse($importation_hour);
+                $hourUser = Carbon::parse($request->hour);
+                $lastHour = Carbon::parse($importation_hour);
 
-            //     // Calcula la diferencia en minutos
-            //     $differenceInMinutes = intval($hourUser->diffInMinutes($lastHour));
+                // Calcula la diferencia en minutos
+                $differenceInMinutes = intval($hourUser->diffInMinutes($lastHour));
 
-            //     if($differenceInMinutes >= 0){
-            //         $importation_hour = $request->hour;
-            //     } else{
-            //         return response()->json([
-            //             'status'   => 200, 
-            //             'response' => 'La importación no puede ejecutarse a las '.$request->hour.'. Por favor selecciona otra hora.'
-            //         ]);
-            //     }
-            // }
+                if($differenceInMinutes >= 0){
+                    $importation_hour = $request->hour;
+                } else{
+                    return response()->json([
+                        'status'   => 200, 
+                        'response' => 'La importación no puede ejecutarse a las '.$request->hour.'. Por favor selecciona otra hora.'
+                    ]);
+                }
+            }
 
-            // $importation = Importation_Demand::create([
-            //     'command' => 'command:update-information',
-            //     'name_db' => $request->name_db,
-            //     'area'    => $request->area,
-            //     'hour'    => $importation_hour,
-            //     'date'    => $currentDate,
-            // ]);
+            $importation = Importation_Demand::create([
+                'command' => 'command:update-information',
+                'name_db' => $request->name_db,
+                'area'    => $request->area,
+                'hour'    => $importation_hour,
+                'date'    => $currentDate,
+            ]);
             
-            // // Calcula la diferencia en minutos hasta la hora de importación
-            // $differenceInMinutes = Carbon::parse($importation->hour)->diffInMinutes(Carbon::now());
+            // Calcula la diferencia en minutos hasta la hora de importación
+            $differenceInMinutes = Carbon::parse($importation->hour)->diffInMinutes(Carbon::now());
 
-            // // Se registra en la cola de procesos (jobs)
-            // ImportationJob::dispatch($importation->consecutive)
-            //     ->onQueue($importation->area)
-            //     ->delay(now()->addMinutes($differenceInMinutes));
+            // Se registra en la cola de procesos (jobs)
+            ImportationJob::dispatch($importation->consecutive)
+                ->onQueue($importation->area)
+                ->delay(now()->addMinutes($differenceInMinutes));
 
-            // return response()->json([
-            //     'status'   => 200, 
-            //     'response' => 'Importación numero: '.$importation->consecutive.'  la cual se ejecutara a las '.$importation->hour
-            // ]);
+            return response()->json([
+                'status'   => 200, 
+                'response' => 'Importación numero: '.$importation->consecutive.'  la cual se ejecutara a las '.$importation->hour
+            ]);
         
         } catch (\Exception $e) {
             Tbl_Log::create([
