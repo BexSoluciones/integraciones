@@ -10,6 +10,7 @@ class Connection extends Model
     use HasFactory;
 
     protected $table = 'connections';
+    protected $connection = 'mysql';
     protected $fillable = [
         'name', 
         'host',
