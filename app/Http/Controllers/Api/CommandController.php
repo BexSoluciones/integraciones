@@ -45,6 +45,7 @@ class CommandController extends Controller
        
             // Valida que no supere el numero de importaciónes permitidos por dia
             $NumberOfAttemptsPerDay = Importation_Demand::NumberOfAttemptsPerDay($request->name_db);
+
             if($NumberOfAttemptsPerDay >= 20){
                 return response()->json([
                     'status'   => 500, 
@@ -53,13 +54,14 @@ class CommandController extends Controller
             }
        
             $configDB = $this->connectionDB($request->name_db);
+
             if($configDB == false){
                 return response()->json([
                     'status'   => 500, 
                     'response' => 'Ocurrio un error en la configuración de BD.'
                 ]);
             }
-
+          
             if ($request->date === '') {
                 $dateUser = Carbon::now()->toDateString();
             } else {

@@ -5,7 +5,7 @@ use Exception;
 use App\Models\Tbl_Log;
 use App\Models\Connection;
 use App\Models\Connection_Bexsoluciones;
-
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 
 trait ConnectionTrait {
@@ -37,8 +37,7 @@ trait ConnectionTrait {
         try {
             $connectionName = $area != null ? $dataConnection->name : 'dynamic_connection';
             // Database configuration
-            config([
-                'database.connections.' . $connectionName => [
+            Config::set('database.connections.' . $connectionName,  [
                     'driver'    => 'mysql',
                     'host'      => $dataConnection->host,
                     'database'  => $dataConnection->name,
@@ -48,7 +47,8 @@ trait ConnectionTrait {
                     'collation' => 'utf8mb4_unicode_ci',
                     'prefix'    => '',
                 ],
-            ]);
+            );
+
             return true;
         } catch (\Exception $e) {
             Tbl_Log::create([
