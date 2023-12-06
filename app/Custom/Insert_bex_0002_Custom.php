@@ -1003,20 +1003,20 @@ class Insert_bex_0002_Custom
             if ($inset > 0) {
                 // Trunca la tabla
                 DB::connection($conectionBex)->table('s1e_vendedores')->truncate();
-                print "◘ Tabla $table truncada" . PHP_EOL;
+                print "◘ Tabla s1e_vendedores truncada" . PHP_EOL;
 
-                $dataToInsert = array_map(function($dato) {
-                    return [
+                $dataToInsert = [];
+                foreach ($datosAInsertar as $dato) {
+                    $dataToInsert[] = [
                         'compania'      => $dato->compania,
                         'codvendedor'   => $dato->tercvendedor,
                         'centro_ope'    => $dato->centroop,
                         'tipodocpedido' => $dato->tipodoc,
                         'estado'        => 'A'
                     ];
-                }, $datosAInsertar);
+                }
 
-                // Inserta los datos
-                DB::connection($conectionBex)->table('s1e_vendedores')->insert($dataToInsert);
+                DB::connection($conectionBex)->table('s1e_vendedores')->insert($dataToInsert); 
                 print "◘ Datos insertados en la tabla s1e_vendedores" . PHP_EOL;   
                 
                 DB::connection($conectionBex)

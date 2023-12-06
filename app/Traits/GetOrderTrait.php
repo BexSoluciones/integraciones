@@ -18,7 +18,6 @@ trait GetOrderTrait {
     use ConnectionTrait;
 
     public function getOrderHeder($db, $area, $closing){
-
         try {
             if($db == 'platafor_pi055'){
                 $order = DB::connection($db)
