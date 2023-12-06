@@ -159,6 +159,15 @@ class CommandController extends Controller
 
     public function uploadOrder(Request $request){
         try{
+            // Validar que exista el area
+            $areas = ['bexmovil', 'bextms', 'bextramites', 'bexwms', 'ecomerce'];
+            if (!in_array($request->area, $areas)) {
+                return response()->json([
+                    'status'   => 200, 
+                    'response' => 'El area '.$request->area.' no existe'
+                ]);
+            }
+            
             Artisan::call('command:upload-order', [
                 'database' => $request->name_db,
                 'area' => $request->area,
