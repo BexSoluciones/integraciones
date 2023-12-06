@@ -53,7 +53,7 @@ class ImportationJob implements ShouldQueue
                 Importation_Demand::updateOrInsert(
                     ['consecutive' => $this->consecutive], ['state' => 2, 'updated_at' => $currentTime]
                 );
-
+                
                 Artisan::call($dataImport->command, ['database' => $dataImport->name_db]);
                 $commandOutput = Artisan::output();
                 
@@ -61,21 +61,19 @@ class ImportationJob implements ShouldQueue
                     $parameters = Command::forNameBD($dataImport->name_db, $dataImport->area)->first();
                     Artisan::call('command:export-information', [
                         'tenantDB' => $parameters->name_db,
-                        'alias' => $parameters->alias,
+                        'name' => $parameters->name,
                         'area' => $parameters->area
                     ]);
-                    $exportOutput = Artisan::output();
-
-                    if ($exportOutput) {
-                        // [Estado:3] => Significa que la importación finalizo
-                        Importation_Demand::updateOrInsert(
-                            ['id' => $this->importationId], ['state' => 3, 'updated_at' => $currentTime]
-                        );
-                    }
+                    //$exportOutput = Artisan::output();
+                    
+                    // [Estado:3] => Significa que la importación finalizo
+                    Importation_Demand::updateOrInsert(
+                        ['id' => $this->importationId], ['state' => 3, 'updated_at' => $currentTime]
+                    );
                 }
 
                 // Apenas termine vuelve a activar la importacion programada
-                $importation->updateOrInsert(['name_db' => $parameter->name_db], ['state' => '1']);
+                $importation->updateOrInsert(['name_db' => $parameters->name_db], ['state' => '1']);
             }else{
                 // [Estado:2] => Significa que la importación esta en ejecución
                 Importation_Demand::updateOrInsert(
@@ -84,7 +82,7 @@ class ImportationJob implements ShouldQueue
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'ImportationJob => '.$e->getMessage()
+                'descripcion' => 'Jobs::ImportationJob[handle()] => '.$e->getMessage()
             ]);
             // [Estado:4] => Significa que ocurrio un error en la importación
             Importation_Demand::updateOrInsert(

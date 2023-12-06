@@ -21,7 +21,8 @@ class Connection extends Model
         'updated_at'
     ];
 
-    public static function getAll(){
-        return static::all();
+    public function scopeGetAll($query){
+        return $query->select('name', 'host', 'username', 'password', 'alias', 'active', 'created_at', 
+            'updated_at');
     }
 }

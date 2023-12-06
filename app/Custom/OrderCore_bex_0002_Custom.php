@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 class OrderCore_bex_0002_Custom
 {
-    public function uploadOrder($orders, $cia)
+    public function uploadOrder($orders, $cia, $closing)
     {
         try{
             $fechaActual = date('Ymd');
@@ -93,7 +93,7 @@ class OrderCore_bex_0002_Custom
                     $dcto=0;
                 }
             
-                $namefile=$fechaActual.'.txt';
+                $namefile=$closing.'.txt';
                 Storage::disk('public')->put('export/bex_0002/pedidos_txt/' . $namefile, $cadena);    
             } else {
                 $error = 'El pedido no tiene productos asignados';

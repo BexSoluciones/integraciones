@@ -13,14 +13,14 @@ class ExportInformation extends Command
 {
     use ConnectionTrait;
 
-    protected $signature   = 'command:export-information {tenantDB} {alias} {area}';
+    protected $signature   = 'command:export-information {tenantDB} {name} {area}';
     protected $description = 'Export information to bex solutions databases';
 
     public function handle()
     {
         try {
             $tenantDB     = $this->argument('tenantDB'); 
-            $conectionBex = $this->argument('alias');
+            $conectionBex = $this->argument('name');
             $area         = $this->argument('area');
 
             //Function that configures the database (ConnetionTrait).
@@ -81,7 +81,7 @@ class ExportInformation extends Command
                 $datosAInsertar = $modelInstance::get();
 
                 if($tableName == 't16_bex_inventarios'){
-                    $conectionSys = 'sys';
+                    $conectionSys = 'platafor_sys';
                     $this->connectionDB($conectionSys, $area);
                 }else{
                     $conectionSys = null;
