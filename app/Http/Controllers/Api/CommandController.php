@@ -23,15 +23,24 @@ class CommandController extends Controller
 
     public function updateInformation(Request $request){
         try {
-            $validator = Validator::make($request->all(), [
+
+            $rules = [
                 'date' => 'nullable|date_format:Y-m-d',
-                'hour' => 'nullable|date_format:H:i'
-            ]);
-        
+                'hour' => 'nullable|date_format:H:i',
+            ];
+            
+            $messages = [
+                'date.date_format' => 'Formato :attribute incorrecto (yyyy-mm-dd).',
+                'hour.date_format' => 'Formato :attribute incorrecto (H:i).',
+            ];
+            
+            $validator = Validator::make($request->all(), $rules, $messages);
+            
             if ($validator->fails()) {
                 return response()->json([
-                    'error' => $validator->errors()->first(),
-                ], 422); 
+                    'status'   => 422, 
+                    'response' => $validator->errors()->first()
+                ]);
             }
 
             // Validar que exista el area
