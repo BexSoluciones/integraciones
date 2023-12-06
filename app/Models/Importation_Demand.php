@@ -11,6 +11,7 @@ class Importation_Demand extends Model
 {
     use HasFactory;
     protected $table = 'importation_demand';
+    protected $connection = 'mysql';
     protected $primaryKey = 'consecutive';
     protected $fillable = [
         'consecutive', 
@@ -23,12 +24,15 @@ class Importation_Demand extends Model
         'created_at',
         'updated_at'
     ];
-
-    public function scopeLast($query){
+   
+    public function scopeProcessAndRunning($query){
         $currentDate = Carbon::now()->toDateString();
-        return $query->where('date', $currentDate)
-            ->where('state', 1)
-            ->orderBy('hour', 'desc');
+        $currentHour = Carbon::now()->toTimeString();
+        //Restamos 30 minutos
+        $newHour = Carbon::parse($currentHour)->subMinutes(30)->toTimeString();
+        return $query->where('date', '>=', $currentDate)
+            ->where('hour', '>=',  $newHour)
+            ->whereIn('state', ['1','2']);
     }
 
     public function scopeForConsecutive($query, $consecutive){
@@ -39,7 +43,7 @@ class Importation_Demand extends Model
         return $query->select('id', 'state', 'updated_at')
             ->where('name_db', $name_db)
             ->where('area', $area)
-            ->where('estado', '2')
+            ->whereIn('estado', ['1', '2'])
             ->first();
     }
 

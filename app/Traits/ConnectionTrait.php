@@ -11,28 +11,31 @@ use Illuminate\Support\Facades\DB;
 trait ConnectionTrait {
     
     public function connectionDB($db, $area = null){
+        
         if($area != null){
-            $dataConnection = Connection_Bexsoluciones::getAll()->where('alias', $db)->first();
+            $dataConnection = Connection_Bexsoluciones::getAll()->where('name', $db)->first();
         }else{
             $dataConnection = Connection::getAll()->where('name', $db)->first(); //Verify that the database exists
         }
-
+        
         if (!$dataConnection) {
+            /*
             Tbl_Log::create([
                 'descripcion' => 'ConnectionTrait[connectionDB()] => La base de datos '.$db.' no existe en la tabla connections.'
-            ]);
+            ]);*/
             return false;
         }
-
+     
         if($dataConnection->active != 1){
+            /*
             Tbl_Log::create([
                 'descripcion' => 'ConnectionTrait[connectionDB()] => El cliente '.$db.' esta en estado inactivo.'
-            ]);
+            ]);*/
             return false; 
         }
-
+        
         try {
-            $connectionName = $area != null ? $dataConnection->alias : 'dynamic_connection';
+            $connectionName = $area != null ? $dataConnection->name : 'dynamic_connection';
             // Database configuration
             config([
                 'database.connections.' . $connectionName => [

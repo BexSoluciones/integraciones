@@ -38,7 +38,7 @@ class Kernel extends ConsoleKernel
                     // Llamar a otro comando si es necesario
                     Artisan::call('command:export-information', [
                         'tenantDB' => $parameter->name_db,
-                        'alias' => $parameter->alias,
+                        'name' => $parameter->name,
                         'area' => $parameter->area
                     ]);
                     //Si finaliza correctamente se cambio a state 1 para que pueda volver a ejecutarse

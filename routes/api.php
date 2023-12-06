@@ -25,6 +25,7 @@ Route::group(['prefix' => 'prueba','middleware' => ['auth:sanctum']], function()
 // Rutas para ejecutar comandos
 Route::group(['prefix' => 'commands'], function(){
     Route::post('/update/information', [CommandController::class, 'updateInformation']);
+    // Sube todos los pedidos
     Route::post('/upload/order', [CommandController::class, 'uploadOrder']);
 });
 
