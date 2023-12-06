@@ -3,7 +3,7 @@ namespace App\Traits;
 
 use Exception;
 
-use App\jobs\ProcessOrderUploadERP;
+use App\Jobs\ProcessOrderUploadERP;
 use App\Models\Tbl_Log;
 use App\Models\OrderDetail;
 use App\Models\OrderHeader;
