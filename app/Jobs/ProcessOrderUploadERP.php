@@ -20,11 +20,13 @@ class ProcessOrderUploadERP implements ShouldQueue
     protected $order;
     protected $orderDetail;
     protected $cia;
+    protected $closing;
 
-    public function __construct($order, $cia, $orderDetail = null)
+    public function __construct($order, $cia, $closing, $orderDetail = null)
     {
         $this->order= $order;
         $this->cia = $cia;
+        $this->closing = $closing;
         $this->orderDetail= $orderDetail;
     }
 
@@ -33,7 +35,7 @@ class ProcessOrderUploadERP implements ShouldQueue
         try{
             if($this->cia->bdlicencias == 'platafor_pi055'){
                 $objOrederCore = new OrderCore_bex_0002_Custom();
-                $objOrederCore->uploadOrder($this->order,$this->cia); 
+                $objOrederCore->uploadOrder($this->order,$this->cia, $this->closing); 
             }else{
                 $objOrederCore = new OrderCoreCustom();
                 $objOrederCore->uploadOrder($this->order, $this->orderDetail, $this->cia);    

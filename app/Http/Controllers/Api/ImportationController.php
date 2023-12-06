@@ -13,6 +13,13 @@ class ImportationController extends Controller
     public function consultState(Request $request){
         try{
             $importation = Importation_Demand::importationState($request->consecutive)->first();
+      
+            if(empty($importation)){
+                return response()->json([
+                    'status'   => 200,
+                    'response' => 'No existe la importacion '.$request->consecutive,
+                ]);
+            }
 
             $responseArray = [
                 '1' => 'La importación está en espera.',
@@ -26,6 +33,7 @@ class ImportationController extends Controller
             if (isset($responseArray[$stateAsString])) {
                 return response()->json([
                     'status'   => 200,
+                    'code' => $stateAsString,
                     'response' => $responseArray[$stateAsString],
                 ]);
             } else {

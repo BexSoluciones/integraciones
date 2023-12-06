@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class CommandController extends Controller
 {
@@ -22,17 +23,36 @@ class CommandController extends Controller
 
     public function updateInformation(Request $request){
         try {
+            $validator = Validator::make($request->all(), [
+                'date' => 'nullable|date_format:Y-m-d',
+                'hour' => 'nullable|date_format:H:i'
+            ]);
+        
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => $validator->errors()->first(),
+                ], 422); 
+            }
 
+            // Validar que exista el area
+            $areas = ['bexmovil', 'bextms', 'bextramites', 'bexwms', 'ecomerce'];
+            if (!in_array($request->area, $areas)) {
+                return response()->json([
+                    'status'   => 200, 
+                    'response' => 'El area '.$request->area.' no existe'
+                ]);
+            }
+       
             // Valida que no supere el numero de importaciónes permitidos por dia
             $NumberOfAttemptsPerDay = Importation_Demand::NumberOfAttemptsPerDay($request->name_db);
 
-            if($NumberOfAttemptsPerDay >= 10){
+            if($NumberOfAttemptsPerDay >= 20){
                 return response()->json([
                     'status'   => 500, 
                     'response' => 'Usted ya supero el limite de importaciones por dia.'
                 ]);
             }
-
+       
             $configDB = $this->connectionDB($request->name_db);
 
             if($configDB == false){
@@ -41,44 +61,60 @@ class CommandController extends Controller
                     'response' => 'Ocurrio un error en la configuración de BD.'
                 ]);
             }
+          
+            if ($request->date === '') {
+                $dateUser = Carbon::now()->toDateString();
+            } else {
+                $dateUser = Carbon::parse($request->date)->toDateString();
+            }
+    
+            if ($request->hour === null ) {
+                $hourUser = Carbon::now()->toTimeString();
+            } else {
+                $hourUser = Carbon::parse($request->hour)->toTimeString();
+            }
 
-            $currentDate = Carbon::now()->toDateString();
-            if($request->hour == null){
-                // Primero revisa que una importación no se este ejecutando
-                $importation = Command::forNameBD($request->name_db, $request->area)->first();
-                if($importation->state == '2'){
-                    return response()->json([
-                        'status'   => 200, 
-                        'response' => 'Ya tienes una importación en curso.'
-                    ]);
-                }
-
-                // Calcula el tiempo en el cual se ejecutara una importacion
-                $importation_hour = $this->calculateTime();
-                if($importation_hour == false){
-                    return response()->json([
-                        'status'   => 500, 
-                        'response' => 'Ocurrio un error con la petición.'
-                    ]);
-                }
-            }else{
-                // Se mira si la importación se puede ejecutar a la hora que pidio el cliente
-                $importation_hour = $this->calculateTime();
-
+            // Primero revisa que una importación no se este ejecutando
+            $importation = Command::forNameBD($request->name_db, $request->area)->first();
+            if($importation->state == '2'){
+                return response()->json([
+                    'status'   => 200, 
+                    'response' => 'Ya tienes una importación en curso.'
+                ]);
+            }
                 
-                $hourUser = Carbon::parse($request->hour);
-                $lastHour = Carbon::parse($importation_hour);
+            $currentHour = Carbon::now()->toTimeString();
+            $currentDate = Carbon::now()->toDateString();
+            
+            //Primero calcula la diferencia entre la hora actual y la que ingresa el usuario
+            if ($dateUser < $currentDate) {
+                return response()->json([
+                    'status'   => 200, 
+                    'response' => 'La importación no puede ejecutarse a las '.$request->hour.'. Por favor selecciona otra hora.'
+                ]);
+            }
 
-                // Calcula la diferencia en minutos
-                $differenceInMinutes = intval($hourUser->diffInMinutes($lastHour));
+            if ($hourUser < $currentHour && $dateUser == $currentDate) {
+                return response()->json([
+                    'status'   => 200, 
+                    'response' => 'La importación no puede ejecutarse a las '.$hourUser.'. Por favor selecciona otra hora.'
+                ]);
+            }
+                
+            $processAndRunning = Importation_Demand::processAndRunning()->get();
+    
+            if(isset($processAndRunning)){
+                foreach ($processAndRunning as $data) {
+                    $datetimeData = Carbon::parse($data->date.' '.$data->hour, 'UTC');
+                    $datetimeUser = Carbon::parse($dateUser.' '.$hourUser, 'UTC' );
 
-                if($differenceInMinutes >= 0){
-                    $importation_hour = $request->hour;
-                } else{
-                    return response()->json([
-                        'status'   => 200, 
-                        'response' => 'La importación no puede ejecutarse a las '.$request->hour.'. Por favor selecciona otra hora.'
-                    ]);
+                    $differenceInMinutes = $datetimeUser->diffInMinutes($datetimeData);
+                    if($differenceInMinutes <= 30){
+                        return response()->json([
+                            'status'   => 200, 
+                            'response' => 'La importación no puede ejecutarse a las '.$hourUser.'. Por favor selecciona otra hora.'
+                        ]);
+                    }
                 }
             }
 
@@ -86,20 +122,18 @@ class CommandController extends Controller
                 'command' => 'command:update-information',
                 'name_db' => $request->name_db,
                 'area'    => $request->area,
-                'hour'    => $importation_hour,
-                'date'    => $currentDate,
+                'hour'    => $hourUser,
+                'date'    => $dateUser,
             ]);
             
-            // Calcula la diferencia en minutos hasta la hora de importación
-            $differenceInMinutes = Carbon::parse($importation->hour)->diffInMinutes(Carbon::now());
-
             // Se registra en la cola de procesos (jobs)
-            ImportationJob::dispatch($importation->consecutive)
-                ->onQueue($importation->area)
-                ->delay(now()->addMinutes($differenceInMinutes));
+            $currentTimeDate = Carbon::now();
+            $delayInSeconds = $currentTimeDate->diffInSeconds($dateUser.' '.$hourUser, 'UTC');
+            ImportationJob::dispatch($importation->consecutive)->onQueue($importation->area)->delay($delayInSeconds);
 
             return response()->json([
                 'status'   => 200, 
+                'code' => $importation->consecutive,
                 'response' => 'Importación numero: '.$importation->consecutive.'  la cual se ejecutara a las '.$importation->hour
             ]);
         
@@ -109,53 +143,22 @@ class CommandController extends Controller
             ]);
             return response()->json([
                 'status'   => 500, 
-                'response' => 'Ocurrio un error con la petición.'
+                'response' => 'Ocurrio un error con la petición.  '.$e->getMessage()
             ]);
-        }
-    }
-
-    private function calculateTime(){
-        try {
-            $lastImportationDemand = Importation_Demand::last()->first();
-
-            if (empty($lastImportationDemand)) {
-                // Si no hay registros, programa la nueva solicitud para 2 minutos después de la hora actual
-                $importation_hour = Carbon::now()->addMinutes(1)->toTimeString();
-            } else {
-                $currentTime = Carbon::now();
-                $lastHour = Carbon::parse($lastImportationDemand->hour);
-
-                // Calcula la diferencia en minutos
-                $differenceInMinutes = intval($currentTime->diffInMinutes($lastHour));
-
-                /* Si la cola de procesos está llena, la nueva solicitud queda programada para 
-                5 minutos después de la última solicitud registrada*/
-                if ($differenceInMinutes != 0) {
-                    $importation_hour = $lastHour->addMinutes(3)->toTimeString();
-                } else {
-                    $importation_hour = Carbon::now()->addMinutes(1)->toTimeString();
-                }
-            }
-            return $importation_hour;
-        } catch (\Exception $e) {
-            Tbl_Log::create([
-                'descripcion' => 'Controller::CommandController[calculateTime()] => ' . $e->getMessage(),
-            ]);
-            return false;
         }
     }
 
     public function uploadOrder(Request $request){
         try{
             Artisan::call('command:upload-order', [
-                'database' => $request->alias_db,
+                'database' => $request->name_db,
                 'area' => $request->area,
                 'closing' => $request->closing,
             ]);
-            /*
+            
             $output = Artisan::output();
-            $currentTime = Carbon::now()->format('Ymd');
-            $rutaArchivo = 'export/bex_0002/pedidos_txt/'.$currentTime.'.txt';
+            sleep(5);
+            $rutaArchivo = 'export/bex_0002/pedidos_txt/'.$request->closing.'.txt';
             $rutaCompleta = storage_path('app/public/' . $rutaArchivo);
             if (file_exists($rutaCompleta)) {
                  // URL pública del archivo
@@ -164,8 +167,8 @@ class CommandController extends Controller
                 $urlCompleta = url($urlArchivo);
             }else{
                 return response()->json(['status' => 200, 'response' => 'Ruta no encontrada']);
-            }*/
-            return response()->json(['status' => 200, 'response' => 'Generando plano']);
+            }
+            return response()->json(['status' => 200, 'response' => $urlCompleta]);
         } catch (\Exception $e) {
             //Log::error('Error uploadOrder: ' . $e->getMessage());
             return  'Error uploadOrder: ' . $e->getMessage();

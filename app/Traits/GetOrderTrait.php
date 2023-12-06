@@ -10,6 +10,7 @@ use App\Models\OrderHeader;
 use App\Models\Ws_Unoee_Config;
 use App\Traits\ConnectionTrait;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,8 +18,9 @@ trait GetOrderTrait {
     use ConnectionTrait;
 
     public function getOrderHeder($db, $area, $closing){
+
         try {
-            if($db == 'fyel'){
+            if($db == 'platafor_pi055'){
                 $order = DB::connection($db)
                     ->table('tbldmovenc')
                     ->join('tbldmovdet','tbldmovenc.nummov','=','tbldmovdet.nummov')
@@ -37,15 +39,14 @@ trait GetOrderTrait {
                     ->get();
 
                 // $cia = json_decode(json_encode(Ws_Unoee_Config::getConnectionId(1)),true);
-                $conectionSys = 'sys';
+                $conectionSys = 'platafor_sys';
                 $this->connectionDB($conectionSys, $area);
-
                 $cia = DB::connection($conectionSys)
                             ->table('tblslicencias')
                             ->where('bdlicencias','platafor_pi055')
                             ->first();
 
-                ProcessOrderUploadERP::dispatch($order, $cia);
+                ProcessOrderUploadERP::dispatch($order, $cia, $closing)->onQueue('pedidos');
             }else{
                 return json_decode(json_encode(
                     OrderHeader::where('estadoenviows', '0')
@@ -75,7 +76,7 @@ trait GetOrderTrait {
                 ), true);
 
                 $cia = json_decode(json_encode(Ws_Unoee_Config::getConnectionId(1)), true);
-                ProcessOrderUploadERP::dispatch($order,$orderDetail,$cia);
+                ProcessOrderUploadERP::dispatch($order,$orderDetail,$cia)->onQueue('orders');
             }
         }catch (\Exception $e) {
             Tbl_Log::create([
