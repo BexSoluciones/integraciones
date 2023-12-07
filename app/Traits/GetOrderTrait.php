@@ -37,7 +37,10 @@ trait GetOrderTrait {
                                 tbldmovenc.codvendedor,fecmov,tbldmovdet.codproducto,tbldmovdet.codbodega,cantidadmov,tbldmovenc.codprecio,
                                 preciomov,dcto1mov,dcto2mov,dcto3mov,dcto4mov,pluproducto,nomunidademp,mensajemov,dctopiefacaut,dctonc')
                     ->get();
-
+            
+                if($order == null){
+                    return false;
+                }
                 // $cia = json_decode(json_encode(Ws_Unoee_Config::getConnectionId(1)),true);
                 $conectionSys = 'platafor_sys';
                 $this->connectionDB($conectionSys, $area);

@@ -23,6 +23,27 @@ class CommandController extends Controller
 
     public function updateInformation(Request $request){
         try {
+
+            $count= count($request->all());
+            if($count == 4){
+
+                $keys = ['name_db', 'area', 'date', 'hour'];
+                foreach($request->all() as $key=>$value){
+                    // return $key;
+                    if (!in_array($key, $keys)) {
+                        return response()->json([
+                            'status'   => 422, 
+                            'response' => 'El atributo '.$key.' es incorrecto'
+                        ]);
+                    }
+                }
+            }else{
+                return response()->json([
+                    'status'   => 422, 
+                    'response' =>'El numero de atributos no son correctos'
+                ]);
+            }
+      
             $validator = Validator::make($request->all(), [
                 'date' => 'nullable|date_format:Y-m-d',
                 'hour' => 'nullable|date_format:H:i'
@@ -42,7 +63,7 @@ class CommandController extends Controller
                     'response' => 'El area '.$request->area.' no existe'
                 ]);
             }
-       
+            
             // Valida que no supere el numero de importaciónes permitidos por dia
             $NumberOfAttemptsPerDay = Importation_Demand::NumberOfAttemptsPerDay($request->name_db);
             if($NumberOfAttemptsPerDay >= 20){
@@ -59,7 +80,7 @@ class CommandController extends Controller
                     'response' => 'Ocurrio un error en la configuración de BD.'
                 ]);
             }
-
+          
             if ($request->date === '') {
                 $dateUser = Carbon::now()->toDateString();
             } else {
@@ -163,8 +184,11 @@ class CommandController extends Controller
                 $urlArchivo = Storage::url($rutaArchivo);
                 // Agregar el dominio a la URL
                 $urlCompleta = url($urlArchivo);
+            }elseif($output == false){
+                return response()->json(['status' => 401, 'response' => 'Los pedidos o el pedido con el cierre: '.$request->closing.' no existe']);
             }else{
                 return response()->json(['status' => 200, 'response' => 'Ruta no encontrada']);
+
             }
             return response()->json(['status' => 200, 'response' => $urlCompleta]);
         } catch (\Exception $e) {
