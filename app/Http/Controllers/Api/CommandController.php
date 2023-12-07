@@ -76,7 +76,7 @@ class CommandController extends Controller
                     'response' => 'El area '.$request->area.' no existe'
                 ]);
             }
-       
+            
             // Valida que no supere el numero de importaciónes permitidos por dia
             $NumberOfAttemptsPerDay = Importation_Demand::NumberOfAttemptsPerDay($request->name_db);
 
@@ -208,8 +208,10 @@ class CommandController extends Controller
                 $urlArchivo = Storage::url($rutaArchivo);
                 // Agregar el dominio a la URL
                 $urlCompleta = url($urlArchivo);
+            }elseif($output == false){
+                return response()->json(['status' => 401, 'response' => 'Los pedidos o el pedido con el cierre: '.$request->closing.' no existe']);
             }else{
-                return response()->json(['status' => 401, 'response' => 'El cierre '.$request->closing.' no exise']);
+                return response()->json(['status' => 200, 'response' => 'Ruta no encontrada']);
             }
             return response()->json(['status' => 200, 'response' => $urlCompleta]);
         } catch (\Exception $e) {
