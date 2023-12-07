@@ -21,6 +21,8 @@ trait ConnectionTrait {
                 $dataConnection = Connection_Bexsoluciones::getAll()->where('id', $db->id)->first();
             }
         }
+
+
         
         if (!$dataConnection) {
             Tbl_Log::create([
