@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -184,6 +185,32 @@ class CommandController extends Controller
 
     public function uploadOrder(Request $request){
         try{
+
+            $rules = [
+                'name_db' => 'required|string',
+            ];
+            
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status'   => 422, 
+                    'response' => $validator->errors()->first()
+                ]);
+            }
+
+            $connection = DB::table('connections')->where('connections.name', $request->name_db)
+            ->join('connection_bexsoluciones', 'connections.id', 'connection_bexsoluciones.connection_id')
+            ->select('connection_bexsoluciones.*')
+            ->first();
+
+            if(!$connection) {
+                return response()->json([
+                    'status'   => 404, 
+                    'response' => 'La base de datos '. $request->name_db . 'no existe'
+                ]);
+            }
+
             // Validar que exista el area
             $areas = ['bexmovil', 'bextms', 'bextramites', 'bexwms', 'ecomerce'];
             if (!in_array($request->area, $areas)) {
@@ -193,27 +220,30 @@ class CommandController extends Controller
                 ]);
             }
 
-            Artisan::call('command:upload-order', [
-                'database' => $request->name_db,
+            $output = Artisan::call('command:upload-order', [
+                'database' => $connection,
                 'area' => $request->area,
                 'closing' => $request->closing,
             ]);
             
-            $output = Artisan::output();
-            sleep(4);
-            $rutaArchivo = 'export/'.$request->name_db.'/'.$request->area.'/pedidos_txt/'.$request->closing.'.txt';
-            $rutaCompleta = storage_path('app/public/' . $rutaArchivo);
-            if (file_exists($rutaCompleta)) {
-                 // URL pública del archivo
-                $urlArchivo = Storage::url($rutaArchivo);
-                // Agregar el dominio a la URL
-                $urlCompleta = url($urlArchivo);
-            }elseif($output == false){
-                return response()->json(['status' => 401, 'response' => 'Los pedidos o el pedido con el cierre: '.$request->closing.' no existe']);
-            }else{
-                return response()->json(['status' => 200, 'response' => 'Ruta no encontrada']);
+            if($output == 1){
+                $rutaArchivo = 'export/'.$request->name_db.'/'.$request->area.'/pedidos_txt/'.$request->closing.'.txt';
+                $rutaCompleta = storage_path('app/public/' . $rutaArchivo);
+                if (file_exists($rutaCompleta)) {
+                     // URL pública del archivo
+                    $urlArchivo = Storage::url($rutaArchivo);
+                    // Agregar el dominio a la URL
+                    $urlCompleta = url($urlArchivo);
+                    return response()->json(['status' => 200, 'response' => $urlCompleta]);
+                }else{
+                    return response()->json(['status' => 401, 'response' => 'El cierre '.$request->closing.' no exise']);
+                }
+            } else {
+                return response()->json(['status' => 401, 'response' => 'El cierre '.$request->closing.' no exise']);
             }
-            return response()->json(['status' => 200, 'response' => $urlCompleta]);
+
+
+            
         } catch (\Exception $e) {
             //Log::error('Error uploadOrder: ' . $e->getMessage());
             return  'Error uploadOrder: ' . $e->getMessage();
