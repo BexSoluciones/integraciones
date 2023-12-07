@@ -23,18 +23,18 @@ Route::group(['prefix' => 'prueba','middleware' => ['auth:sanctum']], function()
 });
 
 // Rutas para ejecutar comandos
-Route::group(['prefix' => 'commands'], function(){
+Route::group(['prefix' => 'commands', 'middleware' => ['auth:sanctum']], function(){
     Route::post('/update/information', [CommandController::class, 'updateInformation']);
     // Sube todos los pedidos
     Route::post('/upload/order', [CommandController::class, 'uploadOrder']);
 });
 
 // Rutas para consultar el estado de las importaciones
-Route::group(['prefix' => 'importation'], function(){
+Route::group(['prefix' => 'importation', 'middleware' => ['auth:sanctum']], function(){
     Route::post('/consult/state', [ImportationController::class, 'consultState']);
 });
 
 // Rutas para descargar archivos planos de pedidos
-Route::group(['prefix' => 'flatfile'], function(){
+Route::group(['prefix' => 'flatfile', 'middleware' => ['auth:sanctum']], function(){
     Route::post('/download/pedido', [FlatFileController::class, 'download']);
 });
