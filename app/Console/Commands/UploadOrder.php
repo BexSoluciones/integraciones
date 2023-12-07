@@ -16,27 +16,31 @@ class UploadOrder extends Command
     protected $signature = 'command:upload-order {database} {area} {closing}';
     protected $description = 'Command upload order to ERP';
 
-    public function handle()
+    public function handle() : int
     {
         try {
             $db      = $this->argument('database');
             $area    = $this->argument('area');
             $closing = $this->argument('closing');
 
-            $x = $configDB = $this->connectionDB($db,$area); 
+            $configDB = $this->connectionDB($db, $area); 
+
             if($configDB == false){
-                return;
+                return 0;
             }
         
             $orders = $this->getOrderHeder($db, $area, $closing);
+            
             if($orders == true){
-                return;
+                return 0;
             }
             
             if(!empty($orders)){
                 $orderDetails = $this->getOrderDetail($orders);
-                return;
+                return 0;
             }   
+
+            return 1;
         }catch (\Exception $e) {
             Tbl_Log::create([
                 'descripcion' => 'Commands::UploadOrder[handle()] => '.$e->getMessage()

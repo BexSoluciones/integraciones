@@ -17,7 +17,9 @@ class Tbl_Log extends Model {
         $this->table = ($this->connection === 'mysql') ? 'tbl_log' : 't10_tbl_log';
     }
     protected $fillable = [
-        'codigo', 
+        'codigo',
+        'id_table',
+        'name_table', 
         'descripcion',
         'created_at',
         'updated_at'

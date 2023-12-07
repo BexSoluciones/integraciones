@@ -19,8 +19,8 @@ trait GetOrderTrait {
 
     public function getOrderHeder($db, $area, $closing){
         try {
-            if($db == 'platafor_pi055'){
-                $order = DB::connection($db)
+            if($db){
+                $order = DB::connection('dynamic_connection')
                     ->table('tbldmovenc')
                     ->join('tbldmovdet','tbldmovenc.nummov','=','tbldmovdet.nummov')
                     ->join('tblmproducto','tbldmovdet.codproducto','=','tblmproducto.codproducto')
@@ -37,25 +37,27 @@ trait GetOrderTrait {
                                 preciomov,dcto1mov,dcto2mov,dcto3mov,dcto4mov,pluproducto,nomunidademp,mensajemov,dctopiefacaut,dctonc')
                     ->get();
 
-                // $cia = json_decode(json_encode(Ws_Unoee_Config::getConnectionId(1)),true);
-                $conectionSys = 'platafor_sys';
-                $this->connectionDB($conectionSys, $area);
-                $cia = DB::connection($conectionSys)
+                $cia = DB::connection('platafor_sys')
                             ->table('tblslicencias')
-                            ->where('bdlicencias','platafor_pi055')
+                            ->where('bdlicencias', $db->name)
                             ->first();
 
                 ProcessOrderUploadERP::dispatch($order, $cia, $closing)->onQueue('pedidos');
-            }else{
-                return json_decode(json_encode(
-                    OrderHeader::where('estadoenviows', '0')
-                        ->where('CODTIPODOC', '4')
-                        ->where('NUMCIERRE', $closing)
-                        ->where('AUTORIZACION', '1')
-                        ->get()
-                ),true);
+
+                return true;
+            } else {
+
+                return false;
+
+                // return json_decode(json_encode(
+                //     OrderHeader::where('estadoenviows', '0')
+                //         ->where('CODTIPODOC', '4')
+                //         ->where('NUMCIERRE', $closing)
+                //         ->where('AUTORIZACION', '1')
+                //         ->get()
+                // ), true);
             }
-            return true;
+            
         }catch (\Exception $e) {
             Tbl_Log::create([
                 'descripcion' => 'Trait::GetOrderTrait[getOrderHeder()] => '.$e->getMessage()
