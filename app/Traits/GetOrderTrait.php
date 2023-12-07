@@ -3,7 +3,7 @@ namespace App\Traits;
 
 use Exception;
 
-use App\jobs\ProcessOrderUploadERP;
+use App\Jobs\ProcessOrderUploadERP;
 use App\Models\Tbl_Log;
 use App\Models\OrderDetail;
 use App\Models\OrderHeader;
@@ -18,7 +18,6 @@ trait GetOrderTrait {
     use ConnectionTrait;
 
     public function getOrderHeder($db, $area, $closing){
-
         try {
             if($db == 'platafor_pi055'){
                 $order = DB::connection($db)

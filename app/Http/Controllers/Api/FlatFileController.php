@@ -12,7 +12,7 @@ class FlatFileController extends Controller
 {
     public function download(Request $request){
         try{
-            $rutaArchivo = 'export/bex_0002/pedidos_txt/' . $request->numero.'.txt';
+            $rutaArchivo = 'export/'.$request->name_db.'/'.$request->area.'/pedidos_txt/' . $request->closing.'.txt';
             $rutaCompleta = storage_path('app/public/' . $rutaArchivo);
             if (file_exists($rutaCompleta)) {
                  // URL pública del archivo
@@ -21,7 +21,7 @@ class FlatFileController extends Controller
                 $urlCompleta = url($urlArchivo);
                 return response()->json(['status' => 200, 'response' => $urlCompleta]);
             } else {
-                return response()->json(['status' => 200, 'response' => 'No se encontro archivo '.$request->numero.'.txt']);
+                return response()->json(['status' => 401, 'response' => 'No se encontro cierre '.$request->closing.'.txt']);
             }
         } catch (\Exception $e) {
             Log::error('Error uploadOrder: ' . $e->getMessage());

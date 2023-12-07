@@ -10,6 +10,7 @@ class ConnectionBS extends Model
     use HasFactory;
 
     protected $table = 'connection_bexsoluciones';
+    protected $connection = 'mysql';
     protected $fillable = [
         'name', 
         'host',

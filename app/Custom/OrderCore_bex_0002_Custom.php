@@ -94,7 +94,7 @@ class OrderCore_bex_0002_Custom
                 }
             
                 $namefile=$closing.'.txt';
-                Storage::disk('public')->put('export/bex_0002/pedidos_txt/' . $namefile, $cadena);    
+                Storage::disk('public')->put('export/bex_0002/bexmovil/pedidos_txt/' . $namefile, $cadena);    
             } else {
                 $error = 'El pedido no tiene productos asignados';
                 $estado = "3";

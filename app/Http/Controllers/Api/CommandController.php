@@ -43,16 +43,29 @@ class CommandController extends Controller
                     'response' =>'El numero de atributos no son correctos'
                 ]);
             }
-      
-            $validator = Validator::make($request->all(), [
+
+            foreach ($request->all() as $key => $value) {
+                // Aquí puedes trabajar con la clave y el valor
+                return "Clave: $key, Valor: $value";
+            }
+            return 1;
+            $rules = [
                 'date' => 'nullable|date_format:Y-m-d',
-                'hour' => 'nullable|date_format:H:i'
-            ]);
-        
+                'hour' => 'nullable|date_format:H:i',
+            ];
+            
+            $messages = [
+                'date.date_format' => 'Formato :attribute incorrecto (yyyy-mm-dd).',
+                'hour.date_format' => 'Formato :attribute incorrecto (H:i).',
+            ];
+            
+            $validator = Validator::make($request->all(), $rules, $messages);
+            
             if ($validator->fails()) {
                 return response()->json([
-                    'error' => $validator->errors()->first(),
-                ], 422); 
+                    'status'   => 422, 
+                    'response' => $validator->errors()->first()
+                ]);
             }
 
             // Validar que exista el area
@@ -66,6 +79,7 @@ class CommandController extends Controller
             
             // Valida que no supere el numero de importaciónes permitidos por dia
             $NumberOfAttemptsPerDay = Importation_Demand::NumberOfAttemptsPerDay($request->name_db);
+
             if($NumberOfAttemptsPerDay >= 20){
                 return response()->json([
                     'status'   => 500, 
@@ -74,6 +88,7 @@ class CommandController extends Controller
             }
        
             $configDB = $this->connectionDB($request->name_db);
+
             if($configDB == false){
                 return response()->json([
                     'status'   => 500, 
@@ -169,6 +184,15 @@ class CommandController extends Controller
 
     public function uploadOrder(Request $request){
         try{
+            // Validar que exista el area
+            $areas = ['bexmovil', 'bextms', 'bextramites', 'bexwms', 'ecomerce'];
+            if (!in_array($request->area, $areas)) {
+                return response()->json([
+                    'status'   => 200, 
+                    'response' => 'El area '.$request->area.' no existe'
+                ]);
+            }
+
             Artisan::call('command:upload-order', [
                 'database' => $request->name_db,
                 'area' => $request->area,
@@ -176,8 +200,8 @@ class CommandController extends Controller
             ]);
             
             $output = Artisan::output();
-            sleep(5);
-            $rutaArchivo = 'export/bex_0002/pedidos_txt/'.$request->closing.'.txt';
+            sleep(4);
+            $rutaArchivo = 'export/'.$request->name_db.'/'.$request->area.'/pedidos_txt/'.$request->closing.'.txt';
             $rutaCompleta = storage_path('app/public/' . $rutaArchivo);
             if (file_exists($rutaCompleta)) {
                  // URL pública del archivo
@@ -188,7 +212,6 @@ class CommandController extends Controller
                 return response()->json(['status' => 401, 'response' => 'Los pedidos o el pedido con el cierre: '.$request->closing.' no existe']);
             }else{
                 return response()->json(['status' => 200, 'response' => 'Ruta no encontrada']);
-
             }
             return response()->json(['status' => 200, 'response' => $urlCompleta]);
         } catch (\Exception $e) {
