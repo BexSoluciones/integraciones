@@ -9,8 +9,8 @@ class T20BexPlanClientes extends Model
 {
     use HasFactory;
 
-protected $connection = 'dynamic_connection';
-protected $table = 't20_bex_plan_clientes';
-protected $fillable = ['cli_plancriterios', 'descripcion', 'estado'];
-public $timestamps = false;
+    protected $connection = 'dynamic_connection';
+    protected $table = 't20_bex_plan_clientes';
+    protected $fillable = ['cli_plancriterios', 'descripcion', 'estado'];
+    public $timestamps = false;
 }

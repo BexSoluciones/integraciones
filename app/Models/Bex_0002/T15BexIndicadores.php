@@ -9,8 +9,8 @@ class T15BexIndicadores extends Model
 {
     use HasFactory;
 
-protected $connection = 'dynamic_connection';
-protected $table = 't15_bex_indicadores';
-protected $fillable = ['tercvendedor', 'detmensaje'];
-public $timestamps = false;
+    protected $connection = 'dynamic_connection';
+    protected $table = 't15_bex_indicadores';
+    protected $fillable = ['tercvendedor', 'detmensaje'];
+    public $timestamps = false;
 }

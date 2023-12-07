@@ -9,8 +9,8 @@ class T07BexCodbarrapro extends Model
 {
     use HasFactory;
 
-protected $connection = 'dynamic_connection';
-protected $table = 't07_bex_codbarrapro';
-protected $fillable = ['codbar', 'codproducto', 'cant_asociada'];
-public $timestamps = false;
+    protected $connection = 'dynamic_connection';
+    protected $table = 't07_bex_codbarrapro';
+    protected $fillable = ['codbar', 'codproducto', 'cant_asociada'];
+    public $timestamps = false;
 }

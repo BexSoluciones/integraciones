@@ -9,8 +9,8 @@ class T11BexDctosProducto extends Model
 {
     use HasFactory;
 
-protected $connection = 'dynamic_connection';
-protected $table = 't11_bex_dctos_producto';
-protected $fillable = ['codgrupodcto', 'codproducto', 'descuento', 'estado'];
-public $timestamps = false;
+    protected $connection = 'dynamic_connection';
+    protected $table = 't11_bex_dctos_producto';
+    protected $fillable = ['codgrupodcto', 'codproducto', 'descuento', 'estado'];
+    public $timestamps = false;
 }

@@ -9,8 +9,8 @@ class T02WsConsultas extends Model
 {
     use HasFactory;
 
-protected $connection = 'dynamic_connection';
-protected $table = 't02_ws_consultas';
-protected $fillable = ['id', 'IdConsulta', 'parametro', 'tabla_destino', 'estado', 'descripcion', 'prioridad', 'desde', 'cuantos', 'sentencia'];
-public $timestamps = false;
+    protected $connection = 'dynamic_connection';
+    protected $table = 't02_ws_consultas';
+    protected $fillable = ['id', 'IdConsulta', 'parametro', 'tabla_destino', 'estado', 'descripcion', 'prioridad', 'desde', 'cuantos', 'sentencia'];
+    public $timestamps = false;
 }
