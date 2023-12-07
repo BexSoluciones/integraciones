@@ -27,14 +27,14 @@ class UpdateInformation extends Command {
             $status = $this->input->hasArgument('status') ? $this->argument('status') : false;
 
             //Function that configures the database (ConnetionTrait).
-            $configDB = $this->connectionDB($db); 
+            $configDB = $this->connectionDB($db, 'local'); 
             if($configDB == false){
                 return;
             }
         
             //Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
             if($status == 'new'){
-                $this->preMigration($db);
+                $this->preMigration($db->name);
                 print '◘Ya puedes ejecutar el comando: php artisan command:update-information '.$db . PHP_EOL;
                 return;
             }

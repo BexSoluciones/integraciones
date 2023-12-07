@@ -45,11 +45,6 @@ class CommandController extends Controller
                 ]);
             }
 
-            foreach ($request->all() as $key => $value) {
-                // Aquí puedes trabajar con la clave y el valor
-                return "Clave: $key, Valor: $value";
-            }
-            return 1;
             $rules = [
                 'date' => 'nullable|date_format:Y-m-d',
                 'hour' => 'nullable|date_format:H:i',
@@ -77,6 +72,18 @@ class CommandController extends Controller
                     'response' => 'El area '.$request->area.' no existe'
                 ]);
             }
+
+            $connection = DB::table('connections')->where('connections.name', $request->name_db)
+            ->join('connection_bexsoluciones', 'connections.id', 'connection_bexsoluciones.connection_id')
+            ->select('connection_bexsoluciones.*')
+            ->first();
+
+            if(!$connection) {
+                return response()->json([
+                    'status'   => 404, 
+                    'response' => 'La base de datos '. $request->name_db . 'no existe'
+                ]);
+            }
             
             // Valida que no supere el numero de importaciónes permitidos por dia
             $NumberOfAttemptsPerDay = Importation_Demand::NumberOfAttemptsPerDay($request->name_db);
@@ -88,7 +95,7 @@ class CommandController extends Controller
                 ]);
             }
        
-            $configDB = $this->connectionDB($request->name_db);
+            $configDB = $this->connectionDB($connection, 'external');
 
             if($configDB == false){
                 return response()->json([
@@ -111,6 +118,7 @@ class CommandController extends Controller
 
             // Primero revisa que una importación no se este ejecutando
             $importation = Command::forNameBD($request->name_db, $request->area)->first();
+
             if($importation->state == '2'){
                 return response()->json([
                     'status'   => 200, 
