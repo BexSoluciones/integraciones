@@ -24,6 +24,31 @@ class CommandController extends Controller
     public function updateInformation(Request $request){
         try {
 
+            $count= count($request->all());
+            if($count == 4){
+
+                $keys = ['name_db', 'area', 'date', 'hour'];
+                foreach($request->all() as $key=>$value){
+                    // return $key;
+                    if (!in_array($key, $keys)) {
+                        return response()->json([
+                            'status'   => 422, 
+                            'response' => 'El atributo '.$key.' es incorrecto'
+                        ]);
+                    }
+                }
+            }else{
+                return response()->json([
+                    'status'   => 422, 
+                    'response' =>'El numero de atributos no son correctos'
+                ]);
+            }
+
+            foreach ($request->all() as $key => $value) {
+                // Aquí puedes trabajar con la clave y el valor
+                return "Clave: $key, Valor: $value";
+            }
+            return 1;
             $rules = [
                 'date' => 'nullable|date_format:Y-m-d',
                 'hour' => 'nullable|date_format:H:i',
@@ -167,7 +192,7 @@ class CommandController extends Controller
                     'response' => 'El area '.$request->area.' no existe'
                 ]);
             }
-            
+
             Artisan::call('command:upload-order', [
                 'database' => $request->name_db,
                 'area' => $request->area,
@@ -175,8 +200,8 @@ class CommandController extends Controller
             ]);
             
             $output = Artisan::output();
-            sleep(5);
-            $rutaArchivo = 'export/bex_0002/pedidos_txt/'.$request->closing.'.txt';
+            sleep(4);
+            $rutaArchivo = 'export/'.$request->name_db.'/'.$request->area.'/pedidos_txt/'.$request->closing.'.txt';
             $rutaCompleta = storage_path('app/public/' . $rutaArchivo);
             if (file_exists($rutaCompleta)) {
                  // URL pública del archivo
@@ -184,7 +209,7 @@ class CommandController extends Controller
                 // Agregar el dominio a la URL
                 $urlCompleta = url($urlArchivo);
             }else{
-                return response()->json(['status' => 200, 'response' => 'Ruta no encontrada']);
+                return response()->json(['status' => 401, 'response' => 'El cierre '.$request->closing.' no exise']);
             }
             return response()->json(['status' => 200, 'response' => $urlCompleta]);
         } catch (\Exception $e) {
