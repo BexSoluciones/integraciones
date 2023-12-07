@@ -9,8 +9,8 @@ class T08BexCriteriosClientes extends Model
 {
     use HasFactory;
 
-protected $connection = 'dynamic_connection';
-protected $table = 't08_bex_criterios_clientes';
-protected $fillable = ['cli_plancriterios', 'cli_criteriomayor', 'descripcion', 'estado', 'estado2'];
-public $timestamps = false;
+    protected $connection = 'dynamic_connection';
+    protected $table = 't08_bex_criterios_clientes';
+    protected $fillable = ['cli_plancriterios', 'cli_criteriomayor', 'descripcion', 'estado', 'estado2'];
+    public $timestamps = false;
 }

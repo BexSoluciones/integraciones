@@ -9,8 +9,8 @@ class T17BexMensajes extends Model
 {
     use HasFactory;
 
-protected $connection = 'dynamic_connection';
-protected $table = 't17_bex_mensajes';
-protected $fillable = ['codmensaje', 'tipomensaje', 'nommensaje'];
-public $timestamps = false;
+    protected $connection = 'dynamic_connection';
+    protected $table = 't17_bex_mensajes';
+    protected $fillable = ['codmensaje', 'tipomensaje', 'nommensaje'];
+    public $timestamps = false;
 }

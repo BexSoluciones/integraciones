@@ -9,8 +9,8 @@ class T22BexPortafolio extends Model
 {
     use HasFactory;
 
-protected $connection = 'dynamic_connection';
-protected $table = 't22_bex_portafolio';
-protected $fillable = ['codportafolio', 'nomportafolio', 'estadoportafolio'];
-public $timestamps = false;
+    protected $connection = 'dynamic_connection';
+    protected $table = 't22_bex_portafolio';
+    protected $fillable = ['codportafolio', 'nomportafolio', 'estadoportafolio'];
+    public $timestamps = false;
 }

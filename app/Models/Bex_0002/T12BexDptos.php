@@ -9,8 +9,8 @@ class T12BexDptos extends Model
 {
     use HasFactory;
 
-protected $connection = 'dynamic_connection';
-protected $table = 't12_bex_dptos';
-protected $fillable = ['codpais', 'coddpto', 'descripcion'];
-public $timestamps = false;
+    protected $connection = 'dynamic_connection';
+    protected $table = 't12_bex_dptos';
+    protected $fillable = ['codpais', 'coddpto', 'descripcion'];
+    public $timestamps = false;
 }

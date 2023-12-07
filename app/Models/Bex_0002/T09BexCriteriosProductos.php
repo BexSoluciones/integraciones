@@ -9,8 +9,8 @@ class T09BexCriteriosProductos extends Model
 {
     use HasFactory;
 
-protected $connection = 'dynamic_connection';
-protected $table = 't09_bex_criterios_productos';
-protected $fillable = ['pro_plancriterios', 'pro_criteriomayor', 'descripcion', 'estado'];
-public $timestamps = false;
+    protected $connection = 'dynamic_connection';
+    protected $table = 't09_bex_criterios_productos';
+    protected $fillable = ['pro_plancriterios', 'pro_criteriomayor', 'descripcion', 'estado'];
+    public $timestamps = false;
 }
