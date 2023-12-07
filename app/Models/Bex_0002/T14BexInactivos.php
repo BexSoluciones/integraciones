@@ -9,8 +9,8 @@ class T14BexInactivos extends Model
 {
     use HasFactory;
 
-protected $connection = 'dynamic_connection';
-protected $table = 't14_bex_inactivos';
-protected $fillable = ['centro_ope', 'producto'];
-public $timestamps = false;
+    protected $connection = 'dynamic_connection';
+    protected $table = 't14_bex_inactivos';
+    protected $fillable = ['centro_ope', 'producto'];
+    public $timestamps = false;
 }

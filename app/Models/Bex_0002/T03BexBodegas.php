@@ -9,8 +9,8 @@ class T03BexBodegas extends Model
 {
     use HasFactory;
 
-protected $connection = 'dynamic_connection';
-protected $table = 't03_bex_bodegas';
-protected $fillable = ['codigo', 'descripcion', 'estadobodega'];
-public $timestamps = false;
+    protected $connection = 'dynamic_connection';
+    protected $table = 't03_bex_bodegas';
+    protected $fillable = ['codigo', 'descripcion', 'estadobodega'];
+    public $timestamps = false;
 }

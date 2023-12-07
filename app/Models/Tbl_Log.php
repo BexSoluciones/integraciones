@@ -9,16 +9,13 @@ class Tbl_Log extends Model {
     
     use HasFactory;
 
-    protected $table = 'tbl_log';
-    // protected $table;
-    // public function __construct(array $attributes = [])
-    // {
-    //     parent::__construct($attributes);
-    //     $this->connection = defined('mysql') ? 'mysql' : 'dynamic_connection';
-    //     $this->table = ($this->connection === 'mysql') ? 'tbl_log' : 't10_tbl_log';
-
-
-    // }
+    protected $table;
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->connection = defined('mysql') ? 'mysql' : 'dynamic_connection';
+        $this->table = ($this->connection === 'mysql') ? 'tbl_log' : 't10_tbl_log';
+    }
     protected $fillable = [
         'codigo',
         'id_table',

@@ -9,8 +9,8 @@ class T19BexPaises extends Model
 {
     use HasFactory;
 
-protected $connection = 'dynamic_connection';
-protected $table = 't19_bex_paises';
-protected $fillable = ['codpais', 'descripcion'];
-public $timestamps = false;
+    protected $connection = 'dynamic_connection';
+    protected $table = 't19_bex_paises';
+    protected $fillable = ['codpais', 'descripcion'];
+    public $timestamps = false;
 }
