@@ -42,9 +42,9 @@ trait GetOrderTrait {
                             ->where('bdlicencias', $db->name)
                             ->first();
 
-                ProcessOrderUploadERP::dispatch($order, $cia, $closing)->onQueue('pedidos');
+                ProcessOrderUploadERP::dispatch($order, $cia, $closing)->onQueue('pedidos')->onConnection('sync');
 
-                return true;
+                return false;
             } else {
 
                 return false;
