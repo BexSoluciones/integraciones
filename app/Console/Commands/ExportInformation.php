@@ -76,7 +76,7 @@ class ExportInformation extends Command
                 't37_bex_amovil'        => 'InsertAmovilCustom',
             ];
 
-            $conectionBex = Connection_Bexsoluciones::showConnectionBS($db, $area)->value('name');
+            $conectionBex = Connection_Bexsoluciones::showConnectionBS($conectionBex, $area)->value('name');
             foreach ($availableModels as $modelClass => $tableName) {
                 $modelInstance = new $modelClass();
                 $datosAInsertar = $modelInstance::get();
