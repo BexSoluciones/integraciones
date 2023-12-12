@@ -27,4 +27,10 @@ class Connection_Bexsoluciones extends Model
     public static function getAll(){
         return static::all();
     }
+
+    public function scopeShowConnectionBS($query, $id, $area){
+        return $query->select('name', 'host', 'username', 'password', 'active')
+            ->where('id', $id)
+            ->where('area', 'bexmovil');
+    }
 }
