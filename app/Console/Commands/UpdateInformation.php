@@ -12,6 +12,7 @@ use App\Traits\ReadExportDataTrait;
 use App\Traits\BackupFlatFileTrait;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class UpdateInformation extends Command {
 
@@ -27,6 +28,7 @@ class UpdateInformation extends Command {
             $status = $this->input->hasArgument('status') ? $this->argument('status') : false;
 
             //Function that configures the database (ConnetionTrait).
+            Log::info($db);
             $configDB = $this->connectionDB($db, 'local'); 
             if($configDB == false){
                 return;
@@ -35,7 +37,7 @@ class UpdateInformation extends Command {
             //Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
             if($status == 'new'){
                 $this->preMigration($db);
-                print '◘Ya puedes ejecutar el comando: php artisan command:update-information '.$db . PHP_EOL;
+                print '◘ Ya puedes ejecutar el comando: php artisan command:update-information '.$db . PHP_EOL;
                 return;
             }
 
@@ -69,7 +71,7 @@ class UpdateInformation extends Command {
             print '◘ La ejecucion "command:update-information '.$db.'" ha finalizado.';
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Commands::ExportInformation[handle()] => '.$e->getMessage()
+                'descripcion' => 'Commands::UpdateInformation[handle()] => '.$e->getMessage()
             ]);
         }
     }
