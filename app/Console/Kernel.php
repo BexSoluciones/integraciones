@@ -23,7 +23,7 @@ class Kernel extends ConsoleKernel
         try {
             $currentTime = Carbon::now();
             $parameters  = Command::getAll()->get();
-
+            
             foreach ($parameters as $parameter) {
                 // Ejecuta el comando
                 $schedule->command($parameter->command, [
@@ -38,16 +38,17 @@ class Kernel extends ConsoleKernel
                     // Llamar a otro comando si es necesario
                     Artisan::call('command:export-information', [
                         'tenantDB' => $parameter->name_db,
-                        'name' => $parameter->name,
+                        'connection_bs_id' => $parameter->connection_bexsoluciones_id,
                         'area' => $parameter->area
                     ]);
+                    
                     //Si finaliza correctamente se cambio a state 1 para que pueda volver a ejecutarse
                     $parameter->updateOrInsert(['name_db' => $parameter->name_db], ['state' => '1']);
 
-                    $importationInCurse = Importation_Demand::importationInCurse($parameter->name_db, $parameter->area);
-                    if($importationInCurse){
+                    $importationInCurse = Importation_Demand::importationInCurse($parameter->name_db, $parameter->area)->first();
+                    if(isset($importationInCurse)){
                         Importation_Demand::updateOrInsert(
-                            ['id' => $importationInCurse->id], ['state' => 3, 'updated_at' => $currentTime]
+                            ['consecutive' => $importationInCurse->consecutive], ['state' => 3, 'updated_at' => $currentTime]
                         );
                     }
                 })

@@ -5,41 +5,38 @@ use Exception;
 use App\Models\Tbl_Log;
 use App\Models\Connection;
 use App\Models\Connection_Bexsoluciones;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
 
 trait ConnectionTrait {
     
-    public function connectionDB($db, $type, $system = false){
-
-        if($system){
-            $dataConnection = Connection_Bexsoluciones::getAll()->where('id', 2)->first();
-        } else {
-            if($type == 'local'){
-                $dataConnection = Connection::getAll()->where('id', $db->id)->first(); //Verify that the database exists
-            }else{
-                $dataConnection = Connection_Bexsoluciones::getAll()->where('id', $db->id)->first();
-            }
+    public function connectionDB($db, $type, $area = null){
+        if($type == 'local'){
+            //Verify that the database exists
+            $dataConnection = Connection::getAll()
+                ->where('name', $db)
+                ->first();
+        }else{
+            $dataConnection = Connection_Bexsoluciones::getAll()->where('id', $db)->first();
         }
-
-
         
         if (!$dataConnection) {
             Tbl_Log::create([
-                'descripcion' => 'ConnectionTrait[connectionDB()] => La base de datos '.$db->name.' no existe en la tabla connections.'
+                'descripcion' => 'Traits::ConnectionTrait[connectionDB()] => La base de datos '.$db.' no existe en la tabla connections.'
             ]);
             return false;
         }
      
-        if($dataConnection->active != 1){
+        if($dataConnection->active != 1 && $type != 'local'){
             Tbl_Log::create([
-                'descripcion' => 'ConnectionTrait[connectionDB()] => El cliente '.$db.' esta en estado inactivo.'
+                'descripcion' => 'Traits::ConnectionTrait[connectionDB()] => El cliente '.$db.' esta en estado inactivo.'
             ]);
             return false; 
         }
         
         try {
-            $connectionName = $type == 'local' ? $dataConnection->id : 'dynamic_connection';
+            $connectionName = $type != 'local' ? $dataConnection->name : 'dynamic_connection';
             // Database configuration
             Config::set('database.connections.' . $connectionName,  [
                     'driver'    => 'mysql',
@@ -52,13 +49,10 @@ trait ConnectionTrait {
                     'prefix'    => '',
                 ],
             );
-
-            // DB::purge('mysql');
-
             return true;
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'ConnectionTrait[connectionDB()] => Error al configurar la conexión: ' . $e->getMessage()
+                'descripcion' => 'Traits::ConnectionTrait[connectionDB()] => Error al configurar la conexión: ' . $e->getMessage()
             ]);
            return false;
         }

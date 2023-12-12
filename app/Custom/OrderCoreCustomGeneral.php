@@ -14,7 +14,7 @@ use App\Traits\ConnectionTrait;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-class OrderCoreCustom
+class OrderCoreCustomGeneral
 {
     use ConnectionTrait;
 

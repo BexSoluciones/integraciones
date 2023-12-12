@@ -40,11 +40,10 @@ class Importation_Demand extends Model
     }
 
     public function scopeImportationInCurse($query, $name_db, $area){
-        return $query->select('id', 'state', 'updated_at')
+        return $query->select('consecutive', 'state', 'updated_at')
             ->where('name_db', $name_db)
             ->where('area', $area)
-            ->whereIn('estado', ['1', '2'])
-            ->first();
+            ->whereIn('state', ['1', '2']);
     }
 
     public function scopeNumberOfAttemptsPerDay($query, $name_db){

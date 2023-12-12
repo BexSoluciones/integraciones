@@ -8,6 +8,7 @@ use App\Models\Tbl_Log;
 use App\Models\OrderDetail;
 use App\Models\OrderHeader;
 use App\Models\Ws_Unoee_Config;
+use App\Models\Connection_Bexsoluciones;
 use App\Traits\ConnectionTrait;
 
 use Illuminate\Support\Facades\Log;
@@ -19,8 +20,9 @@ trait GetOrderTrait {
 
     public function getOrderHeder($db, $area, $closing){
         try {
+            $db = Connection_Bexsoluciones::getAll()->where('id', $db)->value('name');
             if($db){
-                $order = DB::connection('dynamic_connection')
+                $order = DB::connection($db)
                     ->table('tbldmovenc')
                     ->join('tbldmovdet','tbldmovenc.nummov','=','tbldmovdet.nummov')
                     ->join('tblmproducto','tbldmovdet.codproducto','=','tblmproducto.codproducto')
@@ -36,14 +38,16 @@ trait GetOrderTrait {
                                 tbldmovenc.codvendedor,fecmov,tbldmovdet.codproducto,tbldmovdet.codbodega,cantidadmov,tbldmovenc.codprecio,
                                 preciomov,dcto1mov,dcto2mov,dcto3mov,dcto4mov,pluproducto,nomunidademp,mensajemov,dctopiefacaut,dctonc')
                     ->get();
-
-                $cia = DB::connection('platafor_sys')
-                            ->table('tblslicencias')
-                            ->where('bdlicencias', $db->name)
-                            ->first();
+                
+                $plataforSys = 2;
+                $this->connectionDB($plataforSys, 'externa', $area);
+                $plataforSys = Connection_Bexsoluciones::getAll()->where('id', $plataforSys)->value('name');
+                $cia = DB::connection($plataforSys)
+                        ->table('tblslicencias')
+                        ->where('bdlicencias', $db)
+                        ->first();
 
                 ProcessOrderUploadERP::dispatch($order, $cia, $closing)->onQueue('pedidos')->onConnection('sync');
-
                 return false;
             } else {
 

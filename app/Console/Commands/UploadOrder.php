@@ -23,18 +23,16 @@ class UploadOrder extends Command
             $area    = $this->argument('area');
             $closing = $this->argument('closing');
 
-            $configDB = $this->connectionDB($db, $area); 
-
+            $configDB = $this->connectionDB($db, 'externa', $area); 
             if($configDB == false){
                 return 0;
             }
-        
+          
             $orders = $this->getOrderHeder($db, $area, $closing);
-            
             if($orders == true){
                 return 0;
             }
-            
+           
             if(!empty($orders)){
                 $orderDetails = $this->getOrderDetail($orders);
                 return 0;
