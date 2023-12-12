@@ -38,7 +38,7 @@ class ExportInformation extends Command
                 Tbl_Log::create([
                     'descripcion' => 'Commands::ExportInformation[handle()] => No existe el custom '.$custom
                 ]);
-                return print '◘ Se ha producido un error en la importación' . PHP_EOL;
+                return print '▲ Se ha producido un error en la importación' . PHP_EOL;
             }
 
             // Instanciamos el custom
@@ -61,7 +61,6 @@ class ExportInformation extends Command
             }  
             
             $this->connectionDB($tenantDB, 'local');
-        
             $customMethods = [
                 't04_bex_cartera'       => 'insertCarteraCustom',
                 't05_bex_clientes'      => 'insertClientesCustom',
@@ -76,7 +75,8 @@ class ExportInformation extends Command
                 't36_bex_vendedores'    => 'insertVendedoresCustom',
                 't37_bex_amovil'        => 'InsertAmovilCustom',
             ];
-            $conectionBex = Connection_Bexsoluciones::getAll()->where('id', $conectionBex)->value('name');
+
+            $conectionBex = Connection_Bexsoluciones::showConnectionBS($db, $area)->value('name');
             foreach ($availableModels as $modelClass => $tableName) {
                 $modelInstance = new $modelClass();
                 $datosAInsertar = $modelInstance::get();
@@ -84,7 +84,7 @@ class ExportInformation extends Command
                 if($tableName == 't16_bex_inventarios'){
                     $conectionSys = 2;
                     $this->connectionDB($conectionSys, 'externa', $area);
-                    $conectionSys = Connection_Bexsoluciones::getAll()->where('id', $conectionSys)->value('name');
+                    $conectionSys = Connection_Bexsoluciones::showConnectionBS($conectionSys, $area)->value('name');
                 }else{
                     $conectionSys = null;
                 }
@@ -96,7 +96,6 @@ class ExportInformation extends Command
                     print "◘ Proceso $methodName Finalizado" . PHP_EOL;
                 }
             }
-           
             print '◘ Información Base de Datos '.$tenantDB.' Exportada.' . PHP_EOL;
         } catch (\Exception $e) {
             Tbl_Log::create([

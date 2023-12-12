@@ -8,6 +8,7 @@ use App\Jobs\ImportationJob;
 use App\Models\Command;
 use App\Models\Tbl_Log;
 use App\Models\Importation_Demand;
+use App\Models\Connection_Bexsoluciones;
 use App\Traits\ConnectionTrait;
 use App\Http\Controllers\Controller;
 
@@ -24,7 +25,6 @@ class CommandController extends Controller
 
     public function updateInformation(Request $request){
         try {
-
             $count= count($request->all());
             if($count == 4){
 
@@ -94,8 +94,8 @@ class CommandController extends Controller
                     'response' => 'Usted ya supero el limite de importaciones por dia.'
                 ]);
             }
-            
-            $configDB = $this->connectionDB($connection->id, 'external');
+
+            $configDB = $this->connectionDB($connection->id, 'external', $request->area);
         
             if($configDB == false){
                 return response()->json([
