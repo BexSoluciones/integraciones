@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Custom;
+namespace App\Custom\bex_0002;
 
 use App\Models\Tbl_Log;
 use App\Traits\ConnectionTrait;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
-class Insert_bex_0002_Custom
+class InsertCustom
 {
     use ConnectionTrait;
 
@@ -105,7 +105,6 @@ class Insert_bex_0002_Custom
     {   
         try {
             $currentDate = date('Ymd');
-
             $tblmfpagovta = DB::connection($conectionBex)->table('tblmfpagovta')->get();
             foreach($tblmfpagovta as $data){
                 $modelInstance::where('conpag', '=', $data->CODFPAGOVTA)->update(['estadofpagovta' => 'C']);

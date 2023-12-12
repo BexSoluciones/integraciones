@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Custom\OrderCoreCustom;
-use App\Custom\OrderCore_bex_0002_Custom;
+use App\Custom\OrderCoreCustomGeneral;
+use App\Custom\bex_0002\OrderCoreCustom;
 use App\Models\Tbl_Log;
 
 use Illuminate\Bus\Queueable;
@@ -34,10 +34,10 @@ class ProcessOrderUploadERP implements ShouldQueue
     {
         try{
             if($this->cia->bdlicencias == 'platafor_pi055'){
-                $objOrederCore = new OrderCore_bex_0002_Custom();
+                $objOrederCore = new OrderCoreCustom();
                 $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing); 
             }else{
-                $objOrederCore = new OrderCoreCustom();
+                $objOrederCore = new OrderCoreCustomGeneral();
                 $objOrederCore->uploadOrder($this->order, $this->orderDetail, $this->cia);    
             }
         } catch (\Exception $e) {

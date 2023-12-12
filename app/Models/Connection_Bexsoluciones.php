@@ -12,13 +12,14 @@ class Connection_Bexsoluciones extends Model
     protected $table = 'connection_bexsoluciones';
     protected $connection = 'mysql';
     protected $fillable = [
+        'id',
         'name', 
         'host',
         'username',
         'password',
-        'alias',
         'area',
         'active',
+        'connection_id',
         'created_at',
         'updated_at'
     ];

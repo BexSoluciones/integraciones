@@ -16,7 +16,7 @@ class ImportationController extends Controller
       
             if(empty($importation)){
                 return response()->json([
-                    'status'   => 200,
+                    'status'   => 401,
                     'response' => 'No existe la importacion '.$request->consecutive,
                 ]);
             }
@@ -38,7 +38,7 @@ class ImportationController extends Controller
                 ]);
             } else {
                 return response()->json([
-                    'status'   => 200,
+                    'status'   => 401,
                     'response' => 'Estado de importación no reconocido.',
                 ]);
             }

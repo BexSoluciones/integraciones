@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Tbl_Log;
+use App\Models\Connection_Bexsoluciones;
 use App\Traits\ConnectionTrait;
 
 use Illuminate\Console\Command;
@@ -13,29 +14,29 @@ class ExportInformation extends Command
 {
     use ConnectionTrait;
 
-    protected $signature   = 'command:export-information {tenantDB} {name} {area}';
+    protected $signature   = 'command:export-information {tenantDB} {connection_bs_id} {area}';
     protected $description = 'Export information to bex solutions databases';
 
     public function handle()
     {
         try {
             $tenantDB     = $this->argument('tenantDB'); 
-            $conectionBex = $this->argument('name');
+            $conectionBex = $this->argument('connection_bs_id');
             $area         = $this->argument('area');
 
             //Function that configures the database (ConnetionTrait).
-            $configDB = $this->connectionDB($tenantDB); 
+            $configDB = $this->connectionDB($conectionBex, 'externa', $area); 
             if($configDB == false){
                 return;
             }
-
+            
             // Llamar un custom de manera dinamica
-            $custom = "App\\Custom\\Insert_{$tenantDB}_Custom";
-  
+            $custom = "App\\Custom\\$tenantDB\\InsertCustom";
+            
             // Verificar si el custom existe
             if (!class_exists($custom)) {
                 Tbl_Log::create([
-                    'descripcion' => 'Commands::ExportInformation[handle()] => No existe el custom '.$namespace
+                    'descripcion' => 'Commands::ExportInformation[handle()] => No existe el custom '.$custom
                 ]);
                 return print '◘ Se ha producido un error en la importación' . PHP_EOL;
             }
@@ -58,9 +59,9 @@ class ExportInformation extends Command
                     $availableModels[$routeName] = (new $routeName())->getTable();
                 }
             }  
-
-            $this->connectionDB($conectionBex, $area);
-
+            
+            $this->connectionDB($tenantDB, 'local');
+        
             $customMethods = [
                 't04_bex_cartera'       => 'insertCarteraCustom',
                 't05_bex_clientes'      => 'insertClientesCustom',
@@ -75,14 +76,15 @@ class ExportInformation extends Command
                 't36_bex_vendedores'    => 'insertVendedoresCustom',
                 't37_bex_amovil'        => 'InsertAmovilCustom',
             ];
-            
+            $conectionBex = Connection_Bexsoluciones::getAll()->where('id', $conectionBex)->value('name');
             foreach ($availableModels as $modelClass => $tableName) {
                 $modelInstance = new $modelClass();
                 $datosAInsertar = $modelInstance::get();
-
+            
                 if($tableName == 't16_bex_inventarios'){
-                    $conectionSys = 'platafor_sys';
-                    $this->connectionDB($conectionSys, $area);
+                    $conectionSys = 2;
+                    $this->connectionDB($conectionSys, 'externa', $area);
+                    $conectionSys = Connection_Bexsoluciones::getAll()->where('id', $conectionSys)->value('name');
                 }else{
                     $conectionSys = null;
                 }
@@ -94,6 +96,7 @@ class ExportInformation extends Command
                     print "◘ Proceso $methodName Finalizado" . PHP_EOL;
                 }
             }
+           
             print '◘ Información Base de Datos '.$tenantDB.' Exportada.' . PHP_EOL;
         } catch (\Exception $e) {
             Tbl_Log::create([
