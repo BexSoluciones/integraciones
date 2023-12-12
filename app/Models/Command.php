@@ -12,20 +12,22 @@ class Command extends Model
     protected $table = 'commands';
     protected $connection = 'mysql';
     protected $fillable = [
+        'id',
         'alias', 
         'command',
         'name_db',
         'cron_expression',
         'area',
         'cod_area',
-        'state'
+        'state',
+        'connection_bexsoluciones_id'
     ];
     public $timestamps = false;
 
     public function scopeGetAll($query){
-        return $query->select('connection_bexsoluciones.name', 'command', 'name_db', 'cron_expression', 'commands.area', 'cod_area', 'state')
+        return $query->select('connection_bexsoluciones.name', 'command', 'name_db', 'cron_expression', 'commands.area', 'cod_area', 'state', 'connection_bexsoluciones_id')
                     ->join('connection_bexsoluciones', 'commands.connection_bexsoluciones_id', '=' ,'connection_bexsoluciones.id')
-                    ->where('connection_bexsoluciones.area', 'commands.area')
+                    //->where('connection_bexsoluciones.area', 'commands.area')
                     ->where('state', '1');
     }
     

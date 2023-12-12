@@ -12,6 +12,7 @@ class Connection extends Model
     protected $table = 'connections';
     protected $connection = 'mysql';
     protected $fillable = [
+        'id',
         'name', 
         'host',
         'username',
@@ -23,7 +24,7 @@ class Connection extends Model
     ];
 
     public function scopeGetAll($query){
-        return $query->select('name', 'host', 'username', 'password', 'alias', 'active', 'created_at', 
+        return $query->select('id', 'name', 'host', 'username', 'password', 'alias', 'active', 'created_at', 
             'updated_at');
     }
 }

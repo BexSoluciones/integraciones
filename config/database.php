@@ -92,7 +92,7 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
-
+        /*
         'platafor_sys' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
@@ -111,7 +111,7 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
-        ],
+        ],*/
 
 
     ],

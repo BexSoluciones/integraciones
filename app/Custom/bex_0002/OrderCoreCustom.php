@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Custom;
+namespace App\Custom\bex_0002;
 
 use App\Models\Tbl_Log;
 
@@ -10,7 +10,7 @@ use App\Traits\ConnectionTrait;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-class OrderCore_bex_0002_Custom
+class OrderCoreCustom
 {
     public function uploadOrder($orders, $cia, $closing)
     {
@@ -93,7 +93,7 @@ class OrderCore_bex_0002_Custom
                     $dcto=0;
                 }
             
-                $namefile=$closing.'.txt';
+                $namefile=$closing.'.PE0';
                 Storage::disk('public')->put('export/bex_0002/bexmovil/pedidos_txt/' . $namefile, $cadena);    
             } else {
                 $error = 'El pedido no tiene productos asignados';
