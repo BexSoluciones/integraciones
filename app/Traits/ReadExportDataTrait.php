@@ -3,6 +3,8 @@ namespace App\Traits;
 
 use Exception;
 
+use App\Models\Tbl_Log;
+
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
@@ -29,7 +31,14 @@ trait ReadExportDataTrait {
             //Route of flat file
             $folderPath = storage_path("app/imports/$db/planos");
             $txtFiles = glob("$folderPath/*.txt");
-           
+
+            if(count($txtFiles) == 0){
+                Tbl_Log::create([
+                    'descripcion' => 'Traits::ReadExportDataTrait[readFlatFile()] => No se encontraon archivos planos en '.$db
+                ]);
+                return false; 
+            };
+        
             foreach ($txtFiles as $txtFile) {
                 
                 $content = file_get_contents($txtFile);

@@ -193,7 +193,7 @@ class OrderCoreCustomGeneral
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::OrderCoreCustom[uploadOrder()] => '.$e->getMessage()
+                'descripcion' => 'Custom::OrderCoreCustomGeneral[uploadOrder()] => '.$e->getMessage()
             ]);
             return print '▲ Error en uploadOrder';
         }
@@ -236,7 +236,7 @@ class OrderCoreCustomGeneral
             return $data;
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::OrderCoreCustom[crearXmlPedido()] => '.$e->getMessage()
+                'descripcion' => 'Custom::OrderCoreCustomGeneral[crearXmlPedido()] => '.$e->getMessage()
             ]);
             return print '▲ Error en crearXmlPedido';
         }
@@ -264,7 +264,7 @@ class OrderCoreCustomGeneral
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::OrderCoreCustom[existePedidoSiesa()] => '.$e->getMessage()
+                'descripcion' => 'Custom::OrderCoreCustomGeneral[existePedidoSiesa()] => '.$e->getMessage()
             ]);
             return print '▲ Error en existePedidoSiesa';
         }

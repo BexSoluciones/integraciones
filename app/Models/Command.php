@@ -27,14 +27,14 @@ class Command extends Model
     public function scopeGetAll($query){
         return $query->select('connection_bexsoluciones.name', 'command', 'name_db', 'cron_expression', 'commands.area', 'cod_area', 'state', 'connection_bexsoluciones_id')
                     ->join('connection_bexsoluciones', 'commands.connection_bexsoluciones_id', '=' ,'connection_bexsoluciones.id')
-                    //->where('connection_bexsoluciones.area', 'commands.area')
+                    //->whereColumn('connection_bexsoluciones.area', 'commands.area')
                     ->where('state', '1');
     }
     
     public function scopeForNameBD($query, $nameDB, $area){
         return $query->select('name_db', 'connection_bexsoluciones.name', 'commands.area', 'state', 'connection_bexsoluciones_id')
             ->join('connection_bexsoluciones', 'commands.connection_bexsoluciones_id', '=' ,'connection_bexsoluciones.id')
-            //->where('connection_bexsoluciones.area', 'commands.area')
+            //->whereColumn('connection_bexsoluciones.area', 'commands.area')
             ->where('name_db', $nameDB)
             ->where('commands.area', $area);
     }

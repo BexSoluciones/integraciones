@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Tbl_Log;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,34 +12,28 @@ use Illuminate\Support\Facades\Auth;
 class AuthController extends Controller {
     
     public function login(Request $request) {
-
         try {
             $user = User::where('name', $request->name)->first();
-            
             if(!$user){
                 return response()->json(['status' => 404, 'error' => 'Este usuario no existe']);
             }
 
             $credentials = $request->only('name', 'password');
             if (Auth::attempt($credentials)) {
-                // El usuario ha sido autenticado con éxito
+                // Se autentica el usuario
                 $user = Auth::user();
 
                 // Generar un nuevo token de acceso
                 $token = $user->createToken('token-name')->plainTextToken;
 
-                // Puedes devolver el token como respuesta
                 return response()->json(['status' => 200, 'token' => $token]);
             }
             return response()->json(['status' => 401, 'error' => 'Las credenciales no son correctas']);
 
         } catch (\Exception $e) {
-            return response()->json(['status' => 404, 'error' => 'Este usuario no existe']);
+            Tbl_Log::create([
+                'descripcion' => 'Controller/Api::AuthController[login()] => '.$e->getMessage()
+            ]);
         }
-    }
-
-
-    public function prueba(){
-        return 'hola';
     }
 }

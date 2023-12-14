@@ -60,7 +60,11 @@ class ExportInformation extends Command
                 }
             }  
             
-            $this->connectionDB($tenantDB, 'local');
+            $configDB = $this->connectionDB($tenantDB, 'local');
+            if($configDB == false){
+                return;
+            }
+
             $customMethods = [
                 't04_bex_cartera'       => 'insertCarteraCustom',
                 't05_bex_clientes'      => 'insertClientesCustom',
@@ -83,7 +87,10 @@ class ExportInformation extends Command
             
                 if($tableName == 't16_bex_inventarios'){
                     $conectionSys = 2;
-                    $this->connectionDB($conectionSys, 'externa', $area);
+                    $configDB = $this->connectionDB($conectionSys, 'externa', $area);
+                    if($configDB == false){
+                        return;
+                    }
                     $conectionSys = Connection_Bexsoluciones::showConnectionBS($conectionSys, $area)->value('name');
                 }else{
                     $conectionSys = null;
