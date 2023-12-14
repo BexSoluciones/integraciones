@@ -27,7 +27,7 @@ trait DataImportTrait {
             $sentences = Ws_Consulta::getAll();
 
             // We pass the ID to configure the connection to the WS
-            $config = Ws_Config::getConnectionForId(1);
+            $config = Ws_Config::where('estado', 1)->first();
             
             //backup txt files
             $backupFlatFile = $this->backupFlatFile($db, true);
