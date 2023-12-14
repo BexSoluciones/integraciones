@@ -32,7 +32,7 @@ class UpdateInformation extends Command {
             if($configDB == false){
                 return;
             }
-            /*
+     
             //Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
             if($status == 'new'){
                 $this->preMigration($db);
@@ -53,11 +53,11 @@ class UpdateInformation extends Command {
             //Function to configure and migrate tables (MigrateTrait).
             if($archivosPlanos == true){
                 $this->preMigration($db);
-            }*/
+            }
         
             //Function to read and export flat file to tenant DB
-            $x = $this->readFlatFile($db);
-            dd($x);
+            $this->readFlatFile($db);
+          
 
             //Realizar copia de seguridad para tipo de conexion "planoa"
             if ($config->ConecctionType == 'planos') {

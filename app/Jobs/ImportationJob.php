@@ -60,7 +60,6 @@ class ImportationJob implements ShouldQueue
                 
                 if ($commandOutput) {
                     $parameters = Command::forNameBD($dataImport->name_db, $dataImport->area)->first();
-                    Log::info($parameters);
                     Artisan::call('command:export-information', [
                         'tenantDB' => $parameters->name_db,
                         'connection_bs_id' => $parameters->connection_bexsoluciones_id,
@@ -90,7 +89,6 @@ class ImportationJob implements ShouldQueue
             Importation_Demand::updateOrInsert(
                 ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
             );
-            $importation->updateOrInsert(['name_db' => $importation->name_db, 'area', $importation->name_db], ['state' => '1']);
         }
     }
 }
