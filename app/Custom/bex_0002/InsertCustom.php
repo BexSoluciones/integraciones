@@ -95,7 +95,7 @@ class InsertCustom
             DB::connection($conectionBex)->statement('DROP TABLE IF EXISTS s1e_dptos');*/
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Insert_bex_0002_Custom[insertCarteraCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::bex_0002/InsertCustom[insertCarteraCustom()] => '.$e->getMessage()
             ]);
             return print '▲ Error en insertCarteraCustom';
         }
@@ -233,7 +233,7 @@ class InsertCustom
             print '◘ Datos actualizados en la tabla tblmcliente' . PHP_EOL;
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Insert_bex_0002_Custom[insertClientesCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertClientesCustom()] => '.$e->getMessage()
             ]);
             return print '▲ Error en insertClientesCustom';
         }
@@ -309,7 +309,7 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Insert_bex_0002_Custom[insertDptosCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertDptosCustom()] => '.$e->getMessage()
             ]);
             return print '▲ Error en insertDptosCustom';
         }
@@ -443,7 +443,7 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Insert_bex_0002_Custom[insertEstadoPedidosCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertEstadoPedidosCustom()] => '.$e->getMessage()
             ]);
             return print '▲ Error en insertEstadoPedidosCustom';
         }
@@ -452,90 +452,97 @@ class InsertCustom
     public function insertInventarioCustom($conectionBex, $conectionSys, $datosAInsertar, $modelInstance)
     {
         try {
-            //Conexion plafor_sys
-            $tblslicencias = DB::connection($conectionSys)
-                ->table('tblslicencias')
-                ->select('borrardstockimportando', 'creabodegaempresa')
-                ->where('bdlicencias', 'platafor_pi055')
-                ->first();
-            
-            $tblmimpuesto = DB::connection($conectionBex)
-                ->table('tblmimpuesto')
-                ->select('codimpuesto')
-                ->get();
-             
-            $iva = $tblmimpuesto->pluck('codimpuesto')->toArray();
-            $imp = count($tblmimpuesto);
+            $tblbinventario = count($datosAInsertar);
+            if($tblbinventario > 10){
+                //Conexion plafor_sys
+                $tblslicencias = DB::connection($conectionSys)
+                    ->table('tblslicencias')
+                    ->select('borrardstockimportando', 'creabodegaempresa')
+                    ->where('bdlicencias', 'platafor_pi055')
+                    ->first();
+                
+                $tblmimpuesto = DB::connection($conectionBex)
+                    ->table('tblmimpuesto')
+                    ->select('codimpuesto')
+                    ->get();
+                
+                $iva = $tblmimpuesto->pluck('codimpuesto')->toArray();
+                $imp = count($tblmimpuesto);
 
-            if (!empty($iva)) {
-                for($i=0; $i<$imp; $i++){
-                    $t16BexInventarios = $modelInstance::where('iva', $iva[$i])->update(['estadoimpuesto' => 'C']);
+                if (!empty($iva)) {
+                    for($i=0; $i<$imp; $i++){
+                        $t16BexInventarios = $modelInstance::where('iva', $iva[$i])->update(['estadoimpuesto' => 'C']);
+                    }
+                    print '◘ Columna "estadoimpuesto" actualizada en al tabla t16_bex_inventarios' . PHP_EOL;
                 }
-                print '◘ Columna "estadoimpuesto" actualizada en al tabla t16_bex_inventarios' . PHP_EOL;
-            }
 
-            //Inserta datos en estado A en la tabla tblmimpuesto
-            $insertDataTblmimpuesto = $modelInstance::insertDataTblmimpuesto()->get();
+                //Inserta datos en estado A en la tabla tblmimpuesto
+                $insertDataTblmimpuesto = $modelInstance::insertDataTblmimpuesto()->get();
 
-            if(sizeof($insertDataTblmimpuesto) > 0){
-                DB::connection($conectionBex)->table('tblmimpuesto')->insert($insertDataTblmimpuesto->toArray());
-                print '◘ Datos insertados con exito en la tabla tblmimpuesto' . PHP_EOL;
-            }
-
-            //Update estadobodega tabla t16_bex_inventarios
-            $tblmbodega = DB::connection($conectionBex)->table('tblmbodega')->get();
-            $codBodega = $tblmbodega->pluck('CODBODEGA')->toArray();
-            $bod = count($codBodega);
-
-            if (!empty($codBodega)) {
-                for($i=0; $i<$bod; $i++){
-                    $t16BexInventarios = $modelInstance::where('bodega', $codBodega[$i])->update(['estadobodega' => 'C']);
+                if(sizeof($insertDataTblmimpuesto) > 0){
+                    DB::connection($conectionBex)->table('tblmimpuesto')->insert($insertDataTblmimpuesto->toArray());
+                    print '◘ Datos insertados con exito en la tabla tblmimpuesto' . PHP_EOL;
                 }
-                print '◘ Columna "estadobodega" actualizada en al tabla t16_bex_inventarios' . PHP_EOL;
-            }
 
-            //Inserta datos en estado A en la tabla tblmbodega
-            $insertDataToTblmbodega = $modelInstance::insertDataToTblmbodega()->get();
-            if(sizeof($insertDataToTblmbodega) > 0){
-                DB::connection($conectionBex)->table('tblmbodega')->insert($insertDataToTblmbodega->toArray());
-                print '◘ Datos insertados con exito en la tabla tblmbodega' . PHP_EOL;
-            }
-            
-            if($tblslicencias->borrardstockimportando == "S"){
-                DB::connection($conectionBex)->table('tbldstock')->truncate();
-                print '◘ Datos eliminados con exito en la tabla tbldstock' . PHP_EOL;
-            }
+                //Update estadobodega tabla t16_bex_inventarios
+                $tblmbodega = DB::connection($conectionBex)->table('tblmbodega')->get();
+                $codBodega = $tblmbodega->pluck('CODBODEGA')->toArray();
+                $bod = count($codBodega);
 
-            //Insertar datos en la tabla tbldstock
-            $insertDataTbldstock = $modelInstance::insertDataTbldstock()->get();
-            $codigosProductos = $insertDataTbldstock->pluck('codproducto')->toArray();
-
-            // Obtener datos de tblmproducto en una sola consulta
-            $productosData = DB::connection($conectionBex)
-                ->table('tblmproducto')
-                ->whereIn('CODPRODUCTO', $codigosProductos)
-                ->get();
-
-            $dataToInsert = [];
-            foreach ($insertDataTbldstock as $data) {
-                // Buscar los datos correspondientes en $productosData
-                $productoData = $productosData->firstWhere('CODPRODUCTO', $data->codproducto);
-
-                if ($productoData) {
-                    $dataToInsert[] = [
-                        'codproducto' => $data->codproducto,
-                        'codbodega' => $data->codbodega,
-                        'codimpuesto' => $data->codimpuesto,
-                        'existencia_stock' => $data->existencia_stock
-                    ];
+                if (!empty($codBodega)) {
+                    for($i=0; $i<$bod; $i++){
+                        $t16BexInventarios = $modelInstance::where('bodega', $codBodega[$i])->update(['estadobodega' => 'C']);
+                    }
+                    print '◘ Columna "estadobodega" actualizada en al tabla t16_bex_inventarios' . PHP_EOL;
                 }
+
+                //Inserta datos en estado A en la tabla tblmbodega
+                $insertDataToTblmbodega = $modelInstance::insertDataToTblmbodega()->get();
+                if(sizeof($insertDataToTblmbodega) > 0){
+                    DB::connection($conectionBex)->table('tblmbodega')->insert($insertDataToTblmbodega->toArray());
+                    print '◘ Datos insertados con exito en la tabla tblmbodega' . PHP_EOL;
+                }
+                
+                if($tblslicencias->borrardstockimportando == "S"){
+                    DB::connection($conectionBex)->table('tbldstock')->truncate();
+                    print '◘ Datos eliminados con exito en la tabla tbldstock' . PHP_EOL;
+                }
+
+                //Insertar datos en la tabla tbldstock
+                $insertDataTbldstock = $modelInstance::insertDataTbldstock()->get();
+                $codigosProductos = $insertDataTbldstock->pluck('codproducto')->toArray();
+
+                // Obtener datos de tblmproducto en una sola consulta
+                $productosData = DB::connection($conectionBex)
+                    ->table('tblmproducto')
+                    ->whereIn('CODPRODUCTO', $codigosProductos)
+                    ->get();
+
+                $dataToInsert = [];
+                foreach ($insertDataTbldstock as $data) {
+                    // Buscar los datos correspondientes en $productosData
+                    $productoData = $productosData->firstWhere('CODPRODUCTO', $data->codproducto);
+
+                    if ($productoData) {
+                        $dataToInsert[] = [
+                            'codproducto' => $data->codproducto,
+                            'codbodega' => $data->codbodega,
+                            'codimpuesto' => $data->codimpuesto,
+                            'existencia_stock' => $data->existencia_stock
+                        ];
+                    }
+                }
+                DB::connection($conectionBex)->table('tbldstock')->insert($dataToInsert);
+                print '◘ Datos insertados en la tabla tbldstock' . PHP_EOL;
+            }else{
+                Tbl_Log::create([
+                    'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertInventarioCustom()] => Tabla inventario se encuentra vacia.'
+                ]);
             }
-            DB::connection($conectionBex)->table('tbldstock')->insert($dataToInsert);
-            print '◘ Datos insertados en la tabla tbldstock' . PHP_EOL;
 
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Insert_bex_0002_Custom[insertInventarioCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertInventarioCustom()] => '.$e->getMessage()
             ]);
             return print '▲ Error en insertInventarioCustom';
         }
@@ -618,7 +625,7 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Insert_bex_0002_Custom[InsertMpiosCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[InsertMpiosCustom()] => '.$e->getMessage()
             ]);
             return print '▲ Error en InsertMpiosCustom';
         }
@@ -691,7 +698,7 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Insert_bex_0002_Custom[insertPaisCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertPaisCustom()] => '.$e->getMessage()
             ]);
             return print '▲ Error en insertPaisCustom';
         }
@@ -765,7 +772,7 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Insert_bex_0002_Custom[insertPreciosCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertPreciosCustom()] => '.$e->getMessage()
             ]);
             return print '▲ Error en insertPreciosCustom';
         }
@@ -908,7 +915,7 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Insert_bex_0002_Custom[insertPreciosCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertPreciosCustom()] => '.$e->getMessage()
             ]);
             return print '▲ Error en insertPreciosCustom';
         }
@@ -987,7 +994,7 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Insert_bex_0002_Custom[insertRuteroCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertRuteroCustom()] => '.$e->getMessage()
             ]);
             return print '▲ Error en insertRuteroCustom';
         }
@@ -1144,7 +1151,7 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Insert_bex_0002_Custom[insertVendedoresCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertVendedoresCustom()] => '.$e->getMessage()
             ]);
             return print '▲ Error en insertVendedoresCustom';
         }
@@ -1191,7 +1198,7 @@ class InsertCustom
             } 
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Insert_bex_0002_Custom[InsertAmovilCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[InsertAmovilCustom()] => '.$e->getMessage()
             ]);
             return print '▲ Error en InsertAmovilCustom';
         }

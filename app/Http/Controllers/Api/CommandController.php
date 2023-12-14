@@ -25,6 +25,7 @@ class CommandController extends Controller
 
     public function updateInformation(Request $request){
         try {
+        
             $count= count($request->all());
             if($count == 4){
 
@@ -44,7 +45,7 @@ class CommandController extends Controller
                     'response' =>'El numero de atributos no son correctos'
                 ]);
             }
-
+            
             $rules = [
                 'date' => 'nullable|date_format:Y-m-d',
                 'hour' => 'nullable|date_format:H:i',
@@ -68,7 +69,7 @@ class CommandController extends Controller
             $areas = ['bexmovil', 'bextms', 'bextramites', 'bexwms', 'ecomerce'];
             if (!in_array($request->area, $areas)) {
                 return response()->json([
-                    'status'   => 200, 
+                    'status'   => 401, 
                     'response' => 'El area '.$request->area.' no existe'
                 ]);
             }

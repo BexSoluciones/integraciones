@@ -29,7 +29,6 @@ trait ConnectionTrait {
             }
         }else{
             $dataConnection = Connection_Bexsoluciones::showConnectionBS($db, $area)->first();
-            
             if (!$dataConnection) {
                 Tbl_Log::create([
                     'descripcion' => 'Traits::ConnectionTrait[connectionDB()] => El id '.$db.' del area '.$area.' no existe en la tabla connection_bexsoluciones.'
@@ -63,7 +62,7 @@ trait ConnectionTrait {
             Tbl_Log::create([
                 'descripcion' => 'Traits::ConnectionTrait[connectionDB()] => Error al configurar la conexión: ' . $e->getMessage()
             ]);
-           return false;
+            return false;
         }
     }
 }

@@ -28,12 +28,11 @@ class UpdateInformation extends Command {
             $status = $this->input->hasArgument('status') ? $this->argument('status') : false;
 
             //Function that configures the database (ConnetionTrait).
-            Log::info($db);
             $configDB = $this->connectionDB($db, 'local'); 
             if($configDB == false){
                 return;
             }
-        
+            /*
             //Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
             if($status == 'new'){
                 $this->preMigration($db);
@@ -42,7 +41,7 @@ class UpdateInformation extends Command {
             }
 
             //Function to extract data through WS (DataImportTrait).
-            $config = Ws_Config::getConnectionForId(1);
+            $config = Ws_Config::where('estado', 1)->first();
 
             //Cuando el ws_config no tiene informacion es porque los planos se suben automaticamente sin necesidad de conexion
             if ($config->ConecctionType == 'planos') {
@@ -54,10 +53,11 @@ class UpdateInformation extends Command {
             //Function to configure and migrate tables (MigrateTrait).
             if($archivosPlanos == true){
                 $this->preMigration($db);
-            }
+            }*/
         
             //Function to read and export flat file to tenant DB
-            $this->readFlatFile($db);
+            $x = $this->readFlatFile($db);
+            dd($x);
 
             //Realizar copia de seguridad para tipo de conexion "planoa"
             if ($config->ConecctionType == 'planos') {

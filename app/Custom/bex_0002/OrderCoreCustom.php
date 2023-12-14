@@ -101,7 +101,7 @@ class OrderCoreCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::OrderCoreCustomBex_0002[uploadOrder()] => '.$e->getMessage()
+                'descripcion' => 'Custom::bex_0002/OrderCoreCustom[uploadOrder()] => '.$e->getMessage()
             ]);
             return print '▲ Error en uploadOrder';
         }

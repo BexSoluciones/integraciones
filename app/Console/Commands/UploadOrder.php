@@ -37,7 +37,6 @@ class UploadOrder extends Command
                 $orderDetails = $this->getOrderDetail($orders);
                 return 0;
             }   
-
             return 1;
         }catch (\Exception $e) {
             Tbl_Log::create([
