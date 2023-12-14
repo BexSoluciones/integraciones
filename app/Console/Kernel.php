@@ -25,6 +25,9 @@ class Kernel extends ConsoleKernel
             $parameters  = Command::getAll()->get();
             
             foreach ($parameters as $parameter) {
+                // Si ocurre algun error se capura el ID para guardarlo en el catch
+                $parameterId = $parameter->id; 
+                
                 // Ejecuta el comando
                 $schedule->command($parameter->command, [
                     $parameter->name_db 
@@ -64,6 +67,8 @@ class Kernel extends ConsoleKernel
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $parameterId, 
+                'name_table'  => 'commands',
                 'descripcion' => 'Kernel[schedule()] => '.$e->getMessage()
             ]);
         }
@@ -71,7 +76,6 @@ class Kernel extends ConsoleKernel
 
     protected function commands(): void {
         $this->load(__DIR__.'/Commands');
-
         require base_path('routes/console.php');
     }
 }

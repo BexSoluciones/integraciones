@@ -54,7 +54,7 @@ class ImportationJob implements ShouldQueue
                 Importation_Demand::updateOrInsert(
                     ['consecutive' => $this->consecutive], ['state' => 2, 'updated_at' => $currentTime]
                 );
-                Log::info($dataImport->name_db);
+                
                 Artisan::call($dataImport->command, ['database' => $dataImport->name_db]);
                 $commandOutput = Artisan::output();
                 
@@ -81,7 +81,6 @@ class ImportationJob implements ShouldQueue
                 Importation_Demand::updateOrInsert(
                     ['consecutive' => $this->consecutive], ['state' => 2, 'updated_at' => $currentTime]
                 );
-                
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
@@ -91,7 +90,7 @@ class ImportationJob implements ShouldQueue
             Importation_Demand::updateOrInsert(
                 ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
             );
-            $importation->updateOrInsert(['name_db' => $parameters->name_db], ['state' => '1']);
+            $importation->updateOrInsert(['name_db' => $importation->name_db, 'area', $importation->name_db], ['state' => '1']);
         }
     }
 }

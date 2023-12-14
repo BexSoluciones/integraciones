@@ -30,7 +30,7 @@ class Connection_Bexsoluciones extends Model
 
     public function scopeShowConnectionBS($query, $id, $area){
         return $query->select('name', 'host', 'username', 'password', 'active')
-            ->where('id', $id)
-            ->where('area', 'bexmovil');
+            ->where('id', $id);
+            //->where('area', $area);
     }
 }

@@ -31,8 +31,4 @@ class Ws_Config extends Model
         'proxy_host',
         'proxy_port'
     ];
-
-    public static function getConnectionForId($idConnection){
-        return static::find($idConnection);
-    }
 }
