@@ -235,7 +235,7 @@ class CommandController extends Controller
             ]);
 
             if($output == 1){
-                $rutaArchivo = 'export/'.$request->name_db.'/'.$request->area.'/pedidos_txt/'.$request->closing.'.PE0';
+                $rutaArchivo = 'export/'.$request->name_db.'/'.$request->area.'/pedidos_txt/'.str_pad($request->closing,8,"0",STR_PAD_LEFT).'.PE0';
                 $rutaCompleta = storage_path('app/public/' . $rutaArchivo);
                 if (file_exists($rutaCompleta)) {
                      // URL pública del archivo
