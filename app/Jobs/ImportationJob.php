@@ -67,7 +67,7 @@ class ImportationJob implements ShouldQueue
                     'area' => $parameters->area
                 ]);
                 //$exportOutput = Artisan::output();
-
+                Log::info('******************************************');
                 Log::info($parameters);
                 
                 // [Estado:3] => Significa que la importación finalizo
@@ -78,7 +78,7 @@ class ImportationJob implements ShouldQueue
 
                 // Apenas termine vuelve a activar la importacion programada
                 $importation->updateOrInsert(['name_db' => $parameters->name_db], ['state' => '1']);
-            }else{
+            } else {
                 // [Estado:2] => Significa que la importación esta en ejecución
                 Importation_Demand::updateOrInsert(
                     ['consecutive' => $this->consecutive], ['state' => 2, 'updated_at' => $currentTime]
