@@ -59,7 +59,7 @@ class ImportationJob implements ShouldQueue
                 $commandOutput = Artisan::output();
 
                 Log::info('hasta aqui va bien');
-                
+                Log::info($commandOutput);
                 if ($commandOutput) {
                     $parameters = Command::forNameBD($dataImport->name_db, $dataImport->area)->first();
                     Artisan::call('command:export-information', [
