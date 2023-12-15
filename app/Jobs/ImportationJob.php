@@ -61,23 +61,32 @@ class ImportationJob implements ShouldQueue
                 Log::info('hasta aqui va bien');
                 
                 $parameters = Command::forNameBD($dataImport->name_db, $dataImport->area)->first();
-                Artisan::call('command:export-information', [
+
+                $value = Artisan::call('command:export-information', [
                     'tenantDB' => $parameters->name_db,
                     'connection_bs_id' => $parameters->connection_bexsoluciones_id,
                     'area' => $parameters->area
                 ]);
-                //$exportOutput = Artisan::output();
+
                 Log::info('******************************************');
                 Log::info($parameters);
-                
-                // [Estado:3] => Significa que la importación finalizo
-                Importation_Demand::updateOrInsert(
-                    ['consecutive' => $this->consecutive], ['state' => 3, 'updated_at' => $currentTime]
-                );
-                
+
+                if($value) {
+                    // [Estado:3] => Significa que la importación finalizo
+                    Importation_Demand::updateOrInsert(
+                        ['consecutive' => $this->consecutive], ['state' => 3, 'updated_at' => $currentTime]
+                    );
+                    
+                } else {
+                    // [Estado:4] => Significa que la importación finalizo
+                    Importation_Demand::updateOrInsert(
+                        ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
+                    );
+                }
 
                 // Apenas termine vuelve a activar la importacion programada
                 $importation->updateOrInsert(['name_db' => $parameters->name_db], ['state' => '1']);
+                
             } else {
                 // [Estado:2] => Significa que la importación esta en ejecución
                 Importation_Demand::updateOrInsert(
