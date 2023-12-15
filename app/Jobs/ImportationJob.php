@@ -23,6 +23,13 @@ class ImportationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * The number of seconds the job can run before timing out.
+     *
+     * @var int
+     */
+    public $timeout = 120;
+
     protected $consecutive;
 
     public function __construct($consecutive)
