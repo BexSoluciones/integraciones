@@ -93,8 +93,8 @@ class OrderCoreCustom
                     $cadena.="\n";
                     $dcto=0;
                 }
-            
-                $namefile=$closing.'.PE0';
+                
+                $namefile=str_pad($closing,8,"0",STR_PAD_LEFT).'.PE0';
                 Storage::disk('public')->put('export/bex_0002/bexmovil/pedidos_txt/' . $namefile, $cadena);    
             } else {
                 $error = 'El pedido no tiene productos asignados';
