@@ -57,6 +57,8 @@ class ImportationJob implements ShouldQueue
                 
                 Artisan::call($dataImport->command, ['database' => $dataImport->name_db]);
                 $commandOutput = Artisan::output();
+
+                Log::info('hasta aqui va bien');
                 
                 if ($commandOutput) {
                     $parameters = Command::forNameBD($dataImport->name_db, $dataImport->area)->first();
@@ -66,6 +68,8 @@ class ImportationJob implements ShouldQueue
                         'area' => $parameters->area
                     ]);
                     //$exportOutput = Artisan::output();
+
+                    Log::info($parameters);
                     
                     // [Estado:3] => Significa que la importación finalizo
                     Importation_Demand::updateOrInsert(
