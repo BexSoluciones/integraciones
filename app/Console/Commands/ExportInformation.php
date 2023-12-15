@@ -17,7 +17,7 @@ class ExportInformation extends Command
     protected $signature   = 'command:export-information {tenantDB} {connection_bs_id} {area}';
     protected $description = 'Export information to bex solutions databases';
 
-    public function handle()
+    public function handle() : int
     {
         try {
             $tenantDB     = $this->argument('tenantDB'); 
@@ -27,7 +27,7 @@ class ExportInformation extends Command
             //Function that configures the database (ConnetionTrait).
             $configDB = $this->connectionDB($conectionBex, 'externa', $area); 
             if($configDB == false){
-                return;
+                return 0;
             }
             
             // Llamar un custom de manera dinamica
@@ -62,7 +62,7 @@ class ExportInformation extends Command
             
             $configDB = $this->connectionDB($tenantDB, 'local');
             if($configDB == false){
-                return;
+                return 0;
             }
 
             $customMethods = [
@@ -89,7 +89,7 @@ class ExportInformation extends Command
                     $conectionSys = 2;
                     $configDB = $this->connectionDB($conectionSys, 'externa', $area);
                     if($configDB == false){
-                        return;
+                        return 0;
                     }
                     $conectionSys = Connection_Bexsoluciones::showConnectionBS($conectionSys, $area)->value('name');
                 }else{
@@ -104,6 +104,7 @@ class ExportInformation extends Command
                 }
             }
             print '◘ Información Base de Datos '.$tenantDB.' Exportada.' . PHP_EOL;
+            return 1;
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'descripcion' => 'Commands::ExportInformation[handle()] => '.$e->getMessage()
