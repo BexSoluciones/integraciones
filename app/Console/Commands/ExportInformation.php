@@ -88,9 +88,9 @@ class ExportInformation extends Command
                 if($tableName == 't16_bex_inventarios'){
                     $conectionSys = 2;
                     $configDB = $this->connectionDB($conectionSys, 'externa', $area);
-                    if($configDB == false){
-                        return 0;
-                    }
+                    // if($configDB == false){
+                    //     return 0;
+                    // }
                     $conectionSys = Connection_Bexsoluciones::showConnectionBS($conectionSys, $area)->value('name');
                 }else{
                     $conectionSys = null;
