@@ -1026,10 +1026,16 @@ class InsertCustom
                 print "◘ Datos insertados en la tabla s1e_vendedores" . PHP_EOL;   
                 
                 DB::connection($conectionBex)
+                    ->table('tblmvendedor')
+                    ->join('s1e_vendedores','tblmvendedor.CODVENDEDOR','=','s1e_vendedores.codvendedor')
+                    ->update(['tblmvendedor.CO' => 's1e_vendedores.centro_ope']);
+                print "◘ Datos actualizados en la tabla s1e_vendedores" . PHP_EOL;
+
+                 
+                DB::connection($conectionBex)
                     ->table('s1e_vendedores')
                     ->join('tblmvendedor','s1e_vendedores.codvendedor','=','tblmvendedor.CODVENDEDOR')
                     ->update(['s1e_vendedores.estado' => 'C']);
-                print "◘ Datos actualizados en la tabla s1e_vendedores" . PHP_EOL;
 
                 $NuevoVend = DB::connection($conectionBex)
                                 ->table('s1e_vendedores')
