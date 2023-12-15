@@ -35,6 +35,7 @@ class OrderCoreCustom
         
                     if(trim($cia->centroopesiesa)!=""){
                         $cadena.=str_pad($cia->centroopesiesa,2,"0",STR_PAD_RIGHT);
+                        $cadena.=$cia->inditemsiesa;    
                     }else{
                         $cadena.=str_pad(substr(trim($order->codbodega),3,2),2," ",STR_PAD_RIGHT);
                         $cadena.=$cia->inditemsiesa;    
