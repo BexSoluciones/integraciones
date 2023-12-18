@@ -30,12 +30,12 @@ class ExportInformation extends Command
                 return 0;
             }
 
-            $folderPath = storage_path("app/imports/$db/planos");
+            $folderPath = storage_path("app/imports/$tenantDB/planos");
             $txtFiles = glob("$folderPath/*.txt");
 
             if(count($txtFiles) == 0){
                 Tbl_Log::create([
-                    'descripcion' => 'Traits::ReadExportDataTrait[readFlatFile()] => No se encontraon archivos planos en '.$db
+                    'descripcion' => 'Commands::ExportInformation[handle()] => No se encontraon archivos planos en '.$db
                 ]);
                 return 0; 
             };
