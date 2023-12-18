@@ -25,14 +25,17 @@ class Importation_Demand extends Model
         'updated_at'
     ];
    
-    public function scopeProcessAndRunning($query){
+    public function scopeProcessAndRunning($query, $name_db, $area, $limit){
         $currentDate = Carbon::now()->toDateString();
         $currentHour = Carbon::now()->toTimeString();
-        //Restamos 30 minutos
-        $newHour = Carbon::parse($currentHour)->subMinutes(30)->toTimeString();
+     
+        // Aqui sabemos que importaciones se ejecutaron $minutos antes de la fecha actual.
+        $newHour = Carbon::parse($currentHour)->subMinutes($limit)->toTimeString();
         return $query->where('date', '>=', $currentDate)
             ->where('hour', '>=',  $newHour)
-            ->whereIn('state', ['1','2']);
+            ->where('name_db', $name_db)
+            ->where('area', $area)
+            ->whereIn('state', ['1','2','3']);
     }
 
     public function scopeForConsecutive($query, $consecutive){
@@ -46,11 +49,12 @@ class Importation_Demand extends Model
             ->whereIn('state', ['1', '2']);
     }
 
-    public function scopeNumberOfAttemptsPerDay($query, $name_db){
+    public function scopeNumberOfAttemptsPerDay($query, $name_db, $area){
         $currentDate = Carbon::now()->toDateString();
         return $query->where('name_db', $name_db)
             ->where('date', $currentDate)
             ->where('state', '!=', '4')
+            ->where('area', $area)
             ->count();
     }
 

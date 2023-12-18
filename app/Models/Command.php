@@ -34,7 +34,7 @@ class Command extends Model
     public function scopeForNameBD($query, $nameDB, $area){
         return $query->select('name_db', 'connection_bexsoluciones.name', 'commands.area', 'state', 'connection_bexsoluciones_id')
             ->join('connection_bexsoluciones', 'commands.connection_bexsoluciones_id', '=' ,'connection_bexsoluciones.id')
-            //->whereColumn('connection_bexsoluciones.area', 'commands.area')
+            ->whereColumn('connection_bexsoluciones.area', 'commands.area')
             ->where('name_db', $nameDB)
             ->where('commands.area', $area);
     }
