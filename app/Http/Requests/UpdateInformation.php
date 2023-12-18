@@ -8,7 +8,7 @@ use App\Models\Area;
 use App\Models\Limit;
 use App\Models\Command;
 use App\Models\Connection;
-use App\Models\time_Interval;
+use App\Models\Time_Interval;
 use App\Models\Importation_Demand;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -172,7 +172,7 @@ class UpdateInformation extends FormRequest
         }
 
         // Algoritmo para calcular si se puede realizar una importacion en la fecha seleccionada por el usuario
-        $timeInterval = time_Interval::getInterval($this->name_db, $this->area)->value('time');
+        $timeInterval = Time_Interval::getInterval($this->name_db, $this->area)->value('time');
         $processAndRunning = Importation_Demand::processAndRunning($this->name_db, $this->area, $timeInterval)->get();
         if(isset($processAndRunning)){
             foreach ($processAndRunning as $data) {
