@@ -27,4 +27,10 @@ class Connection extends Model
         return $query->select('id', 'name', 'host', 'username', 'password', 'alias', 'active', 'created_at', 
             'updated_at');
     }
+
+    public function scopeForNameDB($query, $name_db){
+        return $query->select('connection_bexsoluciones.id')
+            ->join('connection_bexsoluciones', 'connections.id', 'connection_bexsoluciones.connection_id')
+            ->where('connections.name', $name_db);
+    }
 }
