@@ -29,6 +29,16 @@ class ExportInformation extends Command
             if($configDB == false){
                 return 0;
             }
+
+            $folderPath = storage_path("app/imports/$db/planos");
+            $txtFiles = glob("$folderPath/*.txt");
+
+            if(count($txtFiles) == 0){
+                Tbl_Log::create([
+                    'descripcion' => 'Traits::ReadExportDataTrait[readFlatFile()] => No se encontraon archivos planos en '.$db
+                ]);
+                return 0; 
+            };
             
             // Llamar un custom de manera dinamica
             $custom = "App\\Custom\\$tenantDB\\InsertCustom";
@@ -88,9 +98,6 @@ class ExportInformation extends Command
                 if($tableName == 't16_bex_inventarios'){
                     $conectionSys = 2;
                     $configDB = $this->connectionDB($conectionSys, 'externa', $area);
-                    // if($configDB == false){
-                    //     return 0;
-                    // }
                     $conectionSys = Connection_Bexsoluciones::showConnectionBS($conectionSys, $area)->value('name');
                 }else{
                     $conectionSys = null;
