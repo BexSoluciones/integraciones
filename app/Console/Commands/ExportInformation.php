@@ -29,16 +29,6 @@ class ExportInformation extends Command
             if($configDB == false){
                 return 0;
             }
-
-            $folderPath = storage_path("app/imports/$tenantDB/planos");
-            $txtFiles = glob("$folderPath/*.txt");
-
-            if(count($txtFiles) == 0){
-                Tbl_Log::create([
-                    'descripcion' => 'Commands::ExportInformation[handle()] => No se encontraon archivos planos en '.$tenantDB
-                ]);
-                return 0; 
-            };
             
             // Llamar un custom de manera dinamica
             $custom = "App\\Custom\\$tenantDB\\InsertCustom";
