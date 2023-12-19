@@ -35,7 +35,7 @@ class ExportInformation extends Command
 
             if(count($txtFiles) == 0){
                 Tbl_Log::create([
-                    'descripcion' => 'Commands::ExportInformation[handle()] => No se encontraon archivos planos en '.$db
+                    'descripcion' => 'Commands::ExportInformation[handle()] => No se encontraon archivos planos en '.$tenantDB
                 ]);
                 return 0; 
             };

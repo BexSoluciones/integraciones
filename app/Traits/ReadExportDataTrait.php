@@ -31,14 +31,15 @@ trait ReadExportDataTrait {
             //Route of flat file
             $folderPath = storage_path("app/imports/$db/planos");
             $txtFiles = glob("$folderPath/*.txt");
-
+            Log::info('va a pasar');
             if(count($txtFiles) == 0){
+                Log::info('entro');
                 Tbl_Log::create([
-                    'descripcion' => 'Traits::ReadExportDataTrait[readFlatFile()] => No se encontraon archivos planos en '.$db
+                    'descripcion' => 'Traits::ReadExportDataTrait[readFlatFile()] => No se encontraron archivos planos en '.$db
                 ]);
                 return false; 
             };
-        
+            Log::info('paso');
             foreach ($txtFiles as $txtFile) {
                 
                 $content = file_get_contents($txtFile);
@@ -52,6 +53,7 @@ trait ReadExportDataTrait {
                 }
             }
             $this->info('◘ Proceso de exportacion finalizado en la BD del inquilino '.$db);
+            return true;
         } catch (\Exception $e) {
             $this->error("Ha ocurrido un error: " . $e->getMessage());
         }
