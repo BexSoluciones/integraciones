@@ -98,6 +98,7 @@ class ImportationJob implements ShouldQueue
                 $parameters = Command::forNameBD($dataImport->name_db, $dataImport->area)->first();
 
                 $updateInformation = Artisan::call($dataImport->command, ['database' => $dataImport->name_db]);
+
                 if($updateInformation == 0) {
                     // [Estado:4] => Significa que la importación finalizo
                     Importation_Demand::updateOrInsert(
@@ -114,6 +115,7 @@ class ImportationJob implements ShouldQueue
                     'connection_bs_id' => $parameters->connection_bexsoluciones_id,
                     'area' => $parameters->area
                 ]);
+                
                 if($value != 1) {
                     // [Estado:4] => Significa que la importación finalizo
                     Importation_Demand::updateOrInsert(
