@@ -35,7 +35,7 @@ class CommandController extends Controller
             $currentTimeDate = Carbon::now();
             $delayInSeconds = $currentTimeDate
                 ->diffInSeconds($data['dateUser'].' '.$data['hourUser'], 'UTC');
-                
+
             ImportationJob::dispatch($importation->consecutive)
                 ->onQueue($importation->area)
                 ->delay($delayInSeconds);
@@ -43,7 +43,7 @@ class CommandController extends Controller
             return response()->json([
                 'status'   => 200, 
                 'code' => $importation->consecutive,
-                'response' => 'Importación numero: '.$importation->consecutive.' la cual se ejecutara a las '.$importation->hour
+                'response' => 'Importación numero: '.$importation->consecutive.' la cual se ejecutara en la fecha: '.$importation->date.' a las '.$importation->hour
             ]);
         } catch (\Exception $e) {
             Tbl_Log::create([

@@ -8,7 +8,7 @@ use App\Models\Area;
 use App\Models\Limit;
 use App\Models\Command;
 use App\Models\Connection;
-use App\Models\time_Interval;
+use App\Models\Time_Interval;
 use App\Models\Importation_Demand;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -64,7 +64,6 @@ class UpdateInformation extends FormRequest
         }
 
         $keys = ['name_db', 'area', 'date', 'hour'];
-
         foreach ($this->all() as $key => $value) {
             if (!in_array($key, $keys)) {
                 $validator->errors()->add($key, 'El atributo ' . $key . ' es incorrecto');
@@ -84,9 +83,9 @@ class UpdateInformation extends FormRequest
         $areas = Area::where('state', 1)->pluck('name')->toArray();
         if (!in_array($this->area, $areas)) {
             throw new HttpResponseException(response()->json([
-                'status' => 401,
+                'status' => 422,
                 'response' => 'El area '.$this->area.' no existe'
-            ], 401));
+            ], 422));
         }
     }
 
@@ -95,9 +94,9 @@ class UpdateInformation extends FormRequest
         $connection = Connection::forNameDB($this->name_db)->first();
         if(!$connection) {
             throw new HttpResponseException(response()->json([
-                'status' => 401,
+                'status' => 422,
                 'response' => 'La base de datos '.$this->name_db.' no existe'
-            ], 401));
+            ], 422));
         }
     }
 
@@ -107,9 +106,9 @@ class UpdateInformation extends FormRequest
         $limit = Limit::getLimit($this->name_db, $this->area)->value('number');
         if(empty($limit)){
             throw new HttpResponseException(response()->json([
-                'status' => 401,
+                'status' => 422,
                 'response' => 'El usuario '.$this->name_db.' no tiene limite de importaciones programadas.'
-            ], 401));
+            ], 422));
         }
 
         $NumberOfAttemptsPerDay = Importation_Demand::numberOfAttemptsPerDay($this->name_db, $this->area);
@@ -127,9 +126,9 @@ class UpdateInformation extends FormRequest
         $importation = Command::forNameBD($this->name_db, $this->area)->first();
         if(empty($importation)){
             throw new HttpResponseException(response()->json([
-                'status'   => 401, 
+                'status'   => 422, 
                 'response' => 'El area '.$this->area.' no esta habilitada para este usuario.'
-            ], 401));
+            ], 422));
         }
         if($importation->state == '2'){
             throw new HttpResponseException(response()->json([
@@ -139,6 +138,7 @@ class UpdateInformation extends FormRequest
         }
     }
 
+    // Valida que la importacion se pueda realizar al momento que un usuario lo solicite
     public function timeValidator(){
 
         if ($this->date === '') {
@@ -156,12 +156,12 @@ class UpdateInformation extends FormRequest
         $currentHour = Carbon::now()->toTimeString();
         $currentDate = Carbon::now()->toDateString();
         
-        //Primero se calcula la diferencia entre la hora y fecha actual y la que ingresa el usuario
+        // Primero se calcula la diferencia entre la hora y fecha actual y la que ingresa el usuario
         if ($dateUser < $currentDate) {
             throw new HttpResponseException(response()->json([
-                'status'   => 401, 
+                'status'   => 422, 
                 'response' => 'La importación no puede ejecutarse el dia '.$dateUser.'. Por favor selecciona otra fecha.'
-            ], 401));
+            ], 422));
         }
 
         if ($hourUser < $currentHour && $dateUser == $currentDate) {
@@ -172,7 +172,7 @@ class UpdateInformation extends FormRequest
         }
 
         // Algoritmo para calcular si se puede realizar una importacion en la fecha seleccionada por el usuario
-        $timeInterval = time_Interval::getInterval($this->name_db, $this->area)->value('time');
+        $timeInterval = Time_Interval::getInterval($this->name_db, $this->area)->value('time');
         $processAndRunning = Importation_Demand::processAndRunning($this->name_db, $this->area, $timeInterval)->get();
         if(isset($processAndRunning)){
             foreach ($processAndRunning as $data) {
@@ -182,9 +182,9 @@ class UpdateInformation extends FormRequest
                 $differenceInMinutes = $datetimeUser->diffInMinutes($datetimeData);
                 if($differenceInMinutes <= $timeInterval){
                     throw new HttpResponseException(response()->json([
-                        'status'   => 401, 
+                        'status'   => 422, 
                         'response' => 'La importación no puede ejecutarse en la fecha '.$dateUser.' a las '.$hourUser.'. Por favor selecciona otra hora o fecha.'
-                    ], 401));
+                    ], 422));
                 }
             }
         }
