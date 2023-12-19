@@ -509,8 +509,35 @@ class InsertCustom
                 }
 
                 //Insertar datos en la tabla tbldstock
-                $insertDataTbldstock = $modelInstance::insertDataTbldstock()->get();
-                $codigosProductos = $insertDataTbldstock->pluck('codproducto')->toArray();
+                $inset=(count($datosAInsertar));
+                if($inset > 0){
+
+                    $datosAInsert = json_decode(json_encode($datosAInsertar,true));
+                    // Insertar los datos en lotes
+                    if(sizeof($datosAInsertar) > 0){
+                        foreach (array_chunk($datosAInsert,3000) as $dato) {
+                            $Insert = [];
+                            $count = count($dato);
+                            for($i=0;$i<$count;$i++) {
+                                $Insert[] = [
+                                    'CODPRODUCTO' => $dato[$i]->producto,
+                                    'CODBODEGA'  => $dato[$i]->bodega,
+                                    'CODIMPUESTO' => $dato[$i]->iva,
+                                    'EXISTENCIA_STOCK' => $dato[$i]->inventario
+                                ];    
+                            }  
+                            DB::connection($conectionBex)->table('tbldstock')->insert($Insert);
+                        }
+                        print '◘ Datos insertados en la tabla tbldstock' . PHP_EOL;
+                    }
+        
+                    print '◘ Datos Actualizados en la tabla tbldstock' . PHP_EOL;
+                }else{
+                    print '◘ No hay datos para Actualizar en la tabla tbldstock' . PHP_EOL;
+                } 
+
+                // $insertDataTbldstock = $modelInstance::insertDataTbldstock()->get();
+                // $codigosProductos = $insertDataTbldstock->pluck('codproducto')->toArray();
 
                 // Obtener datos de tblmproducto en una sola consulta
                 $productosData = DB::connection($conectionBex)
