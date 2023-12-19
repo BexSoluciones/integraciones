@@ -526,7 +526,7 @@ class InsertCustom
                                     'EXISTENCIA_STOCK' => $dato[$i]->inventario
                                 ];    
                             }  
-                            DB::connection($conectionBex)->table('tbldstock')->insert($Insert);
+                            DB::connection($conectionBex)->table('tbldstock')->insertOrIgnore($Insert);
                         }
                         print '◘ Datos insertados en la tabla tbldstock' . PHP_EOL;
                     }
@@ -540,26 +540,27 @@ class InsertCustom
                 // $codigosProductos = $insertDataTbldstock->pluck('codproducto')->toArray();
 
                 // Obtener datos de tblmproducto en una sola consulta
-                $productosData = DB::connection($conectionBex)
-                    ->table('tblmproducto')
-                    ->whereIn('CODPRODUCTO', $codigosProductos)
-                    ->get();
+                // $productosData = DB::connection($conectionBex)
+                //     ->table('tblmproducto')
+                //     ->whereIn('CODPRODUCTO', $codigosProductos)
+                //     ->get();
 
-                $dataToInsert = [];
-                foreach ($insertDataTbldstock as $data) {
-                    // Buscar los datos correspondientes en $productosData
-                    $productoData = $productosData->firstWhere('CODPRODUCTO', $data->codproducto);
+                // $dataToInsert = [];
+                // foreach ($insertDataTbldstock as $data) {
+                //     // Buscar los datos correspondientes en $productosData
+                //     $productoData = $productosData->firstWhere('CODPRODUCTO', $data->codproducto);
 
-                    if ($productoData) {
-                        $dataToInsert[] = [
-                            'codproducto' => $data->codproducto,
-                            'codbodega' => $data->codbodega,
-                            'codimpuesto' => $data->codimpuesto,
-                            'existencia_stock' => $data->existencia_stock
-                        ];
-                    }
-                }
-                DB::connection($conectionBex)->table('tbldstock')->insert($dataToInsert);
+                //     if ($productoData) {
+                //         $dataToInsert[] = [
+                //             'codproducto' => $data->codproducto,
+                //             'codbodega' => $data->codbodega,
+                //             'codimpuesto' => $data->codimpuesto,
+                //             'existencia_stock' => $data->existencia_stock
+                //         ];
+                //     }
+                // }
+                // DB::connection($conectionBex)->table('tbldstock')->insert($dataToInsert);
+                
                 print '◘ Datos insertados en la tabla tbldstock' . PHP_EOL;
             }else{
                 Tbl_Log::create([
