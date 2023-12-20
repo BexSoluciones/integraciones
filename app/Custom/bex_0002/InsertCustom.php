@@ -1235,6 +1235,6 @@ class InsertCustom
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[InsertAmovilCustom()] => '.$e->getMessage()
             ]);
             return print '▲ Error en InsertAmovilCustom';
-        }
-    }
+        }
+    }
 }
