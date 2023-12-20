@@ -37,6 +37,6 @@ class Command extends Model
             ->whereColumn('connection_bexsoluciones.area', 'commands.area')
             ->where('name_db', $nameDB)
             ->where('commands.area', $area)
-            ->where('commands.state', '!=', 0);
+            ->where('commands.state', '!=', '0');
     }
 }

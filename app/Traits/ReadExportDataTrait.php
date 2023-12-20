@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\File;
 
 trait ReadExportDataTrait {
     
-    public function readFlatFile($db) {
+    public function readFlatFile($db, $id_importation, $name_table) {
         try {
-            //Folder of Models
+            // Folder of Models
             $baseNamespace = 'App\\Models\\'.ucfirst($db).'\\';
-            //All models
+            // All models
             $modelFiles = File::files(app_path('Models/'.ucfirst($db)));
             $availableModels = [];
 
@@ -28,34 +28,41 @@ trait ReadExportDataTrait {
                 }
             }
             
-            //Route of flat file
+            // Route of flat file
             $folderPath = storage_path("app/imports/$db/planos");
             $txtFiles = glob("$folderPath/*.txt");
-            Log::info('va a pasar');
+       
             if(count($txtFiles) == 0){
-                Log::info('entro');
                 Tbl_Log::create([
+                    'id_table'    => $id_importation,
+                    'name_table'  => $name_table,
                     'descripcion' => 'Traits::ReadExportDataTrait[readFlatFile()] => No se encontraron archivos planos en '.$db
                 ]);
-                return false; 
+                return 0; 
             };
-            Log::info('paso');
+     
             foreach ($txtFiles as $txtFile) {
-                
                 $content = file_get_contents($txtFile);
                 $filenameWithoutExtension = pathinfo($txtFile, PATHINFO_FILENAME);
-                
                 foreach ($availableModels as $modelClass => $tableName) {
                     if ($filenameWithoutExtension === $tableName) {
                         $this->info("◘ El archivo plano $filenameWithoutExtension coincide con el modelo: $tableName");
-                        $this->processFileContent($modelClass, $content, $tableName);
+                        $fileContent = $this->processFileContent($modelClass, $content, $tableName);
+                        if($fileContent == 0){
+                            return 0;
+                        }
                     }
                 }
             }
             $this->info('◘ Proceso de exportacion finalizado en la BD del inquilino '.$db);
             return true;
         } catch (\Exception $e) {
-            $this->error("Ha ocurrido un error: " . $e->getMessage());
+            Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
+                'descripcion' => 'Traits::ReadExportDataTrait[readFlatFile()] => '.$e->getMessage()
+            ]);
+            return 0;
         }
     }
 
@@ -66,8 +73,12 @@ trait ReadExportDataTrait {
             $autoIncrement = 1;
     
             if ($content === false) {
-                $this->error("No se pudo leer el archivo plano " . $modelInstance);
-                return;
+                Tbl_Log::create([
+                    'id_table'    => $id_importation,
+                    'name_table'  => $name_table,
+                    'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => No se pudo leer el archivo plano '.$modelInstance
+                ]);
+                return 0;
             }
     
             // Split the content into lines
@@ -111,10 +122,20 @@ trait ReadExportDataTrait {
                 }
                 $this->info("◘ Datos insertados en la tabla " . $tableName);
             } else {
-                $this->error("Error al insertar datos en la tabla " . $tableName);
+                Tbl_Log::create([
+                    'id_table'    => $id_importation,
+                    'name_table'  => $name_table,
+                    'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => Error al insertar datos en la tabla '.$tableName
+                ]);
+                return 0;
             }
         } catch (\Exception $e) {
-            $this->error("Ha ocurrido un error: " . $e->getMessage());
+            Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
+                'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => '.$e->getMessage()
+            ]);
+            return 0;
         }
     }
 }

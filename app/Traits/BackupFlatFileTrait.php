@@ -3,6 +3,8 @@ namespace App\Traits;
 
 use Exception;
 
+use App\Models\Tbl_Log;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -10,7 +12,6 @@ trait BackupFlatFileTrait {
     
     public function backupFlatFile($db, $estado){
         try {
-
             if($estado == true){
                 $flatFilesRoute = 'imports/'.$db.'/planos';
                 $backupRoute = 'imports/'.$db.'/planos/backup';
@@ -34,11 +35,21 @@ trait BackupFlatFileTrait {
             if($estado == true){
                 $this->info('◘ Copia de seguridad archivos planos '.$db.' realizada con exito');
             }else{
-                $this->info('◘ Ha ocurrido un error, por lo tanto se restauro la copia de seguridad archivos planos '.$db);
+                Tbl_Log::create([
+                    'id_table'    => $id_importation,
+                    'name_table'  => $name_table,
+                    'descripcion' => 'Traits::BackupFlatFileTrait[backupFlatFile()] => Ha ocurrido un error, por lo tanto se restauro la copia de seguridad archivos planos '.$db
+                ]);
+                return 0;
             }
-            return true;
+            return 1;
         } catch (\Exception $e) {
-            $this->info("Ha ocurrido un error al momento de crear copia de seguridad archivos TXT: " . $e->getMessage());
+            Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
+                'descripcion' => 'Traits::BackupFlatFileTrait[backupFlatFile()] => '.$e->getMessage()
+            ]);
+            return 0;
         }
     }
     
