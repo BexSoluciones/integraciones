@@ -45,7 +45,6 @@ class ImportationJob implements ShouldQueue
                     Tbl_Log::create([
                         'id_table'    => $this->consecutive,
                         'name_table'  => 'commands',
-                        'area'        => $dataImport->area,
                         'descripcion' => 'Jobs::ImportationJob[handle()] => No existe la BD '.$dataImport->name_db
                     ]);
                     return;
@@ -61,7 +60,7 @@ class ImportationJob implements ShouldQueue
                     'id_importation' => $this->consecutive,
                     'name_table'     => 'importation_demand'
                 ]);
-               
+                
                 if($updateInformation == 0) {
                     // [Estado:4] => Significa que la importación finalizo
                     Importation_Demand::updateOrInsert(
@@ -77,8 +76,8 @@ class ImportationJob implements ShouldQueue
                     'id_importation'   => $this->consecutive,
                     'name_table'       => 'importation_demand'
                 ]);
-                Log::info('paso 6');
-                if($exportInformation == 1) {
+           
+                if($exportInformation != 0) {
                     // [Estado:3] => Significa que la importación finalizo
                     Importation_Demand::updateOrInsert(
                         ['consecutive' => $this->consecutive], ['state' => 3, 'updated_at' => $currentTime]
@@ -89,13 +88,9 @@ class ImportationJob implements ShouldQueue
                         ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
                     );
                 }
-                Log::info('paso 7');
                 return;
             }
 
-            Log::info('por aqui paso');
-            
-            return;
             if($importation->state == '1'){
                 /* Colocamos en state 0 cualquier importacion programada para que no se cruce con
                    la que esta a punto de ejecutarse */
@@ -106,9 +101,11 @@ class ImportationJob implements ShouldQueue
                     ['consecutive' => $this->consecutive], ['state' => 2, 'updated_at' => $currentTime]
                 );
                 
-                $parameters = Command::forNameBD($dataImport->name_db, $dataImport->area)->first();
-
-                $updateInformation = Artisan::call($dataImport->command, ['database' => $dataImport->name_db]);
+                $updateInformation = Artisan::call($dataImport->command, [
+                    'database'       => $dataImport->name_db,
+                    'id_importation' => $this->consecutive,
+                    'name_table'     => 'importation_demand'
+                ]);
 
                 if($updateInformation == 0) {
                     // [Estado:4] => Significa que la importación finalizo
@@ -117,18 +114,19 @@ class ImportationJob implements ShouldQueue
                     );
 
                     // Apenas termine vuelve a activar la importacion programada
-                    $importation->updateOrInsert(['name_db' => $parameters->name_db], ['state' => '1']);
+                    $importation->updateOrInsert(['name_db' => $importation->name_db], ['state' => '1']);
                     return;
                 }
-                Log::info('finalizo');
-                return;
-                $value = Artisan::call('command:export-information', [
-                    'tenantDB' => $parameters->name_db,
-                    'connection_bs_id' => $parameters->connection_bexsoluciones_id,
-                    'area' => $parameters->area
+            
+                $exportInformation = Artisan::call('command:export-information', [
+                    'tenantDB'         => $importation->name_db,
+                    'connection_bs_id' => $importation->connection_bexsoluciones_id,
+                    'area'             => $importation->area,
+                    'id_importation'   => $this->consecutive,
+                    'name_table'       => 'importation_demand'
                 ]);
                 
-                if($value != 1) {
+                if($exportInformation != 0) {
                     // [Estado:4] => Significa que la importación finalizo
                     Importation_Demand::updateOrInsert(
                         ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
@@ -141,7 +139,7 @@ class ImportationJob implements ShouldQueue
                 );
 
                 // Apenas termine vuelve a activar la importacion programada
-                $importation->updateOrInsert(['name_db' => $parameters->name_db], ['state' => '1']);
+                $importation->updateOrInsert(['name_db' => $importation->name_db], ['state' => '1']);
                 
             } else {
                 // [Estado:2] => Significa que la importación esta en ejecución
@@ -151,8 +149,11 @@ class ImportationJob implements ShouldQueue
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $this->consecutive,
+                'name_table'  => 'importation_demand',
                 'descripcion' => 'Jobs::ImportationJob[handle()] => '.$e->getMessage()
             ]);
+
             // [Estado:4] => Significa que ocurrio un error en la importación
             Importation_Demand::updateOrInsert(
                 ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]

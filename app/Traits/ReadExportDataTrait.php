@@ -13,9 +13,9 @@ trait ReadExportDataTrait {
     
     public function readFlatFile($db, $id_importation, $name_table) {
         try {
-            // Folder of Models
+            //Folder of Models
             $baseNamespace = 'App\\Models\\'.ucfirst($db).'\\';
-            // All models
+            //All models
             $modelFiles = File::files(app_path('Models/'.ucfirst($db)));
             $availableModels = [];
 
@@ -28,45 +28,39 @@ trait ReadExportDataTrait {
                 }
             }
             
-            // Route of flat file
+            //Route of flat file
             $folderPath = storage_path("app/imports/$db/planos");
             $txtFiles = glob("$folderPath/*.txt");
-       
+           
             if(count($txtFiles) == 0){
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
                     'name_table'  => $name_table,
                     'descripcion' => 'Traits::ReadExportDataTrait[readFlatFile()] => No se encontraron archivos planos en '.$db
                 ]);
-                return 0; 
+                return 0;
             };
-     
+           
             foreach ($txtFiles as $txtFile) {
+                
                 $content = file_get_contents($txtFile);
                 $filenameWithoutExtension = pathinfo($txtFile, PATHINFO_FILENAME);
+                
                 foreach ($availableModels as $modelClass => $tableName) {
                     if ($filenameWithoutExtension === $tableName) {
                         $this->info("◘ El archivo plano $filenameWithoutExtension coincide con el modelo: $tableName");
-                        $fileContent = $this->processFileContent($modelClass, $content, $tableName);
-                        if($fileContent == 0){
-                            return 0;
-                        }
+                        $this->processFileContent($modelClass, $content, $tableName, $id_importation, $name_table);
                     }
                 }
             }
             $this->info('◘ Proceso de exportacion finalizado en la BD del inquilino '.$db);
             return true;
         } catch (\Exception $e) {
-            Tbl_Log::create([
-                'id_table'    => $id_importation,
-                'name_table'  => $name_table,
-                'descripcion' => 'Traits::ReadExportDataTrait[readFlatFile()] => '.$e->getMessage()
-            ]);
-            return 0;
+            $this->error("Ha ocurrido un error: " . $e->getMessage());
         }
     }
 
-    private function processFileContent($modelClass, $content, $tableName) {
+    private function processFileContent($modelClass, $content, $tableName, $id_importation, $name_table) {
         try {
             $modelInstance = new $modelClass();
             $columnsModelo = $modelInstance->getFillable();
@@ -109,7 +103,6 @@ trait ReadExportDataTrait {
                         //Inserta un autoincrement
                         $rowData['consecutivo'] = $autoIncrement++;
                     }
-    
                     $dataToInsert[] = array_map('utf8_encode', $rowData);
                 }
             }

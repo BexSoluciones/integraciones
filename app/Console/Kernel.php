@@ -28,7 +28,9 @@ class Kernel extends ConsoleKernel
                 
                 // Ejecuta el comando
                 $schedule->command($parameter->command, [
-                    $parameter->name_db 
+                    'database'       => $parameter->name_db,
+                    'id_importation' => $parameter->id,
+                    'name_table'     => 'commands'
                 ])
                 ->before(function () use ($parameter) {
                     // Se cambia el state a 2 para saber que se esta ejecutando
@@ -38,9 +40,11 @@ class Kernel extends ConsoleKernel
                 ->cron($parameter->cron_expression)->onSuccess(function (Stringable $output) use ($parameter) {
                     // Llamar a otro comando si es necesario
                     Artisan::call('command:export-information', [
-                        'tenantDB' => $parameter->name_db,
+                        'tenantDB'         => $parameter->name_db,
                         'connection_bs_id' => $parameter->connection_bexsoluciones_id,
-                        'area' => $parameter->area
+                        'area'             => $parameter->area,
+                        'id_importation'   => $parameter->id,
+                        'name_table'       => 'commands'
                     ]);
                     
                     //Si finaliza correctamente se cambio a state 1 para que pueda volver a ejecutarse
@@ -57,6 +61,8 @@ class Kernel extends ConsoleKernel
                 ->onFailure(function (Stringable $output) use ($parameter) {
                     $parameter->updateOrInsert(['name_db' => $parameter->name_db], ['state' => '1']);
                     Tbl_Log::create([
+                        'id_importation' => $parameter->id,
+                        'name_table'     => 'commands',
                         'descripcion' => 'Kernel[schedule()] => '.$output
                     ]);
                 })

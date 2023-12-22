@@ -28,7 +28,7 @@ class UpdateInformation extends Command {
             $status         = $this->input->hasArgument('status') ? $this->argument('status') : false;
             $id_importation = $this->input->hasArgument('id_importation') ? $this->argument('id_importation') : null;
             $name_table     = $this->input->hasArgument('name_table') ? $this->argument('name_table') : null;
-          
+           
             // Function that configures the database (ConnetionTrait).
             $configDB = $this->connectionDB($db, 'local'); 
             if($configDB == false){
@@ -46,7 +46,7 @@ class UpdateInformation extends Command {
                 print '◘ Ya puedes ejecutar el comando: php artisan command:update-information '.$db . PHP_EOL;
                 return 0;
             }
-       
+            
             // Function to extract data through WS (DataImportTrait).
             $config = Ws_Config::where('estado', 1)->first();
             if(!$config){
@@ -57,25 +57,25 @@ class UpdateInformation extends Command {
                 ]);
                 return 0;
             }
-        
+       
             // Cuando el ws_config no tiene informacion es porque los planos se suben automaticamente sin necesidad de conexion
             if ($config->ConecctionType == 'planos') {
                 $archivosPlanos = true;
             } elseif($config->ConecctionType == 'ws') {
                 $archivosPlanos = $this->importData($db);
             }
-       
+          
             // Function to configure and migrate tables (MigrateTrait).
             if($archivosPlanos == true){
                 $this->preMigration($db);
             }
-
+            
             //Function to read and export flat file to tenant DB
             $flatFile = $this->readFlatFile($db, $id_importation, $name_table);
             if($flatFile == 0){
                 return 0;
             }
-      
+           
             //Realizar copia de seguridad para tipo de conexion "planoa"
             if ($config->ConecctionType == 'planos') {
                 //backup txt files

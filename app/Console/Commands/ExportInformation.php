@@ -110,7 +110,15 @@ class ExportInformation extends Command
                 if (array_key_exists($tableName, $customMethods)) {
                     $methodName = $customMethods[$tableName];
                     $insert = new $custom();
-                    $insert->$methodName($conectionBex, $conectionSys, $datosAInsertar, $modelInstance, $tableName);
+                    $insert->$methodName(
+                                        $conectionBex, 
+                                        $conectionSys, 
+                                        $datosAInsertar, 
+                                        $id_importation,
+                                        $name_table,
+                                        $modelInstance, 
+                                        $tableName
+                                    );
                     print "◘ Proceso $methodName Finalizado" . PHP_EOL;
                 }
             }
@@ -118,8 +126,11 @@ class ExportInformation extends Command
             return 1;
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
                 'descripcion' => 'Commands::ExportInformation[handle()] => '.$e->getMessage()
             ]);
+            return 0;
         }
     }
 }
