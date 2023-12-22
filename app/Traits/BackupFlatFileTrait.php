@@ -37,7 +37,7 @@ trait BackupFlatFileTrait {
             }else{
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'name_table'  => $name_table,
+                    'type'  => $type,
                     'descripcion' => 'Traits::BackupFlatFileTrait[backupFlatFile()] => Ha ocurrido un error, por lo tanto se restauro la copia de seguridad archivos planos '.$db
                 ]);
                 return 0;
@@ -46,7 +46,7 @@ trait BackupFlatFileTrait {
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Traits::BackupFlatFileTrait[backupFlatFile()] => '.$e->getMessage()
             ]);
             return 0;

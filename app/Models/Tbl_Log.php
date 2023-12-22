@@ -19,7 +19,7 @@ class Tbl_Log extends Model {
     protected $fillable = [
         'codigo',
         'id_table',
-        'name_table', 
+        'type', 
         'descripcion',
         'created_at',
         'updated_at'
