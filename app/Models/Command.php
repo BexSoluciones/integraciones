@@ -25,7 +25,7 @@ class Command extends Model
     public $timestamps = false;
 
     public function scopeGetAll($query){
-        return $query->select('connection_bexsoluciones.name', 'command', 'name_db', 'cron_expression', 'commands.area', 'cod_area', 'state', 'connection_bexsoluciones_id')
+        return $query->select('commands.id', 'connection_bexsoluciones.name', 'command', 'name_db', 'cron_expression', 'commands.area', 'cod_area', 'state', 'connection_bexsoluciones_id')
                     ->join('connection_bexsoluciones', 'commands.connection_bexsoluciones_id', '=' ,'connection_bexsoluciones.id')
                     //->whereColumn('connection_bexsoluciones.area', 'commands.area')
                     ->where('state', '1');
@@ -37,6 +37,6 @@ class Command extends Model
             ->whereColumn('connection_bexsoluciones.area', 'commands.area')
             ->where('name_db', $nameDB)
             ->where('commands.area', $area)
-            ->where('commands.state', '!=', 0);
+            ->where('commands.state', '!=', '0');
     }
 }

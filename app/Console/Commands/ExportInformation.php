@@ -14,19 +14,26 @@ class ExportInformation extends Command
 {
     use ConnectionTrait;
 
-    protected $signature   = 'command:export-information {tenantDB} {connection_bs_id} {area}';
+    protected $signature   = 'command:export-information {tenantDB} {connection_bs_id} {area} {id_importation?} {name_table?}';
     protected $description = 'Export information to bex solutions databases';
 
     public function handle() : int
     {
         try {
-            $tenantDB     = $this->argument('tenantDB'); 
-            $conectionBex = $this->argument('connection_bs_id');
-            $area         = $this->argument('area');
+            $tenantDB       = $this->argument('tenantDB'); 
+            $conectionBex   = $this->argument('connection_bs_id');
+            $area           = $this->argument('area');
+            $id_importation = $this->input->hasArgument('id_importation') ? $this->argument('id_importation') : null;
+            $name_table     = $this->input->hasArgument('name_table') ? $this->argument('name_table') : null;
 
             //Function that configures the database (ConnetionTrait).
             $configDB = $this->connectionDB($conectionBex, 'externa', $area); 
             if($configDB == false){
+                Tbl_Log::create([
+                    'id_table'    => $id_importation,
+                    'name_table'  => $name_table,
+                    'descripcion' => 'Commands::ExportInformation[handle()] => Error al conectar BD externa'
+                ]);
                 return 0;
             }
             
@@ -36,9 +43,11 @@ class ExportInformation extends Command
             // Verificar si el custom existe
             if (!class_exists($custom)) {
                 Tbl_Log::create([
+                    'id_table'    => $id_importation,
+                    'name_table'  => $name_table,
                     'descripcion' => 'Commands::ExportInformation[handle()] => No existe el custom '.$custom
                 ]);
-                return print '▲ Se ha producido un error en la importación' . PHP_EOL;
+                return 0;
             }
 
             // Instanciamos el custom
@@ -62,6 +71,11 @@ class ExportInformation extends Command
             
             $configDB = $this->connectionDB($tenantDB, 'local');
             if($configDB == false){
+                Tbl_Log::create([
+                    'id_table'    => $id_importation,
+                    'name_table'  => $name_table,
+                    'descripcion' => 'Commands::ExportInformation[handle()] => Error al conectar BD local'
+                ]);
                 return 0;
             }
 
@@ -96,7 +110,15 @@ class ExportInformation extends Command
                 if (array_key_exists($tableName, $customMethods)) {
                     $methodName = $customMethods[$tableName];
                     $insert = new $custom();
-                    $insert->$methodName($conectionBex, $conectionSys, $datosAInsertar, $modelInstance, $tableName);
+                    $insert->$methodName(
+                                        $conectionBex, 
+                                        $conectionSys, 
+                                        $datosAInsertar, 
+                                        $id_importation,
+                                        $name_table,
+                                        $modelInstance, 
+                                        $tableName
+                                    );
                     print "◘ Proceso $methodName Finalizado" . PHP_EOL;
                 }
             }
@@ -104,8 +126,11 @@ class ExportInformation extends Command
             return 1;
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
                 'descripcion' => 'Commands::ExportInformation[handle()] => '.$e->getMessage()
             ]);
+            return 0;
         }
     }
 }

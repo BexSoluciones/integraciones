@@ -14,7 +14,7 @@ class InsertCustom
 {
     use ConnectionTrait;
 
-    public function insertCarteraCustom($conectionBex, $conectionSys, $datosAInsertar)
+    public function insertCarteraCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
     {
         try {
             //Tunca tabla s1e_cartera
@@ -95,13 +95,15 @@ class InsertCustom
             DB::connection($conectionBex)->statement('DROP TABLE IF EXISTS s1e_dptos');*/
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
                 'descripcion' => 'Custom::bex_0002/InsertCustom[insertCarteraCustom()] => '.$e->getMessage()
             ]);
-            return print '▲ Error en insertCarteraCustom';
+            return 0;
         }
     }
 
-    public function insertClientesCustom($conectionBex, $conectionSys, $datosAInsertar, $modelInstance, $tableName)
+    public function insertClientesCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table, $modelInstance, $tableName)
     {   
         try {
             $currentDate = date('Ymd');
@@ -233,13 +235,15 @@ class InsertCustom
             print '◘ Datos actualizados en la tabla tblmcliente' . PHP_EOL;
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertClientesCustom()] => '.$e->getMessage()
             ]);
-            return print '▲ Error en insertClientesCustom';
+            return 0;
         }
     }
 
-    public function insertDptosCustom($conectionBex, $conectionSys, $datosAInsertar)
+    public function insertDptosCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
     {
         try {
             $countPais = DB::connection($conectionBex)->table('tblmdpto')->get()->count();
@@ -309,13 +313,15 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertDptosCustom()] => '.$e->getMessage()
             ]);
-            return print '▲ Error en insertDptosCustom';
+            return 0;
         }
     }
 
-    public function insertEstadoPedidosCustom($conectionBex, $conectionSys, $datosAInsertar)
+    public function insertEstadoPedidosCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
     {
         try {
             $insertCount = count($datosAInsertar);
@@ -443,13 +449,15 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertEstadoPedidosCustom()] => '.$e->getMessage()
             ]);
-            return print '▲ Error en insertEstadoPedidosCustom';
+            return 0;
         }
     }
 
-    public function insertInventarioCustom($conectionBex, $conectionSys, $datosAInsertar, $modelInstance)
+    public function insertInventarioCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table, $modelInstance)
     {
         try {
             $tblbinventario = count($datosAInsertar);
@@ -511,7 +519,6 @@ class InsertCustom
                 //Insertar datos en la tabla tbldstock
                 $inset=(count($datosAInsertar));
                 if($inset > 0){
-
                     $datosAInsert = json_decode(json_encode($datosAInsertar,true));
                     // Insertar los datos en lotes
                     if(sizeof($datosAInsertar) > 0){
@@ -564,19 +571,24 @@ class InsertCustom
                 print '◘ Datos insertados en la tabla tbldstock' . PHP_EOL;
             }else{
                 Tbl_Log::create([
+                    'id_table'    => $id_importation,
+                    'name_table'  => $name_table,
                     'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertInventarioCustom()] => Tabla inventario se encuentra vacia.'
                 ]);
+                return 0;
             }
 
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertInventarioCustom()] => '.$e->getMessage()
             ]);
-            return print '▲ Error en insertInventarioCustom';
+            return 0;
         }
     }
 
-    public function insertMpiosCustom($conectionBex, $conectionSys, $datosAInsertar)
+    public function insertMpiosCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
     {
         try {
             $countMpios = DB::connection($conectionBex)->table('tblmmpio')->count();
@@ -653,13 +665,15 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[InsertMpiosCustom()] => '.$e->getMessage()
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
+                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertMpiosCustom()] => '.$e->getMessage()
             ]);
-            return print '▲ Error en InsertMpiosCustom';
+            return 0;
         }
     }
 
-    public function insertPaisCustom($conectionBex,  $conectionSys, $datosAInsertar)
+    public function insertPaisCustom($conectionBex,  $conectionSys, $datosAInsertar, $id_importation, $name_table)
     {
         try {
             $countPais = DB::connection($conectionBex)->table('tblmpais')->count();
@@ -726,13 +740,15 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertPaisCustom()] => '.$e->getMessage()
             ]);
-            return print '▲ Error en insertPaisCustom';
+            return 0;
         }
     }
 
-    public function insertPreciosCustom($conectionBex, $conectionSys, $datosAInsertar)
+    public function insertPreciosCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
     {
         try {
             DB::connection($conectionBex)->table('s1e_precios')->truncate();
@@ -800,13 +816,15 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertPreciosCustom()] => '.$e->getMessage()
             ]);
-            return print '▲ Error en insertPreciosCustom';
+            return 0;
         }
     }
 
-    public function insertProductsCustom($conectionBex, $conectionSys, $datosAInsertar)
+    public function insertProductsCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
     {
         try {
             DB::connection($conectionBex)->table('s1e_productos')->truncate();
@@ -943,13 +961,15 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertPreciosCustom()] => '.$e->getMessage()
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
+                'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertProductsCustom()] => '.$e->getMessage()
             ]);
-            return print '▲ Error en insertPreciosCustom';
+            return 0;
         }
     }
 
-    public function insertRuteroCustom($conectionBex, $conectionSys, $datosAInsertar)
+    public function insertRuteroCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
     {
         try {
             $inset=(count($datosAInsertar));
@@ -1022,13 +1042,15 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertRuteroCustom()] => '.$e->getMessage()
             ]);
-            return print '▲ Error en insertRuteroCustom';
+            return 0;
         }
     }
 
-    public function insertVendedoresCustom($conectionBex, $conectionSys, $datosAInsertar)
+    public function insertVendedoresCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
     {
         try {
             $fechaActual = Carbon::now();
@@ -1185,13 +1207,15 @@ class InsertCustom
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertVendedoresCustom()] => '.$e->getMessage()
             ]);
-            return print '▲ Error en insertVendedoresCustom';
+            return 0;
         }
     }
 
-    public function InsertAmovilCustom($conectionBex, $conectionSys, $datosAInsertar)
+    public function InsertAmovilCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
     {   
         try {
             $inset=(count($datosAInsertar));
@@ -1232,9 +1256,11 @@ class InsertCustom
             } 
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'name_table'  => $name_table,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[InsertAmovilCustom()] => '.$e->getMessage()
             ]);
-            return print '▲ Error en InsertAmovilCustom';
+            return 0;
         }
     }
 }
