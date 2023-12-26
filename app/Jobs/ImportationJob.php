@@ -44,7 +44,7 @@ class ImportationJob implements ShouldQueue
                 if(!$connections){
                     Tbl_Log::create([
                         'id_table'    => $this->consecutive,
-                        'name_table'  => 'commands',
+                        'type'        => 2,
                         'descripcion' => 'Jobs::ImportationJob[handle()] => No existe la BD '.$dataImport->name_db
                     ]);
                     return;
@@ -58,7 +58,7 @@ class ImportationJob implements ShouldQueue
                 $updateInformation = Artisan::call('command:update-information', [
                     'database'       => $dataImport->name_db,
                     'id_importation' => $this->consecutive,
-                    'name_table'     => 'importation_demand'
+                    'type'           => 2
                 ]);
                 
                 if($updateInformation == 0) {
@@ -74,7 +74,7 @@ class ImportationJob implements ShouldQueue
                     'connection_bs_id' => $connections->id,
                     'area'             => $connections->area,
                     'id_importation'   => $this->consecutive,
-                    'name_table'       => 'importation_demand'
+                    'type'             => 2
                 ]);
            
                 if($exportInformation != 0) {
@@ -104,7 +104,7 @@ class ImportationJob implements ShouldQueue
                 $updateInformation = Artisan::call($dataImport->command, [
                     'database'       => $dataImport->name_db,
                     'id_importation' => $this->consecutive,
-                    'name_table'     => 'importation_demand'
+                    'type'           => 2
                 ]);
 
                 if($updateInformation == 0) {
@@ -123,7 +123,7 @@ class ImportationJob implements ShouldQueue
                     'connection_bs_id' => $importation->connection_bexsoluciones_id,
                     'area'             => $importation->area,
                     'id_importation'   => $this->consecutive,
-                    'name_table'       => 'importation_demand'
+                    'type'             => 2
                 ]);
                 
                 if($exportInformation != 0) {
@@ -150,7 +150,7 @@ class ImportationJob implements ShouldQueue
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $this->consecutive,
-                'name_table'  => 'importation_demand',
+                'type'        => 2,
                 'descripcion' => 'Jobs::ImportationJob[handle()] => '.$e->getMessage()
             ]);
 

@@ -18,7 +18,7 @@ class UpdateInformation extends Command {
 
     use MigrateTrait, ConnectionTrait, DataImportTrait, ReadExportDataTrait, BackupFlatFileTrait;
 
-    protected $signature = 'command:update-information {database} {status?} {id_importation?} {name_table?}';
+    protected $signature = 'command:update-information {database} {status?} {id_importation?} {type?}';
     protected $description = "Extract, generate drawings, and store information in the tenant's database";
 
     public function handle(): int {
@@ -27,14 +27,14 @@ class UpdateInformation extends Command {
             $db             = $this->argument('database'); 
             $status         = $this->input->hasArgument('status') ? $this->argument('status') : false;
             $id_importation = $this->input->hasArgument('id_importation') ? $this->argument('id_importation') : null;
-            $name_table     = $this->input->hasArgument('name_table') ? $this->argument('name_table') : null;
-           
+            $type           = $this->input->hasArgument('type') ? $this->argument('type') : null;
+            
             // Function that configures the database (ConnetionTrait).
             $configDB = $this->connectionDB($db, 'local'); 
             if($configDB == false){
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'name_table'  => $name_table,
+                    'type'        => $type,
                     'descripcion' => 'Commands::UpdateInformation[handle()] => Error al conectar Base de Datos'
                 ]);
                 return 0;
@@ -52,7 +52,7 @@ class UpdateInformation extends Command {
             if(!$config){
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'name_table'  => $name_table,
+                    'type'        => $type,
                     'descripcion' => 'Commands::UpdateInformation[handle()] => No se encontraron datos en la tabla ws_config'
                 ]);
                 return 0;
@@ -71,7 +71,7 @@ class UpdateInformation extends Command {
             }
             
             //Function to read and export flat file to tenant DB
-            $flatFile = $this->readFlatFile($db, $id_importation, $name_table);
+            $flatFile = $this->readFlatFile($db, $id_importation, $type);
             if($flatFile == 0){
                 return 0;
             }
@@ -79,7 +79,7 @@ class UpdateInformation extends Command {
             //Realizar copia de seguridad para tipo de conexion "planoa"
             if ($config->ConecctionType == 'planos') {
                 //backup txt files
-                $backupFlatFile = $this->backupFlatFile($db, true, $id_importation, $name_table);
+                $backupFlatFile = $this->backupFlatFile($db, true, $id_importation, $type);
                 if($backupFlatFile == 0){
                     return 0;
                 }

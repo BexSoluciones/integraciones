@@ -5,21 +5,32 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Tbl_Log;
 use App\Models\Importation_Demand;
+use App\Traits\ConnectionTrait;
 
 use Illuminate\Http\Request;
 
 class ImportationController extends Controller
 {
+    use ConnectionTrait;
+
     public function consultState(Request $request){
         try{
             $importation = Importation_Demand::importationState($request->consecutive)->first();
-      
             if(empty($importation)){
                 return response()->json([
                     'status'   => 401,
                     'response' => 'No existe la importacion '.$request->consecutive,
                 ]);
             }
+
+            $configDB = $this->connectionDB($request->name_db, 'local');
+            if($configDB == false){
+                return response()->json([
+                    'descripcion' => 'Error al conectar Base de Datos'.$request->name_db 
+                ]);
+            }
+            $detailLogs = Tbl_Log::where('id_table', $request->consecutive)
+                ->get(['type', 'descripcion', 'created_at', 'updated_at']);
 
             $responseArray = [
                 '1' => 'La importación está en espera.',
@@ -32,9 +43,10 @@ class ImportationController extends Controller
             
             if (isset($responseArray[$stateAsString])) {
                 return response()->json([
-                    'status'   => 200,
-                    'code' => $stateAsString,
-                    'response' => $responseArray[$stateAsString],
+                    'status'      => 200,
+                    'code'        => $stateAsString,
+                    'response'    => $responseArray[$stateAsString],
+                    'detailsLogs' => $detailLogs
                 ]);
             } else {
                 return response()->json([
