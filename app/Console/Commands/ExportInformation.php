@@ -8,13 +8,14 @@ use App\Traits\ConnectionTrait;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 
 class ExportInformation extends Command
 {
     use ConnectionTrait;
 
-    protected $signature   = 'command:export-information {tenantDB} {connection_bs_id} {area} {id_importation?} {name_table?}';
+    protected $signature   = 'command:export-information {tenantDB} {connection_bs_id} {area} {id_importation?} {type?}';
     protected $description = 'Export information to bex solutions databases';
 
     public function handle() : int
@@ -24,14 +25,19 @@ class ExportInformation extends Command
             $conectionBex   = $this->argument('connection_bs_id');
             $area           = $this->argument('area');
             $id_importation = $this->input->hasArgument('id_importation') ? $this->argument('id_importation') : null;
-            $name_table     = $this->input->hasArgument('name_table') ? $this->argument('name_table') : null;
+            $type           = $this->input->hasArgument('type') ? $this->argument('type') : null;
 
+            Log::info($tenantDB);
+            Log::info($conectionBex);
+            Log::info($area);
+            Log::info($id_importation);
+            Log::info($type);
             //Function that configures the database (ConnetionTrait).
             $configDB = $this->connectionDB($conectionBex, 'externa', $area); 
             if($configDB == false){
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'name_table'  => $name_table,
+                    'type'  => $type,
                     'descripcion' => 'Commands::ExportInformation[handle()] => Error al conectar BD externa'
                 ]);
                 return 0;
@@ -44,7 +50,7 @@ class ExportInformation extends Command
             if (!class_exists($custom)) {
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'name_table'  => $name_table,
+                    'type'  => $type,
                     'descripcion' => 'Commands::ExportInformation[handle()] => No existe el custom '.$custom
                 ]);
                 return 0;
@@ -73,7 +79,7 @@ class ExportInformation extends Command
             if($configDB == false){
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'name_table'  => $name_table,
+                    'type'  => $type,
                     'descripcion' => 'Commands::ExportInformation[handle()] => Error al conectar BD local'
                 ]);
                 return 0;
@@ -115,7 +121,7 @@ class ExportInformation extends Command
                                         $conectionSys, 
                                         $datosAInsertar, 
                                         $id_importation,
-                                        $name_table,
+                                        $type,
                                         $modelInstance, 
                                         $tableName
                                     );
@@ -127,7 +133,7 @@ class ExportInformation extends Command
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Commands::ExportInformation[handle()] => '.$e->getMessage()
             ]);
             return 0;

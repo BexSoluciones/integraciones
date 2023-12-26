@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\File;
 
 trait ReadExportDataTrait {
     
-    public function readFlatFile($db, $id_importation, $name_table) {
+    public function readFlatFile($db, $id_importation, $type) {
         try {
             //Folder of Models
             $baseNamespace = 'App\\Models\\'.ucfirst($db).'\\';
@@ -31,11 +31,11 @@ trait ReadExportDataTrait {
             //Route of flat file
             $folderPath = storage_path("app/imports/$db/planos");
             $txtFiles = glob("$folderPath/*.txt");
-           
+     
             if(count($txtFiles) == 0){
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'name_table'  => $name_table,
+                    'type'        => $type,
                     'descripcion' => 'Traits::ReadExportDataTrait[readFlatFile()] => No se encontraron archivos planos en '.$db
                 ]);
                 return 0;
@@ -49,7 +49,7 @@ trait ReadExportDataTrait {
                 foreach ($availableModels as $modelClass => $tableName) {
                     if ($filenameWithoutExtension === $tableName) {
                         $this->info("◘ El archivo plano $filenameWithoutExtension coincide con el modelo: $tableName");
-                        $this->processFileContent($modelClass, $content, $tableName, $id_importation, $name_table);
+                        $this->processFileContent($modelClass, $content, $tableName, $id_importation, $type);
                     }
                 }
             }
@@ -60,7 +60,7 @@ trait ReadExportDataTrait {
         }
     }
 
-    private function processFileContent($modelClass, $content, $tableName, $id_importation, $name_table) {
+    private function processFileContent($modelClass, $content, $tableName, $id_importation, $type) {
         try {
             $modelInstance = new $modelClass();
             $columnsModelo = $modelInstance->getFillable();
@@ -69,7 +69,7 @@ trait ReadExportDataTrait {
             if ($content === false) {
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'name_table'  => $name_table,
+                    'type'  => $type,
                     'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => No se pudo leer el archivo plano '.$modelInstance
                 ]);
                 return 0;
@@ -117,7 +117,7 @@ trait ReadExportDataTrait {
             } else {
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'name_table'  => $name_table,
+                    'type'  => $type,
                     'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => Error al insertar datos en la tabla '.$tableName
                 ]);
                 return 0;
@@ -125,7 +125,7 @@ trait ReadExportDataTrait {
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => '.$e->getMessage()
             ]);
             return 0;

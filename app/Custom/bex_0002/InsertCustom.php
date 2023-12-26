@@ -14,7 +14,7 @@ class InsertCustom
 {
     use ConnectionTrait;
 
-    public function insertCarteraCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
+    public function insertCarteraCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
     {
         try {
             //Tunca tabla s1e_cartera
@@ -96,14 +96,14 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Custom::bex_0002/InsertCustom[insertCarteraCustom()] => '.$e->getMessage()
             ]);
             return 0;
         }
     }
 
-    public function insertClientesCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table, $modelInstance, $tableName)
+    public function insertClientesCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance, $tableName)
     {   
         try {
             $currentDate = date('Ymd');
@@ -236,14 +236,14 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertClientesCustom()] => '.$e->getMessage()
             ]);
             return 0;
         }
     }
 
-    public function insertDptosCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
+    public function insertDptosCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
     {
         try {
             $countPais = DB::connection($conectionBex)->table('tblmdpto')->get()->count();
@@ -314,14 +314,14 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertDptosCustom()] => '.$e->getMessage()
             ]);
             return 0;
         }
     }
 
-    public function insertEstadoPedidosCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
+    public function insertEstadoPedidosCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
     {
         try {
             $insertCount = count($datosAInsertar);
@@ -450,14 +450,14 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertEstadoPedidosCustom()] => '.$e->getMessage()
             ]);
             return 0;
         }
     }
 
-    public function insertInventarioCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table, $modelInstance)
+    public function insertInventarioCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance)
     {
         try {
             $tblbinventario = count($datosAInsertar);
@@ -572,7 +572,7 @@ class InsertCustom
             }else{
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'name_table'  => $name_table,
+                    'type'  => $type,
                     'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertInventarioCustom()] => Tabla inventario se encuentra vacia.'
                 ]);
                 return 0;
@@ -581,14 +581,14 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertInventarioCustom()] => '.$e->getMessage()
             ]);
             return 0;
         }
     }
 
-    public function insertMpiosCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
+    public function insertMpiosCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
     {
         try {
             $countMpios = DB::connection($conectionBex)->table('tblmmpio')->count();
@@ -666,14 +666,14 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertMpiosCustom()] => '.$e->getMessage()
             ]);
             return 0;
         }
     }
 
-    public function insertPaisCustom($conectionBex,  $conectionSys, $datosAInsertar, $id_importation, $name_table)
+    public function insertPaisCustom($conectionBex,  $conectionSys, $datosAInsertar, $id_importation, $type)
     {
         try {
             $countPais = DB::connection($conectionBex)->table('tblmpais')->count();
@@ -741,14 +741,14 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertPaisCustom()] => '.$e->getMessage()
             ]);
             return 0;
         }
     }
 
-    public function insertPreciosCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
+    public function insertPreciosCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
     {
         try {
             DB::connection($conectionBex)->table('s1e_precios')->truncate();
@@ -817,14 +817,14 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertPreciosCustom()] => '.$e->getMessage()
             ]);
             return 0;
         }
     }
 
-    public function insertProductsCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
+    public function insertProductsCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
     {
         try {
             DB::connection($conectionBex)->table('s1e_productos')->truncate();
@@ -962,14 +962,14 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertProductsCustom()] => '.$e->getMessage()
             ]);
             return 0;
         }
     }
 
-    public function insertRuteroCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
+    public function insertRuteroCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
     {
         try {
             $inset=(count($datosAInsertar));
@@ -1043,14 +1043,14 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertRuteroCustom()] => '.$e->getMessage()
             ]);
             return 0;
         }
     }
 
-    public function insertVendedoresCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
+    public function insertVendedoresCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
     {
         try {
             $fechaActual = Carbon::now();
@@ -1208,14 +1208,14 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertVendedoresCustom()] => '.$e->getMessage()
             ]);
             return 0;
         }
     }
 
-    public function InsertAmovilCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $name_table)
+    public function InsertAmovilCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
     {   
         try {
             $inset=(count($datosAInsertar));
@@ -1257,7 +1257,7 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'name_table'  => $name_table,
+                'type'  => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[InsertAmovilCustom()] => '.$e->getMessage()
             ]);
             return 0;
