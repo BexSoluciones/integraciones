@@ -27,11 +27,6 @@ class ExportInformation extends Command
             $id_importation = $this->input->hasArgument('id_importation') ? $this->argument('id_importation') : null;
             $type           = $this->input->hasArgument('type') ? $this->argument('type') : null;
 
-            Log::info($tenantDB);
-            Log::info($conectionBex);
-            Log::info($area);
-            Log::info($id_importation);
-            Log::info($type);
             //Function that configures the database (ConnetionTrait).
             $configDB = $this->connectionDB($conectionBex, 'externa', $area); 
             if($configDB == false){
