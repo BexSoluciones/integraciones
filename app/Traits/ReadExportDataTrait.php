@@ -31,18 +31,16 @@ trait ReadExportDataTrait {
             //Route of flat file
             $folderPath = storage_path("app/imports/$db/planos");
             $txtFiles = glob("$folderPath/*.txt");
-     
             if(count($txtFiles) == 0){
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
                     'type'        => $type,
                     'descripcion' => 'Traits::ReadExportDataTrait[readFlatFile()] => No se encontraron archivos planos en '.$db
                 ]);
-                return 0;
+                return 1;
             };
            
             foreach ($txtFiles as $txtFile) {
-                
                 $content = file_get_contents($txtFile);
                 $filenameWithoutExtension = pathinfo($txtFile, PATHINFO_FILENAME);
                 
@@ -54,7 +52,7 @@ trait ReadExportDataTrait {
                 }
             }
             $this->info('◘ Proceso de exportacion finalizado en la BD del inquilino '.$db);
-            return true;
+            return 0;
         } catch (\Exception $e) {
             $this->error("Ha ocurrido un error: " . $e->getMessage());
         }
@@ -69,10 +67,10 @@ trait ReadExportDataTrait {
             if ($content === false) {
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'type'  => $type,
+                    'type'        => $type,
                     'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => No se pudo leer el archivo plano '.$modelInstance
                 ]);
-                return 0;
+                return 1;
             }
     
             // Split the content into lines
@@ -120,7 +118,7 @@ trait ReadExportDataTrait {
                     'type'  => $type,
                     'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => Error al insertar datos en la tabla '.$tableName
                 ]);
-                return 0;
+                return 1;
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
@@ -128,7 +126,7 @@ trait ReadExportDataTrait {
                 'type'  => $type,
                 'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 }

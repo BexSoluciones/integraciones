@@ -32,24 +32,25 @@ trait BackupFlatFileTrait {
                     Storage::move($file, $backupRoute.'/'.$fileName);
                 }
             }
+
             if($estado == true){
                 $this->info('◘ Copia de seguridad archivos planos '.$db.' realizada con exito');
             }else{
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'type'  => $type,
+                    'type'        => $type,
                     'descripcion' => 'Traits::BackupFlatFileTrait[backupFlatFile()] => Ha ocurrido un error, por lo tanto se restauro la copia de seguridad archivos planos '.$db
                 ]);
-                return 0;
+                return 1;
             }
-            return 1;
+            return 0;
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Traits::BackupFlatFileTrait[backupFlatFile()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
     
