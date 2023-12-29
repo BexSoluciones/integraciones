@@ -31,15 +31,15 @@ class UpdateInformation extends Command {
             
             // Function that configures the database (ConnetionTrait).
             $configDB = $this->connectionDB($db, 'local'); 
-            if($configDB == false){
+            if($configDB == 1){
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
                     'type'        => $type,
                     'descripcion' => 'Commands::UpdateInformation[handle()] => Error al conectar Base de Datos'
                 ]);
-                return 0;
+                return 1;
             }
-           
+        
             // Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
             if($status == 'new'){
                 $this->preMigration($db);
@@ -55,7 +55,7 @@ class UpdateInformation extends Command {
                     'type'        => $type,
                     'descripcion' => 'Commands::UpdateInformation[handle()] => No se encontraron datos en la tabla ws_config'
                 ]);
-                return 0;
+                return 1;
             }
        
             // Cuando el ws_config no tiene informacion es porque los planos se suben automaticamente sin necesidad de conexion
@@ -72,25 +72,25 @@ class UpdateInformation extends Command {
             
             //Function to read and export flat file to tenant DB
             $flatFile = $this->readFlatFile($db, $id_importation, $type);
-            if($flatFile == 0){
-                return 0;
+            if($flatFile == 1){
+                return 1;
             }
            
             //Realizar copia de seguridad para tipo de conexion "planoa"
             if ($config->ConecctionType == 'planos') {
                 //backup txt files
                 $backupFlatFile = $this->backupFlatFile($db, true, $id_importation, $type);
-                if($backupFlatFile == 0){
-                    return 0;
+                if($backupFlatFile == 1){
+                    return 1;
                 }
             }
             print '◘ La ejecucion "command:update-information '.$db.'" ha finalizado.';
-            return 1;
+            return 0;
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'descripcion' => 'Commands::UpdateInformation[handle()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 }

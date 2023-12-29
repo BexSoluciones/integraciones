@@ -17,7 +17,7 @@ class OrderCoreCustom
         try{
             $fechaActual = date('Ymd');
             $count       = count($orders);
-
+ 
             if ($count > 0) {
                 
                 $dcto = '';
@@ -93,7 +93,7 @@ class OrderCoreCustom
                     $cadena.="\n";
                     $dcto=0;
                 }
-                
+              
                 $namefile=str_pad($closing,8,"0",STR_PAD_LEFT).'.PE0';
                 Storage::disk('public')->put('export/bex_0002/bexmovil/pedidos_txt/' . $namefile, $cadena);    
             } else {
