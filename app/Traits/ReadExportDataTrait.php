@@ -86,7 +86,7 @@ trait ReadExportDataTrait {
     
                     // Fill rowData with values from $columns, up to the number of fillable columns
                     for ($i = 0; $i < count($columns); $i++) {
-                        if ($tableName == 't05_bex_clientes') {
+                        if ($tableName == 't05_bex_clientes' || $tableName == 't38_bex_entregas') {
                             $j = $i + 1;
                         } else {
                             $j = $i;
@@ -102,7 +102,7 @@ trait ReadExportDataTrait {
                     $dataToInsert[] = array_map('utf8_encode', $rowData);
                 }
             }
-    
+            
             // Bulk insert the data into the corresponding model
             if ($modelInstance && !empty($dataToInsert)) {
                 $chunks = array_chunk($dataToInsert, 1000); // Divide en lotes de 1000 registros
