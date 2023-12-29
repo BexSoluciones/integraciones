@@ -39,7 +39,7 @@ class UpdateInformation extends Command {
                 ]);
                 return 1;
             }
-           
+        
             // Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
             if($status == 'new'){
                 $this->preMigration($db);
