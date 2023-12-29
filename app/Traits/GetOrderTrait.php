@@ -38,7 +38,7 @@ trait GetOrderTrait {
                                 tbldmovenc.codvendedor,fecmov,tbldmovdet.codproducto,tbldmovdet.codbodega,cantidadmov,tbldmovenc.codprecio,
                                 preciomov,dcto1mov,dcto2mov,dcto3mov,dcto4mov,pluproducto,nomunidademp,mensajemov,dctopiefacaut,dctonc')
                     ->get();
-                
+                    
                 $plataforSys = 2;
                 $this->connectionDB($plataforSys, 'externa', $area);
                 $plataforSys = Connection_Bexsoluciones::getAll()->where('id', $plataforSys)->value('name');
@@ -48,10 +48,10 @@ trait GetOrderTrait {
                         ->first();
 
                 ProcessOrderUploadERP::dispatch($order, $cia, $closing)->onQueue('pedidos')->onConnection('sync');
-                return false;
+                return 0;
             } else {
 
-                return false;
+                return 0;
 
                 // return json_decode(json_encode(
                 //     OrderHeader::where('estadoenviows', '0')
@@ -78,9 +78,9 @@ trait GetOrderTrait {
                                 ->where('PREFMOV',$order['PREFMOV'])
                                 ->where('NUMMOV',$order['NUMMOV'])
                                 ->get()
-                ), true);
+                ), 0);
 
-                $cia = json_decode(json_encode(Ws_Unoee_Config::getConnectionId(1)), true);
+                $cia = json_decode(json_encode(Ws_Unoee_Config::getConnectionId(1)), 0);
                 ProcessOrderUploadERP::dispatch($order,$orderDetail,$cia)->onQueue('orders');
             }
         }catch (\Exception $e) {

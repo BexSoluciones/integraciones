@@ -29,15 +29,15 @@ class ExportInformation extends Command
 
             //Function that configures the database (ConnetionTrait).
             $configDB = $this->connectionDB($conectionBex, 'externa', $area); 
-            if($configDB == false){
+            if($configDB == 1){
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'type'  => $type,
-                    'descripcion' => 'Commands::ExportInformation[handle()] => Error al conectar BD externa'
+                    'type'        => $type,
+                    'descripcion' => 'Commands::ExportInformation[handle()] => Error al conectar BD externa '.$conectionBex
                 ]);
-                return 0;
+                return 1;
             }
-            
+         
             // Llamar un custom de manera dinamica
             $custom = "App\\Custom\\$tenantDB\\InsertCustom";
             
@@ -45,12 +45,12 @@ class ExportInformation extends Command
             if (!class_exists($custom)) {
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'type'  => $type,
+                    'type'        => $type,
                     'descripcion' => 'Commands::ExportInformation[handle()] => No existe el custom '.$custom
                 ]);
-                return 0;
+                return 1;
             }
-
+            
             // Instanciamos el custom
             $customInstance = app()->make($custom);
 
@@ -71,13 +71,13 @@ class ExportInformation extends Command
             }  
             
             $configDB = $this->connectionDB($tenantDB, 'local');
-            if($configDB == false){
+            if($configDB == 1){
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'type'  => $type,
-                    'descripcion' => 'Commands::ExportInformation[handle()] => Error al conectar BD local'
+                    'type'        => $type,
+                    'descripcion' => 'Commands::ExportInformation[handle()] => Error al conectar BD local' .$tenantDB
                 ]);
-                return 0;
+                return 1;
             }
 
             $customMethods = [
@@ -124,14 +124,14 @@ class ExportInformation extends Command
                 }
             }
             print '◘ Información Base de Datos '.$tenantDB.' Exportada.' . PHP_EOL;
-            return 1;
+            return 0;
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Commands::ExportInformation[handle()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 }

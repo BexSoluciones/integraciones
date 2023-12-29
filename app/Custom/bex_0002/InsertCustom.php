@@ -96,10 +96,10 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Custom::bex_0002/InsertCustom[insertCarteraCustom()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 
@@ -157,7 +157,6 @@ class InsertCustom
                             'estadofpagovta'=> $dato[$i]->estadofpagovta
                         ];    
                     }
-                    
                     DB::connection($conectionBex)->table('s1e_clientes')->insert($Insert);
                 }
                 print '◘ Datos insertados la tabla s1e_clientes' . PHP_EOL;
@@ -236,10 +235,10 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertClientesCustom()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 
@@ -314,10 +313,10 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertDptosCustom()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 
@@ -450,10 +449,10 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertEstadoPedidosCustom()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 
@@ -567,24 +566,23 @@ class InsertCustom
                 //     }
                 // }
                 // DB::connection($conectionBex)->table('tbldstock')->insert($dataToInsert);
-                
                 print '◘ Datos insertados en la tabla tbldstock' . PHP_EOL;
             }else{
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
                     'type'  => $type,
-                    'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertInventarioCustom()] => Tabla inventario se encuentra vacia.'
+                    'descripcion' => 'Custom::bex_0002/InsertCustom[insertInventarioCustom()] => Tabla inventario se encuentra vacia.'
                 ]);
-                return 0;
+                return 1;
             }
-
+            $configDB = $this->connectionDB('bex_0002', 'local'); 
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertInventarioCustom()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 
@@ -666,10 +664,10 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertMpiosCustom()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 
@@ -741,10 +739,10 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertPaisCustom()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 
@@ -817,10 +815,10 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertPreciosCustom()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 
@@ -962,10 +960,10 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertProductsCustom()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 
@@ -1043,10 +1041,10 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertRuteroCustom()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 
@@ -1208,10 +1206,10 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[insertVendedoresCustom()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 
@@ -1257,10 +1255,10 @@ class InsertCustom
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Custom::Custom::bex_0002/InsertCustom[InsertAmovilCustom()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 }

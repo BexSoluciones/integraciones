@@ -24,12 +24,13 @@ class UploadOrder extends Command
             $closing = $this->argument('closing');
 
             $configDB = $this->connectionDB($db, 'externa', $area); 
-            if($configDB == false){
-                return 0;
+            if($configDB == 1){
+                return 1;
             }
           
             $orders = $this->getOrderHeder($db, $area, $closing);
-            if($orders == true){
+            Log::info($orders);
+            if($orders == 0){
                 return 0;
             }
            

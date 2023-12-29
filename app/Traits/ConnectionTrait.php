@@ -12,20 +12,21 @@ use Illuminate\Support\Facades\Config;
 trait ConnectionTrait {
     
     public function connectionDB($db, $type, $area = null){
-        
+
         if($type == 'local'){
             $dataConnection = Connection::getAll()->where('name', $db)->first();
             if (!$dataConnection) {
                 Tbl_Log::create([
                     'descripcion' => 'Traits::ConnectionTrait[connectionDB()] => El name '.$db.' no existe en la tabla connections.'
                 ]);
-                return false;
+                return 1;
             }
+            
             if($dataConnection->active != 1){
                 Tbl_Log::create([
                     'descripcion' => 'Traits::ConnectionTrait[connectionDB()] => El usuario '.$db.' esta inactivo en la tabla connections.'
                 ]);
-                return false; 
+                return 1; 
             }
         }else{
             $dataConnection = Connection_Bexsoluciones::showConnectionBS($db, $area)->first();
@@ -33,17 +34,17 @@ trait ConnectionTrait {
                 Tbl_Log::create([
                     'descripcion' => 'Traits::ConnectionTrait[connectionDB()] => El id '.$db.' del area '.$area.' no existe en la tabla connection_bexsoluciones.'
                 ]);
-                return false;
+                return 1;
             }
             
             if($dataConnection->active != 1){
                 Tbl_Log::create([
                     'descripcion' => 'Traits::ConnectionTrait[connectionDB()] => El id '.$db.' del area '.$area.' esta inactivo en la tabla connection_bexsoluciones.'
                 ]);
-                return false; 
+                return 1; 
             }
         }
-     
+       
         try {
             $connectionName = $type != 'local' ? $dataConnection->name : 'dynamic_connection';
             Config::set('database.connections.' . $connectionName,  [
@@ -57,12 +58,12 @@ trait ConnectionTrait {
                     'prefix'    => '',
                 ],
             );
-            return true;
+            return 0;
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'descripcion' => 'Traits::ConnectionTrait[connectionDB()] => Error al configurar la conexión: ' . $e->getMessage()
             ]);
-            return false;
+            return 1;
         }
     }
 }

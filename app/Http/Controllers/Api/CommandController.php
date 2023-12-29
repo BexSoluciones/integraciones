@@ -42,7 +42,7 @@ class CommandController extends Controller
 
             return response()->json([
                 'status'   => 200, 
-                'code' => $importation->consecutive,
+                'code'     => $importation->consecutive,
                 'response' => 'Importación numero: '.$importation->consecutive.' la cual se ejecutara en la fecha: '.$importation->date.' a las '.$importation->hour
             ]);
         } catch (\Exception $e) {
@@ -97,8 +97,8 @@ class CommandController extends Controller
                 'area' => $request->area,
                 'closing' => $request->closing,
             ]);
-
-            if($output == 1){
+          
+            if($output == 0){
                 $rutaArchivo = 'export/'.$request->name_db.'/'.$request->area.'/pedidos_txt/'.str_pad($request->closing,8,"0",STR_PAD_LEFT).'.PE0';
                 $rutaCompleta = storage_path('app/public/' . $rutaArchivo);
                 if (file_exists($rutaCompleta)) {

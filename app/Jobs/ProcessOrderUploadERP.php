@@ -9,6 +9,7 @@ use App\Models\Tbl_Log;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -17,11 +18,6 @@ class ProcessOrderUploadERP implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * The number of seconds the job can run before timing out.
-     *
-     * @var int
-     */
     public $timeout = 120;
 
     protected $order;
@@ -49,7 +45,7 @@ class ProcessOrderUploadERP implements ShouldQueue
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::OrderCoreCustom[uploadOrder()] => '.$e->getMessage()
+                'descripcion' => 'Jobs::ProcessOrderUploadERP[handle()] => '.$e->getMessage()
             ]);
         }
     }

@@ -4,59 +4,55 @@ namespace App\Traits;
 use Exception;
 
 use App\Models\Tbl_Log;
+use App\Models\File as FileModels;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 
 trait ReadExportDataTrait {
-    
-    public function readFlatFile($db, $id_importation, $type) {
-        try {
-            //Folder of Models
-            $baseNamespace = 'App\\Models\\'.ucfirst($db).'\\';
-            //All models
-            $modelFiles = File::files(app_path('Models/'.ucfirst($db)));
-            $availableModels = [];
 
-            foreach ($modelFiles as $modelFile) {
-                //Route of model
-                $routeName = $baseNamespace . pathinfo($modelFile->getFilename(), PATHINFO_FILENAME);
-                if (class_exists($routeName)) {
-                    //extracts the model name and stores it in the $availableModels array
-                    $availableModels[$routeName] = (new $routeName())->getTable();
+    public function readFlatFile($db, $id_importation, $type){
+
+        //Route of flat file
+        $folderPath = storage_path("app/imports/$db/planos");
+        $txtFiles   = glob("$folderPath/*.txt");
+        if(count($txtFiles) == 0){
+            Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'type'        => $type,
+                'descripcion' => 'Traits::ReadExportDataTrait[readFlatFile()] => No se encontraron archivos planos en '.$db
+            ]);
+            return 1;
+        };
+
+        //Folder of Models
+        $baseNamespace   = 'App\\Models\\'.ucfirst($db).'\\';
+        //All models
+        $modelFiles      = File::files(app_path('Models/'.ucfirst($db)));
+        $availableModels = [];
+
+        foreach ($modelFiles as $modelFile) {
+            //Route of model
+            $routeName = $baseNamespace . pathinfo($modelFile->getFilename(), PATHINFO_FILENAME);
+            if (class_exists($routeName)) {
+                //extracts the model name and stores it in the $availableModels array
+                $availableModels[$routeName] = (new $routeName())->getTable();
+            }
+        }
+
+        $fileModels = FileModels::join('custom_migrations', 'custom_migrations.id', '=', 'custom_migrations_id')
+                ->where('state', 1)
+                ->get(['name_table', 'files.name as nameFile']); 
+
+        foreach($fileModels as $file){
+            foreach ($availableModels as $modelClass => $tableName) {
+                $content = file_get_contents($folderPath.'/'.$file->nameFile);
+                if ($file->name_table === $tableName) {
+                    $this->info("◘ El archivo plano $file->nameFile coincide con el modelo: $tableName");
+                    $this->processFileContent($modelClass, $content, $tableName, $id_importation, $type);
                 }
             }
-            
-            //Route of flat file
-            $folderPath = storage_path("app/imports/$db/planos");
-            $txtFiles = glob("$folderPath/*.txt");
-     
-            if(count($txtFiles) == 0){
-                Tbl_Log::create([
-                    'id_table'    => $id_importation,
-                    'type'        => $type,
-                    'descripcion' => 'Traits::ReadExportDataTrait[readFlatFile()] => No se encontraron archivos planos en '.$db
-                ]);
-                return 0;
-            };
-           
-            foreach ($txtFiles as $txtFile) {
-                
-                $content = file_get_contents($txtFile);
-                $filenameWithoutExtension = pathinfo($txtFile, PATHINFO_FILENAME);
-                
-                foreach ($availableModels as $modelClass => $tableName) {
-                    if ($filenameWithoutExtension === $tableName) {
-                        $this->info("◘ El archivo plano $filenameWithoutExtension coincide con el modelo: $tableName");
-                        $this->processFileContent($modelClass, $content, $tableName, $id_importation, $type);
-                    }
-                }
-            }
-            $this->info('◘ Proceso de exportacion finalizado en la BD del inquilino '.$db);
-            return true;
-        } catch (\Exception $e) {
-            $this->error("Ha ocurrido un error: " . $e->getMessage());
         }
     }
 
@@ -69,10 +65,10 @@ trait ReadExportDataTrait {
             if ($content === false) {
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
-                    'type'  => $type,
+                    'type'        => $type,
                     'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => No se pudo leer el archivo plano '.$modelInstance
                 ]);
-                return 0;
+                return 1;
             }
     
             // Split the content into lines
@@ -120,7 +116,7 @@ trait ReadExportDataTrait {
                     'type'  => $type,
                     'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => Error al insertar datos en la tabla '.$tableName
                 ]);
-                return 0;
+                return 1;
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
@@ -128,7 +124,7 @@ trait ReadExportDataTrait {
                 'type'  => $type,
                 'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => '.$e->getMessage()
             ]);
-            return 0;
+            return 1;
         }
     }
 }

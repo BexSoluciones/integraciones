@@ -22,13 +22,14 @@ class ImportationController extends Controller
                     'response' => 'No existe la importacion '.$request->consecutive,
                 ]);
             }
-
+            
             $configDB = $this->connectionDB($request->name_db, 'local');
-            if($configDB == false){
+            if($configDB == 1){
                 return response()->json([
-                    'descripcion' => 'Error al conectar Base de Datos'.$request->name_db 
+                    'descripcion' => 'Error al conectar Base de Datos '.$request->name_db 
                 ]);
             }
+            
             $detailLogs = Tbl_Log::where('id_table', $request->consecutive)
                 ->get(['type', 'descripcion', 'created_at', 'updated_at']);
 

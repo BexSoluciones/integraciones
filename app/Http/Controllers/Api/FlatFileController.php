@@ -21,7 +21,7 @@ class FlatFileController extends Controller
                 $urlCompleta = url($urlArchivo);
                 return response()->json(['status' => 200, 'response' => $urlCompleta]);
             } else {
-                return response()->json(['status' => 401, 'response' => 'No se encontro cierre '.$request->closing.'.txt']);
+                return response()->json(['status' => 401, 'response' => 'No se encontro cierre '.$request->closing.'.PE0']);
             }
         } catch (\Exception $e) {
             Log::error('Error uploadOrder: ' . $e->getMessage());
