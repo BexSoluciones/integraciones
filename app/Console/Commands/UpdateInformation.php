@@ -88,6 +88,8 @@ class UpdateInformation extends Command {
             return 0;
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'type'        => $type,
                 'descripcion' => 'Commands::UpdateInformation[handle()] => '.$e->getMessage()
             ]);
             return 1;
