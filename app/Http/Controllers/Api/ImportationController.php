@@ -30,8 +30,13 @@ class ImportationController extends Controller
                 ]);
             }
             
-            $detailLogs = Tbl_Log::where('id_table', $request->consecutive)
-                ->get(['type', 'descripcion', 'created_at', 'updated_at']);
+            $arrayTables = [1 => 'commands', 2 => 'importation_demand'];
+            $detailLogs  = Tbl_Log::where('id_table', $request->consecutive)
+                ->get(['type', 'descripcion', 'created_at', 'updated_at'])
+                ->map(function ($table) use ($arrayTables) {
+                    $table->table_name = $arrayTables[$table->type] ?? 'Desconocida';
+                    return $table;
+                });
 
             $responseArray = [
                 '1' => 'La importación está en espera.',
