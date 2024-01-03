@@ -40,7 +40,16 @@ trait GetOrderTrait {
                     ->get();
                     
                 $plataforSys = 2;
-                $this->connectionDB($plataforSys, 'externa', $area);
+                $config = $this->connectionDB($plataforSys, 'externa', $area);
+                if($configDB != 0){
+                    DB::connection('mysql')->table('tbl_log')->insert([
+                        'descripcion' => 'Trait::GetOrderTrait[getOrderHeder()] => Conexion Externa: Linea '.__LINE__.'; '.$configDB,
+                        'created_at'  => now(),
+                        'updated_at'  => now()
+                    ]);
+                    return 1;
+                }
+
                 $plataforSys = Connection_Bexsoluciones::getAll()->where('id', $plataforSys)->value('name');
                 $cia = DB::connection($plataforSys)
                         ->table('tblslicencias')

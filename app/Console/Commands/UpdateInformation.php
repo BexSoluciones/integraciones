@@ -31,11 +31,13 @@ class UpdateInformation extends Command {
             
             // Function that configures the database (ConnetionTrait).
             $configDB = $this->connectionDB($db, 'local'); 
-            if($configDB == 1){
-                Tbl_Log::create([
+            if($configDB != 0){
+                DB::connection('mysql')->table('tbl_log')->insert([
                     'id_table'    => $id_importation,
                     'type'        => $type,
-                    'descripcion' => 'Commands::UpdateInformation[handle()] => Error al conectar Base de Datos'
+                    'descripcion' => 'Commands::UpdateInformation[handle()] => Conexion Local: Linea '.__LINE__.'; '.$configDB,
+                    'created_at'  => now(),
+                    'updated_at'  => now()
                 ]);
                 return 1;
             }

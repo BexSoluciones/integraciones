@@ -24,12 +24,16 @@ class UploadOrder extends Command
             $closing = $this->argument('closing');
 
             $configDB = $this->connectionDB($db, 'externa', $area); 
-            if($configDB == 1){
+            if($configDB != 0){
+                DB::connection('mysql')->table('tbl_log')->insert([
+                    'descripcion' => 'Commands::UploadOrder[handle()] => Conexion Local: Linea '.__LINE__.'; '.$configDB,
+                    'created_at'  => now(),
+                    'updated_at'  => now()
+                ]);
                 return 1;
             }
           
             $orders = $this->getOrderHeder($db, $area, $closing);
-            Log::info($orders);
             if($orders == 0){
                 return 0;
             }
