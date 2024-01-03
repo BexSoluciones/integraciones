@@ -24,7 +24,7 @@ class ImportationController extends Controller
             }
             
             $configDB = $this->connectionDB($request->name_db, 'local');
-            if($configDB == 1){
+            if($configDB != 0){
                 return response()->json([
                     'descripcion' => 'Error al conectar Base de Datos '.$request->name_db 
                 ]);
