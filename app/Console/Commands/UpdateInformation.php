@@ -31,15 +31,17 @@ class UpdateInformation extends Command {
             
             // Function that configures the database (ConnetionTrait).
             $configDB = $this->connectionDB($db, 'local'); 
-            if($configDB == 1){
-                Tbl_Log::create([
+            if($configDB != 0){
+                DB::connection('mysql')->table('tbl_log')->insert([
                     'id_table'    => $id_importation,
                     'type'        => $type,
-                    'descripcion' => 'Commands::UpdateInformation[handle()] => Error al conectar Base de Datos'
+                    'descripcion' => 'Commands::UpdateInformation[handle()] => Conexion Local: Linea '.__LINE__.'; '.$configDB,
+                    'created_at'  => now(),
+                    'updated_at'  => now()
                 ]);
                 return 1;
             }
-        
+ 
             // Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
             if($status == 'new'){
                 $this->preMigration($db);
@@ -69,13 +71,13 @@ class UpdateInformation extends Command {
             if($archivosPlanos == true){
                 $this->preMigration($db);
             }
-            
+
             //Function to read and export flat file to tenant DB
             $flatFile = $this->readFlatFile($db, $id_importation, $type);
             if($flatFile == 1){
                 return 1;
             }
-           
+         
             //Realizar copia de seguridad para tipo de conexion "planoa"
             if ($config->ConecctionType == 'planos') {
                 //backup txt files
@@ -88,6 +90,8 @@ class UpdateInformation extends Command {
             return 0;
         } catch (\Exception $e) {
             Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'type'        => $type,
                 'descripcion' => 'Commands::UpdateInformation[handle()] => '.$e->getMessage()
             ]);
             return 1;

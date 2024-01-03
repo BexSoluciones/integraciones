@@ -6,9 +6,10 @@ use Exception;
 use App\Models\Tbl_Log;
 use App\Models\File as FileModels;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 trait ReadExportDataTrait {
 
@@ -31,7 +32,6 @@ trait ReadExportDataTrait {
         //All models
         $modelFiles      = File::files(app_path('Models/'.ucfirst($db)));
         $availableModels = [];
-
         foreach ($modelFiles as $modelFile) {
             //Route of model
             $routeName = $baseNamespace . pathinfo($modelFile->getFilename(), PATHINFO_FILENAME);
@@ -44,7 +44,7 @@ trait ReadExportDataTrait {
         $fileModels = FileModels::join('custom_migrations', 'custom_migrations.id', '=', 'custom_migrations_id')
                 ->where('state', 1)
                 ->get(['name_table', 'files.name as nameFile']); 
-
+        
         foreach($fileModels as $file){
             foreach ($availableModels as $modelClass => $tableName) {
                 $content = file_get_contents($folderPath.'/'.$file->nameFile);
@@ -74,26 +74,44 @@ trait ReadExportDataTrait {
             // Split the content into lines
             $lines = explode("\n", $content);
             $dataToInsert = [];
-    
+           
             foreach ($lines as $line) {
                 // Verificar si la línea no está vacía antes de procesarla
                 if (!empty($line)) {
                     // Split each line into columns using the |
                     $columns = explode("|", $line);
-    
+
+                    // Esta condicion sirve para que tenga en cuenta el autoincrementable
+                    if ($tableName == 't05_bex_clientes' || $tableName == 't38_bex_entregas') {
+                        $columnsCount = count($columns) + 1;
+                    }else{
+                        $columnsCount = count($columns);
+                    }
+             
+                    if($columnsCount > count($columnsModelo)){
+                        Tbl_Log::create([
+                            'id_table'    => $id_importation,
+                            'type'        => $type,
+                            'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => El numero de columnas es mayor al esperado.
+                                                => Tabla: '.$tableName.' 
+                                                => Columnas archivo plano: '.$columnsCount.', Columnas esperadas: '.count($columnsModelo).'
+                                                => Info linea archivo plano que ocasiona conflicto: '.json_encode($columns)
+                        ]);
+                        return 1;
+                    }
+                    
                     // Construct an associative array of data for insertion
                     $rowData = [];
-    
                     // Fill rowData with values from $columns, up to the number of fillable columns
                     for ($i = 0; $i < count($columns); $i++) {
-                        if ($tableName == 't05_bex_clientes') {
+                        if ($tableName == 't05_bex_clientes' || $tableName == 't38_bex_entregas') {
                             $j = $i + 1;
                         } else {
                             $j = $i;
                         }
                         $rowData[$columnsModelo[$j]] = isset($columns[$i]) ? trim($columns[$i]) : null;
                     }
-
+                    
                     // Insert the data into the array to be bulk-inserted
                     if ($tableName == 't05_bex_clientes' && !empty($rowData)) {
                         //Inserta un autoincrement
@@ -102,12 +120,14 @@ trait ReadExportDataTrait {
                     $dataToInsert[] = array_map('utf8_encode', $rowData);
                 }
             }
-    
+            
             // Bulk insert the data into the corresponding model
             if ($modelInstance && !empty($dataToInsert)) {
                 $chunks = array_chunk($dataToInsert, 1000); // Divide en lotes de 1000 registros
                 foreach ($chunks as $chunk) {
-                    $modelInstance->insert($chunk);
+                    DB::transaction(function () use ($modelInstance, $chunk, $tableName) {
+                        $modelInstance->insert($chunk);
+                    });
                 }
                 $this->info("◘ Datos insertados en la tabla " . $tableName);
             } else {
@@ -121,7 +141,7 @@ trait ReadExportDataTrait {
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
-                'type'  => $type,
+                'type'        => $type,
                 'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => '.$e->getMessage()
             ]);
             return 1;

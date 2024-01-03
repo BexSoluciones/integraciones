@@ -29,11 +29,13 @@ class ExportInformation extends Command
 
             //Function that configures the database (ConnetionTrait).
             $configDB = $this->connectionDB($conectionBex, 'externa', $area); 
-            if($configDB == 1){
-                Tbl_Log::create([
+            if($configDB != 0){
+                DB::connection('mysql')->table('tbl_log')->insert([
                     'id_table'    => $id_importation,
                     'type'        => $type,
-                    'descripcion' => 'Commands::ExportInformation[handle()] => Error al conectar BD externa '.$conectionBex
+                    'descripcion' => 'Commands::ExportInformation[handle()] => Conexion Externa: Linea '.__LINE__.'; '.$configDB,
+                    'created_at'  => now(),
+                    'updated_at'  => now()
                 ]);
                 return 1;
             }
@@ -71,11 +73,13 @@ class ExportInformation extends Command
             }  
             
             $configDB = $this->connectionDB($tenantDB, 'local');
-            if($configDB == 1){
-                Tbl_Log::create([
+            if($configDB != 0){
+                DB::connection('mysql')->table('tbl_log')->insert([
                     'id_table'    => $id_importation,
                     'type'        => $type,
-                    'descripcion' => 'Commands::ExportInformation[handle()] => Error al conectar BD local' .$tenantDB
+                    'descripcion' => 'Commands::ExportInformation[handle()] => Conexion Local: Linea '.__LINE__.'; '.$configDB,
+                    'created_at'  => now(),
+                    'updated_at'  => now()
                 ]);
                 return 1;
             }
@@ -103,6 +107,15 @@ class ExportInformation extends Command
                 if($tableName == 't16_bex_inventarios'){
                     $conectionSys = 2;
                     $configDB = $this->connectionDB($conectionSys, 'externa', $area);
+                    if($configDB != 0){
+                        DB::connection('mysql')->table('tbl_log')->insert([
+                            'id_table'    => $id_importation,
+                            'type'        => $type,
+                            'descripcion' => 'Commands::ExportInformation[handle()] => Conexion Externa: Linea '.__LINE__.'; '.$configDB,
+                            'created_at'  => now(),
+                            'updated_at'  => now()
+                        ]);
+                    }
                     $conectionSys = Connection_Bexsoluciones::showConnectionBS($conectionSys, $area)->value('name');
                 }else{
                     $conectionSys = null;
