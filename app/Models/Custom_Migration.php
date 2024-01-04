@@ -15,10 +15,16 @@ class Custom_Migration extends Model
     protected $fillable = [
         'id', 
         'name',
-        'command'
+        'command',
+        'custom_inserts_id'
     ];
 
     public static function getAll(){
         return static::all();
+    }
+
+    public function scopeNameTables($query){
+        return $query->select('name_table', 'custom_inserts_id')
+            ->where('custom_inserts_id', '!=', null);
     }
 }

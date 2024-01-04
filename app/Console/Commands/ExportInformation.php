@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\Tbl_Log;
+use App\Models\Custom_Insert;
+use App\Models\Custom_Migration;
 use App\Models\Connection_Bexsoluciones;
 use App\Traits\ConnectionTrait;
 
@@ -84,30 +86,32 @@ class ExportInformation extends Command
                 return 1;
             }
 
-            $customMethods = [
-                't04_bex_cartera'       => 'insertCarteraCustom',
-                't05_bex_clientes'      => 'insertClientesCustom',
-                't12_bex_dptos'         => 'insertDptosCustom',
-                't13_bex_estadopedidos' => 'insertEstadoPedidosCustom',
-                't16_bex_inventarios'   => 'insertInventarioCustom',
-                't18_bex_mpios'         => 'insertMpiosCustom',
-                't19_bex_paises'        => 'insertPaisCustom',
-                't25_bex_precios'       => 'insertPreciosCustom',
-                't29_bex_productos'     => 'insertProductsCustom',
-                't34_bex_ruteros'       => 'insertRuteroCustom',
-                't36_bex_vendedores'    => 'insertVendedoresCustom',
-                't37_bex_amovil'        => 'InsertAmovilCustom',
-            ];
+            $nameTables = Custom_Migration::nameTables()->get();
+            $methods    = Custom_Insert::methods()->get();
+            
+            // Unir los resultados por custom_inserts_id e id
+            $customMethods = $nameTables->map(function ($nameTableItem) use ($methods) {
+                // Encontrar el método correspondiente por id
+                $matchingMethod = $methods->where('id', $nameTableItem->custom_inserts_id)->first();
+
+                // Combinar las columnas name_table y method
+                return (object) [
+                    'name_table' => $nameTableItem->name_table,
+                    'method' => optional($matchingMethod)->method, // Usar optional para manejar el caso en que no hay coincidencia
+                ];
+            });
 
             $conectionBex = Connection_Bexsoluciones::showConnectionBS($conectionBex, $area)->value('name');
+            $conectionSys = null;
+
             foreach ($availableModels as $modelClass => $tableName) {
                 $modelInstance = new $modelClass();
                 $datosAInsertar = $modelInstance::get();
-            
-                if($tableName == 't16_bex_inventarios'){
+
+                if ($tableName == 't16_bex_inventarios') {
                     $conectionSys = 2;
                     $configDB = $this->connectionDB($conectionSys, 'externa', $area);
-                    if($configDB != 0){
+                    if ($configDB != 0) {
                         DB::connection('mysql')->table('tbl_log')->insert([
                             'id_table'    => $id_importation,
                             'type'        => $type,
@@ -117,23 +121,23 @@ class ExportInformation extends Command
                         ]);
                     }
                     $conectionSys = Connection_Bexsoluciones::showConnectionBS($conectionSys, $area)->value('name');
-                }else{
-                    $conectionSys = null;
                 }
-            
-                if (array_key_exists($tableName, $customMethods)) {
-                    $methodName = $customMethods[$tableName];
-                    $insert = new $custom();
-                    $insert->$methodName(
-                                        $conectionBex, 
-                                        $conectionSys, 
-                                        $datosAInsertar, 
-                                        $id_importation,
-                                        $type,
-                                        $modelInstance, 
-                                        $tableName
-                                    );
-                    print "◘ Proceso $methodName Finalizado" . PHP_EOL;
+
+                foreach ($customMethods as $method) {
+                    $methodName = $method->method;
+                    if ($tableName == $method->name_table) {
+                        $insert = new $custom();
+                        $insert->$methodName(
+                            $conectionBex,
+                            $conectionSys,
+                            $datosAInsertar,
+                            $id_importation,
+                            $type,
+                            $modelInstance,
+                            $tableName
+                        );
+                        print "◘ Proceso $methodName Finalizado" . PHP_EOL;
+                    }
                 }
             }
             print '◘ Información Base de Datos '.$tenantDB.' Exportada.' . PHP_EOL;
