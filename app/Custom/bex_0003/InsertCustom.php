@@ -1403,7 +1403,7 @@ class InsertCustom
                 ->whereNotNull('CODPRODUCTO')
                 ->update([
                     'CANT2' => DB::raw('CASE WHEN CANT2 > 0 THEN CANT2 - 1 ELSE CANT2 END'),
-                    '   ' => DB::raw('CASE WHEN CANT3 > 0 THEN CANT3 - 1 ELSE CANT3 END'),
+                    'CANT3' => DB::raw('CASE WHEN CANT3 > 0 THEN CANT3 - 1 ELSE CANT3 END'),
                     'CANT4' => DB::raw('CASE WHEN CANT4 > 0 THEN CANT4 - 1 ELSE CANT4 END'),
                     'CANT5' => DB::raw('CASE WHEN CANT5 > 0 THEN CANT5 - 1 ELSE CANT5 END'),
                 ]);
