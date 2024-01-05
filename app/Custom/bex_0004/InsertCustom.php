@@ -47,29 +47,7 @@ class InsertCustom
                 }
                 print '◘ Datos insertados la tabla s1e_cartera' . PHP_EOL;
             }
-            /*
-            $dataToInsert = $datosAInsertar->map(function ($dato) {
-                return [
-                    'nitcliente'    => $dato->nitcliente,
-                    'dv'            => $dato->dv,
-                    'succliente'    => $dato->succliente,
-                    'codtipodoc'    => $dato->codtipodoc,
-                    'documento'     => $dato->documento,
-                    'fecmov'        => $dato->fecmov,
-                    'fechavenci'    => $dato->fechavenci,
-                    'valor'         => $dato->valor,
-                    'codvendedor'   => $dato->codvendedor,
-                    'x'             => null,
-                    'codcliente'    => '',
-                    'estadotipodoc' => 'A',
-                ];
-            });
-        
-            // Insertar los datos en la tabla s1e_cartera
-            DB::connection($conectionBex)->table('s1e_cartera')->insert($dataToInsert->toArray());
-            print '◘ Datos insertados en la tabla s1e_cartera' . PHP_EOL;
-            */
-            
+     
             //Actualiza codcliente en la tabla s1e_cartera
             DB::connection($conectionBex)
                 ->table('s1e_cartera')
@@ -86,10 +64,11 @@ class InsertCustom
                 ->insertUsing(
                     ['CODVENDEDOR', 'CODCLIENTE','CODTIPODOC','NUMMOV','FECMOV','FECVEN','PRECIOMOV'],
                     function ($query) {
-                        $query->select('s1e_cartera.codvendedor','s1e_cartera.codcliente','s1e_cartera.codtipodoc','documento','s1e_cartera.fecmov','fechavenci','valor')
+                        $query->select('tblmvendedor.codvendedor','s1e_cartera.codcliente','s1e_cartera.codtipodoc','documento','s1e_cartera.fecmov','fechavenci','valor')
+                        ->distinct()
                         ->from('s1e_cartera')
                         ->join('tblmcliente','s1e_cartera.codcliente','=','tblmcliente.CODCLIENTE')
-                        ->join('tblmvendedor','s1e_cartera.codvendedor','=','tblmvendedor.CODVENDEDOR');
+                        ->join('tblmvendedor','s1e_cartera.codvendedor','=','tblmvendedor.tercvendedor');
                     }
                 );
             print '◘ Datos insertados en la tabla tbldcartera' . PHP_EOL;

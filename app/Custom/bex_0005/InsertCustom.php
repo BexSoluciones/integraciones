@@ -1105,7 +1105,7 @@ class InsertCustom
                             'DIARUTERO' => $ruteroDia->dia,
                             'NOMDIARUTERO' => $ruteroDia->dia_descrip
                         ];
-                    }, $ruteroDias);
+                    }, $ruteroDias->toArray());
                 
                     DB::connection($conectionBex)->table('tblmdiarutero')->insert($insertData);
                     print '◘ Datos insertados en la tabla tblmdiarutero' . PHP_EOL;
