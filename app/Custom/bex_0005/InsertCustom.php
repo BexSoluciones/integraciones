@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Custom\bex_0003;
+namespace App\Custom\bex_0005;
 
 use App\Models\Tbl_Log;
 use App\Traits\ConnectionTrait;
@@ -125,7 +125,7 @@ class InsertCustom
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::bex_0003/InsertCustom[insertCarteraCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::bex_0005/InsertCustom[insertCarteraCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
@@ -264,7 +264,7 @@ class InsertCustom
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::Custom::bex_0003/InsertCustom[insertClientesCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0005/InsertCustom[insertClientesCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
@@ -342,7 +342,7 @@ class InsertCustom
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::Custom::bex_0003/InsertCustom[insertDptosCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0005/InsertCustom[insertDptosCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
@@ -478,7 +478,7 @@ class InsertCustom
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::Custom::bex_0003/InsertCustom[insertEstadoPedidosCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0005/InsertCustom[insertEstadoPedidosCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
@@ -520,7 +520,7 @@ class InsertCustom
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::Custom::bex_0003/InsertCustom[insertEntregasCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0005/InsertCustom[insertEntregasCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
@@ -536,7 +536,7 @@ class InsertCustom
                 $tblslicencias = DB::connection($conectionSys)
                     ->table('tblslicencias')
                     ->select('borrardstockimportando', 'creabodegaempresa')
-                    ->where('bdlicencias', 'platafor_pi002')
+                    ->where('bdlicencias', 'platafor_pi131')
                     ->first();
                 
                 $tblmimpuesto = DB::connection($conectionBex)
@@ -642,16 +642,16 @@ class InsertCustom
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
                     'type'  => $type,
-                    'descripcion' => 'Custom::bex_0003/InsertCustom[insertInventarioCustom()] => Tabla inventario se encuentra vacia.'
+                    'descripcion' => 'Custom::bex_0005/InsertCustom[insertInventarioCustom()] => Tabla inventario se encuentra vacia.'
                 ]);
                 return 1;
             }
-            $configDB = $this->connectionDB('bex_0003', 'local'); 
+            $configDB = $this->connectionDB('bex_0005', 'local'); 
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::Custom::bex_0003/InsertCustom[insertInventarioCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0005/InsertCustom[insertInventarioCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
@@ -736,7 +736,7 @@ class InsertCustom
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::Custom::bex_0003/InsertCustom[insertMpiosCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0005/InsertCustom[insertMpiosCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
@@ -811,7 +811,7 @@ class InsertCustom
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::Custom::bex_0003/InsertCustom[insertPaisCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0005/InsertCustom[insertPaisCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
@@ -887,7 +887,7 @@ class InsertCustom
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::Custom::bex_0003/InsertCustom[insertPreciosCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0005/InsertCustom[insertPreciosCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
@@ -1032,7 +1032,7 @@ class InsertCustom
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::Custom::bex_0003/InsertCustom[insertProductsCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0005/InsertCustom[insertProductsCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
@@ -1105,7 +1105,7 @@ class InsertCustom
                             'DIARUTERO' => $ruteroDia->dia,
                             'NOMDIARUTERO' => $ruteroDia->dia_descrip
                         ];
-                    }, $ruteroDias->toArray());
+                    }, $ruteroDias);
                 
                     DB::connection($conectionBex)->table('tblmdiarutero')->insert($insertData);
                     print '◘ Datos insertados en la tabla tblmdiarutero' . PHP_EOL;
@@ -1136,7 +1136,7 @@ class InsertCustom
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::Custom::bex_0003/InsertCustom[insertRuteroCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0005/InsertCustom[insertRuteroCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
@@ -1187,12 +1187,18 @@ class InsertCustom
                 $dataToInsert = [];
                 if (count($NuevoVend) > 0) {
                     foreach ($NuevoVend as $vendedor) {
+
+                        $vendedorMax = DB::connection($conectionBex)
+                            ->table('tblmvendedor')
+                            ->selectRaw('MAX(estado) + 1 as tervendedor')
+                            ->get(); 
+
                         $dataToInsert[] = [
-                            'codvendedor'           => $vendedor->codvendedor,
+                            'codvendedor'           => $vendedorMax[0]->codvendedor,
                             'nomvendedor'           => 'Vendedor Nuevo',
                             'codbodega'             => '00101',
                             'codgrupoemp'           => '0',
-                            'codsupervisor'         => $vendedor->centro_ope,
+                            'codsupervisor'         => $vendedor->codvendedor,
                             'codgrupodcto'          => '000',
                             'coddescuento'          => '0',
                             'codportafolio'         => '0',
@@ -1204,7 +1210,7 @@ class InsertCustom
                             'hacedctopiefacaut'     => 'S',
                             'hacedctonc'            => 'N',
                             'descuentosescala'      => 'N',
-                            'tercvendedor'          => NULL,
+                            'tercvendedor'          => $vendedor->codvendedor,
                             'tipodoc'               => $vendedor->tipodocpedido,
                             'cedula'                => NULL,
                             'co'                    => $vendedor->centro_ope,
@@ -1254,7 +1260,7 @@ class InsertCustom
                             'NOMUSUARIO'    => $vendedor['NOMVENDEDOR'],
                             'CODUSUARIO'    => $vendedor['CODVENDEDOR'],
                             'CLAVEUSUARIO'  => $vendedor['CODVENDEDOR'],
-                            'CODEMPRESA'    => NULL,
+                            'CODEMPRESA'    => '3',
                             'FECGRA'        => $fechaActual,
                             'CODGRA'        => 'root',
                             'modificadoc'   => 'N',
@@ -1301,7 +1307,7 @@ class InsertCustom
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::Custom::bex_0003/InsertCustom[insertVendedoresCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0005/InsertCustom[insertVendedoresCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
@@ -1350,7 +1356,7 @@ class InsertCustom
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::Custom::bex_0003/InsertCustom[InsertAmovilCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0005/InsertCustom[InsertAmovilCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
@@ -1547,7 +1553,7 @@ class InsertCustom
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Custom::Custom::bex_0003/InsertCustom[insertDescuentos_ofiCustom()] => '.$e->getMessage()
+                'descripcion' => 'Custom::Custom::bex_0005/InsertCustom[insertDescuentos_ofiCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
