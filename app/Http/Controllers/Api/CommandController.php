@@ -91,13 +91,13 @@ class CommandController extends Controller
                     'response' => 'El area '.$request->area.' no existe'
                 ]);
             }
-
+            
             $output = Artisan::call('command:upload-order', [
                 'database' => $connection->id,
                 'area' => $request->area,
                 'closing' => $request->closing,
             ]);
-          
+            
             if($output == 0){
                 $rutaArchivo = 'export/'.$request->name_db.'/'.$request->area.'/pedidos_txt/'.str_pad($request->closing,8,"0",STR_PAD_LEFT).'.PE0';
                 $rutaCompleta = storage_path('app/public/' . $rutaArchivo);
