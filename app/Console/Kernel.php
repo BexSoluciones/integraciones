@@ -8,6 +8,7 @@ use App\Models\Tbl_Log;
 use App\Models\Command;
 use App\Models\Connection;
 use App\Models\Importation_Demand;
+use App\Models\Importation_Automatic;
 
 use App\Console\Commands\UpdateInformation;
 
@@ -30,6 +31,12 @@ class Kernel extends ConsoleKernel
                 ->before(function () use ($parameter) {
                     // Se cambia el state a 2 para saber que se esta ejecutando
                     $parameter->updateOrInsert(['name_db' => $parameter->name_db], ['state' => '2']);
+
+                    Importation_Automatic::create([
+                        'id_table'  => $parameter->id,
+                        'state'     => 0,
+                        'date_init' => Carbon::now()
+                    ]);
                 })
                 // Si todo sale bien ejecuta el siguiente comando
                 ->cron($parameter->cron_expression)
@@ -52,10 +59,14 @@ class Kernel extends ConsoleKernel
                             ['consecutive' => $importationInCurse->consecutive], ['state' => 3, 'updated_at' => $currentTime]
                         );
                     }
+
+                    Importation_Automatic::updateOrInsert(['id_table' => $parameter->id], ['state' => 3, 'date_end' =>  Carbon::now()]);
                 })
                 //si ocurre un error se se guarda y se cambia a state 1 para que vuelva aquedar activo 
                 ->onFailure(function (Stringable $output) use ($parameter) {
                     $parameter->updateOrInsert(['name_db' => $parameter->name_db], ['state' => '1']);
+
+                    Importation_Automatic::updateOrInsert(['id_table' => $parameter->id], ['state' => 4, 'date_end' =>  Carbon::now()]);
                 })
                 // Sirve para que un schedule no se ejecute encima de otro y espere 10 mn
                 ->withoutOverlapping(10);
