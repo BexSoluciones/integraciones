@@ -603,11 +603,29 @@ class InsertCustom
                                     'EXISTENCIA_STOCK' => $dato[$i]->inventario
                                 ];    
                             }  
-                            DB::connection($conectionBex)->table('tbldstock')->insertOrIgnore($Insert);
+                            $stock = DB::connection($conectionBex)->table('tbldstock')->insertOrIgnore($Insert);
                         }
                         print '◘ Datos insertados en la tabla tbldstock' . PHP_EOL;
                     }
-        
+                    
+                    if($stock>0){
+                        foreach (array_chunk($datosAInsert,3000) as $dato) {
+                            $Insert = [];
+                            $count = count($dato);
+                            for($i=0;$i<$count;$i++) {
+                                $Insert[] = [
+                                    'bodega'         => $dato[$i]->bodega,
+                                    'iva'            => $dato[$i]->iva,
+                                    'producto'       => $dato[$i]->producto,
+                                    'inventario'     => $dato[$i]->inventario,
+                                    'estadoimpuesto' => $dato[$i]->estadoimpuesto,
+                                    'estadobodega'   => $dato[$i]->estadobodega
+                                ];    
+                            }
+                            DB::connection($conectionBex)->table('s1e_inventarios')->insertOrIgnore($Insert);
+                        }
+                        print '◘ Datos insertados en la tabla inventarios' . PHP_EOL;
+                    }
                     print '◘ Datos Actualizados en la tabla tbldstock' . PHP_EOL;
                 }else{
                     print '◘ No hay datos para Actualizar en la tabla tbldstock' . PHP_EOL;
@@ -1105,7 +1123,7 @@ class InsertCustom
                             'DIARUTERO' => $ruteroDia->dia,
                             'NOMDIARUTERO' => $ruteroDia->dia_descrip
                         ];
-                    }, $ruteroDias);
+                    }, $ruteroDias->toArray());
                 
                     DB::connection($conectionBex)->table('tblmdiarutero')->insert($insertData);
                     print '◘ Datos insertados en la tabla tblmdiarutero' . PHP_EOL;

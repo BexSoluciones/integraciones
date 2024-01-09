@@ -47,29 +47,7 @@ class InsertCustom
                 }
                 print '◘ Datos insertados la tabla s1e_cartera' . PHP_EOL;
             }
-            /*
-            $dataToInsert = $datosAInsertar->map(function ($dato) {
-                return [
-                    'nitcliente'    => $dato->nitcliente,
-                    'dv'            => $dato->dv,
-                    'succliente'    => $dato->succliente,
-                    'codtipodoc'    => $dato->codtipodoc,
-                    'documento'     => $dato->documento,
-                    'fecmov'        => $dato->fecmov,
-                    'fechavenci'    => $dato->fechavenci,
-                    'valor'         => $dato->valor,
-                    'codvendedor'   => $dato->codvendedor,
-                    'x'             => null,
-                    'codcliente'    => '',
-                    'estadotipodoc' => 'A',
-                ];
-            });
-        
-            // Insertar los datos en la tabla s1e_cartera
-            DB::connection($conectionBex)->table('s1e_cartera')->insert($dataToInsert->toArray());
-            print '◘ Datos insertados en la tabla s1e_cartera' . PHP_EOL;
-            */
-            
+     
             //Actualiza codcliente en la tabla s1e_cartera
             DB::connection($conectionBex)
                 ->table('s1e_cartera')
@@ -86,10 +64,11 @@ class InsertCustom
                 ->insertUsing(
                     ['CODVENDEDOR', 'CODCLIENTE','CODTIPODOC','NUMMOV','FECMOV','FECVEN','PRECIOMOV'],
                     function ($query) {
-                        $query->select('s1e_cartera.codvendedor','s1e_cartera.codcliente','s1e_cartera.codtipodoc','documento','s1e_cartera.fecmov','fechavenci','valor')
+                        $query->select('tblmvendedor.codvendedor','s1e_cartera.codcliente','s1e_cartera.codtipodoc','documento','s1e_cartera.fecmov','fechavenci','valor')
+                        ->distinct()
                         ->from('s1e_cartera')
                         ->join('tblmcliente','s1e_cartera.codcliente','=','tblmcliente.CODCLIENTE')
-                        ->join('tblmvendedor','s1e_cartera.codvendedor','=','tblmvendedor.CODVENDEDOR');
+                        ->join('tblmvendedor','s1e_cartera.codvendedor','=','tblmvendedor.tercvendedor');
                     }
                 );
             print '◘ Datos insertados en la tabla tbldcartera' . PHP_EOL;
@@ -603,11 +582,29 @@ class InsertCustom
                                     'EXISTENCIA_STOCK' => $dato[$i]->inventario
                                 ];    
                             }  
-                            DB::connection($conectionBex)->table('tbldstock')->insertOrIgnore($Insert);
+                            $stock = DB::connection($conectionBex)->table('tbldstock')->insertOrIgnore($Insert);
                         }
                         print '◘ Datos insertados en la tabla tbldstock' . PHP_EOL;
                     }
-        
+                    
+                    if($stock>0){
+                        foreach (array_chunk($datosAInsert,3000) as $dato) {
+                            $Insert = [];
+                            $count = count($dato);
+                            for($i=0;$i<$count;$i++) {
+                                $Insert[] = [
+                                    'bodega'         => $dato[$i]->bodega,
+                                    'iva'            => $dato[$i]->iva,
+                                    'producto'       => $dato[$i]->producto,
+                                    'inventario'     => $dato[$i]->inventario,
+                                    'estadoimpuesto' => $dato[$i]->estadoimpuesto,
+                                    'estadobodega'   => $dato[$i]->estadobodega
+                                ];    
+                            }
+                            DB::connection($conectionBex)->table('s1e_inventarios')->insertOrIgnore($Insert);
+                        }
+                        print '◘ Datos insertados en la tabla inventarios' . PHP_EOL;
+                    }    
                     print '◘ Datos Actualizados en la tabla tbldstock' . PHP_EOL;
                 }else{
                     print '◘ No hay datos para Actualizar en la tabla tbldstock' . PHP_EOL;
