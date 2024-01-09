@@ -5,7 +5,9 @@ namespace App\Console\Commands;
 use App\Models\Tbl_Log;
 use App\Traits\GetOrderTrait;
 use App\Traits\ConnectionTrait;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+
 
 use Illuminate\Console\Command;
 
@@ -34,10 +36,11 @@ class UploadOrder extends Command
             }
           
             $orders = $this->getOrderHeder($db, $area, $closing);
+          
             if($orders == 0){
                 return 0;
             }
-           
+       
             if(!empty($orders)){
                 $orderDetails = $this->getOrderDetail($orders);
                 return 0;
