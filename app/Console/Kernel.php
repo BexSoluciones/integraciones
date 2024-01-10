@@ -13,6 +13,7 @@ use App\Models\Importation_Automatic;
 use App\Console\Commands\UpdateInformation;
 
 use Illuminate\Support\Stringable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Console\Scheduling\Schedule;
@@ -22,7 +23,7 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule): void {
         try {
-            $currentTime = Carbon::now();
+            $this->currentTime = Carbon::now();
             $parameters  = Command::getAll()->get();
             
             foreach ($parameters as $parameter) {
@@ -32,7 +33,7 @@ class Kernel extends ConsoleKernel
                     // Se cambia el state a 2 para saber que se esta ejecutando
                     $parameter->updateOrInsert(['name_db' => $parameter->name_db], ['state' => '2']);
 
-                    Importation_Automatic::create([
+                    $this->importationAutomatic = Importation_Automatic::create([
                         'id_table'  => $parameter->id,
                         'state'     => 0,
                         'date_init' => Carbon::now()
@@ -56,24 +57,30 @@ class Kernel extends ConsoleKernel
                     $importationInCurse = Importation_Demand::importationInCurse($parameter->name_db, $parameter->area)->first();
                     if(isset($importationInCurse)){
                         Importation_Demand::updateOrInsert(
-                            ['consecutive' => $importationInCurse->consecutive], ['state' => 3, 'updated_at' => $currentTime]
+                            ['consecutive' => $importationInCurse->consecutive], ['state' => 3, 'updated_at' => $this->currentTime]
                         );
                     }
-
-                    Importation_Automatic::updateOrInsert(['id_table' => $parameter->id], ['state' => 3, 'date_end' =>  Carbon::now()]);
+                
+                    Importation_Automatic::updateOrInsert(
+                        ['id' => $this->importationAutomatic->id], ['state' => 3, 'date_end' => $this->currentTime]
+                    );
                 })
                 //si ocurre un error se se guarda y se cambia a state 1 para que vuelva aquedar activo 
                 ->onFailure(function (Stringable $output) use ($parameter) {
                     $parameter->updateOrInsert(['name_db' => $parameter->name_db], ['state' => '1']);
-
-                    Importation_Automatic::updateOrInsert(['id_table' => $parameter->id], ['state' => 4, 'date_end' =>  Carbon::now()]);
+                   
+                    Importation_Automatic::updateOrInsert(
+                        ['id' => $this->importationAutomatic->id], ['state' => 4, 'date_end' => $this->currentTime]
+                    );
                 })
                 // Sirve para que un schedule no se ejecute encima de otro y espere 10 mn
                 ->withoutOverlapping(10);
             }
         } catch (\Exception $e) {
-            Tbl_Log::create([
-                'descripcion' => 'Kernel[schedule()] => '.$e->getMessage()
+            DB::connection('mysql')->table('tbl_log')->insert([
+                'descripcion' => 'Kernel[schedule()] => '.$e->getMessage(),
+                'created_at'  => now(),
+                'updated_at'  => now()
             ]);
         }
     }
