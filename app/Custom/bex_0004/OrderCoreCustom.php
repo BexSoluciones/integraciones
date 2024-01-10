@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Custom\bex_0002;
+namespace App\Custom\bex_0004;
 
 use App\Models\Tbl_Log;
 
@@ -95,14 +95,14 @@ class OrderCoreCustom
                 }
               
                 $namefile=str_pad($closing,8,"0",STR_PAD_LEFT).'.PE0';
-                Storage::disk('public')->put('export/bex_0002/bexmovil/pedidos_txt/' . $namefile, $cadena);    
+                Storage::disk('public')->put('export/bex_0004/bexmovil/pedidos_txt/' . $namefile, $cadena);    
             } else {
                 $error = 'El pedido no tiene productos asignados';
                 $estado = "3";
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::bex_0002/OrderCoreCustom[uploadOrder()] => '.$e->getMessage()
+                'descripcion' => 'Custom::bex_0004/OrderCoreCustom[uploadOrder()] => '.$e->getMessage()
             ]);
             return print '▲ Error en uploadOrder';
         }

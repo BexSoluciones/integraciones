@@ -3,7 +3,10 @@
 namespace App\Jobs;
 
 use App\Custom\OrderCoreCustomGeneral;
-use App\Custom\bex_0002\OrderCoreCustom;
+use App\Custom\bex_0002\OrderCoreCustom as OrderCoreCustom2;
+use App\Custom\bex_0003\OrderCoreCustom as OrderCoreCustom3;
+use App\Custom\bex_0004\OrderCoreCustom as OrderCoreCustom4;
+use App\Custom\bex_0005\OrderCoreCustom as OrderCoreCustom5;
 use App\Models\Tbl_Log;
 
 use Illuminate\Bus\Queueable;
@@ -37,8 +40,17 @@ class ProcessOrderUploadERP implements ShouldQueue
     {
         try{
             if($this->cia->bdlicencias == 'platafor_pi055'){
-                $objOrederCore = new OrderCoreCustom();
-                $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing); 
+                $objOrederCore = new OrderCoreCustom2();
+                $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing);
+            }elseif($this->cia->bdlicencias == 'platafor_pi002'){
+                $objOrederCore = new OrderCoreCustom3();
+                $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing);  
+            }elseif($this->cia->bdlicencias == 'platafor_pi151'){
+                $objOrederCore = new OrderCoreCustom4();
+                $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing);
+            }elseif($this->cia->bdlicencias == 'platafor_pi131'){
+                $objOrederCore = new OrderCoreCustom5();
+                $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing);    
             }else{
                 $objOrederCore = new OrderCoreCustomGeneral();
                 $objOrederCore->uploadOrder($this->order, $this->orderDetail, $this->cia);    
