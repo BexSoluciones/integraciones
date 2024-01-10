@@ -37,13 +37,15 @@ trait GetOrderTrait {
                     ->selectRaw('tblmvendedor.co,tblmvendedor.tipodoc,tbldmovenc.nummov,nitcliente,succliente,tbldmovenc.codfpagovta,
                                 tbldmovenc.codvendedor,fecmov,tbldmovdet.codproducto,tbldmovdet.codbodega,cantidadmov,tbldmovenc.codprecio,
                                 preciomov,dcto1mov,dcto2mov,dcto3mov,dcto4mov,pluproducto,nomunidademp,mensajemov,dctopiefacaut,dctonc')
+                    ->orderBy('tbldmovenc.nummov','asc')
+                    ->orderBy('tbldmovdet.codmovdet','asc')
                     ->get();
-                    
+
                 $plataforSys = 2;
                 $config = $this->connectionDB($plataforSys, 'externa', $area);
                 if($config != 0){
                     DB::connection('mysql')->table('tbl_log')->insert([
-                        'descripcion' => 'Trait::GetOrderTrait[getOrderHeder()] => Conexion Externa: Linea '.__LINE__.'; '.$configDB,
+                        'descripcion' => 'Trait::GetOrderTrait[getOrderHeder()] => Conexion Externa: Linea '.__LINE__.'; '.$config,
                         'created_at'  => now(),
                         'updated_at'  => now()
                     ]);

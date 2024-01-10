@@ -933,6 +933,7 @@ class InsertCustom
                             'estado'          => $dato['estado'],
                             'estadounidademp' => $dato['estado_unidademp'],
                             'estadoproveedor' => $dato['estadoproveedor'],
+                            'codigoalterno'   => $dato['codindadventa']
                         ];
                     }, $chunk);
 
@@ -1005,7 +1006,7 @@ class InsertCustom
                 ->where('s1e_productos.codigo','<>','')
                 ->update([
                     'tblmproducto.NOMPRODUCTO' => DB::raw('s1e_productos.descripcion'),
-                    'tblmproducto.PLUPRODUCTO' => DB::raw('s1e_productos.codigo'),
+                    'tblmproducto.PLUPRODUCTO' => DB::raw('s1e_productos.codigoalterno'),
                     'tblmproducto.codunidademp' => DB::raw('s1e_productos.codunidademp'),
                     'tblmproducto.PESO' => DB::raw('s1e_productos.peso'),
                     'tblmproducto.CODPROVEEDOR' => DB::raw('s1e_productos.codproveedor'),

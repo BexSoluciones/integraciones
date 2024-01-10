@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class Importation_Demand extends Model
 {
     use HasFactory;
+    
     protected $table = 'importation_demand';
     protected $connection = 'mysql';
     protected $primaryKey = 'consecutive';

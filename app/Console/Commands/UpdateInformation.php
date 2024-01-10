@@ -25,9 +25,9 @@ class UpdateInformation extends Command {
         try {
             // Name of the database where we are going to migrate
             $db             = $this->argument('database'); 
-            $status         = $this->input->hasArgument('status') ? $this->argument('status') : false;
-            $id_importation = $this->input->hasArgument('id_importation') ? $this->argument('id_importation') : null;
-            $type           = $this->input->hasArgument('type') ? $this->argument('type') : null;
+            $status         = $this->argument('status', false);
+            $id_importation = $this->argument('id_importation', null);
+            $type           = $this->argument('type', null);
             
             // Function that configures the database (ConnetionTrait).
             $configDB = $this->connectionDB($db, 'local'); 
