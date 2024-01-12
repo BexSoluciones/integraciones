@@ -14,7 +14,7 @@ class CreateT05BexClientesTable extends Migration
     public function up()
     {
         Schema::create('t05_bex_clientes', function (Blueprint $table) {
-            $table->integer('consecutivo')->primary()->autoIncrement();
+            $table->integer('consecutivo')->primary();
             $table->string('codigo', 15)->nullable();
             $table->char('dv', 1)->nullable();
             $table->string('sucursal', 4)->nullable();
@@ -29,9 +29,9 @@ class CreateT05BexClientesTable extends Migration
             $table->string('cupo', 20)->nullable();
             $table->string('codgrupodcto', 20)->nullable();
             $table->string('email', 50)->nullable();
-            $table->string('barrio', 100)->nullable()->index('cli_barrios');
+            $table->string('barrio', 100)->nullable();
             $table->string('direccion2', 50)->nullable();
-            $table->bigInteger('codcliente')->nullable()->index('codcliente');
+            $table->bigInteger('codcliente')->nullable();
             $table->string('tipocliente', 30)->nullable();
             $table->string('cobraiva', 30)->nullable();
             $table->string('codpais', 100)->nullable();
