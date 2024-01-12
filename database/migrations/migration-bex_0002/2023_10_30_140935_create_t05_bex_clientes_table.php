@@ -14,7 +14,7 @@ class CreateT05BexClientesTable extends Migration
     public function up()
     {
         Schema::create('t05_bex_clientes', function (Blueprint $table) {
-            $table->integer('consecutivo')->primary();
+            $table->integer('consecutivo')->primary()->autoIncrement();
             $table->string('codigo', 15)->nullable();
             $table->char('dv', 1)->nullable();
             $table->string('sucursal', 4)->nullable();
