@@ -68,8 +68,6 @@ trait MigrateTrait {
                 ->update(['command' => ':refresh']);
         } catch (\Exception $e) {
             DB::connection('mysql')->table('tbl_log')->insert([
-                'id_table'    => $id_importation,
-                'type'        => $type,
                 'descripcion' => 'Error al actualizar los comandos '.$db.': '.$e->getMessage(),
                 'created_at'  => now(),
                 'updated_at'  => now()
@@ -137,8 +135,6 @@ trait MigrateTrait {
                     rename(app_path('Models') . '/' . $modelName . '.php', $modelPath);
                 } else {
                     DB::connection('mysql')->table('tbl_log')->insert([
-                        'id_table'    => $id_importation,
-                        'type'        => $type,
                         'descripcion' => 'El modelo $modelName ya existe, no se creará nuevamente.'.$db,
                         'created_at'  => now(),
                         'updated_at'  => now()
@@ -148,8 +144,6 @@ trait MigrateTrait {
             
             } catch (\Exception $e) {
                 DB::connection('mysql')->table('tbl_log')->insert([
-                    'id_table'    => $id_importation,
-                    'type'        => $type,
                     'descripcion' => 'Error al migrar tabla '.$migration->name.': '.$e->getMessage(),
                     'created_at'  => now(),
                     'updated_at'  => now()
