@@ -12,6 +12,7 @@ use App\Traits\ReadExportDataTrait;
 use App\Traits\BackupFlatFileTrait;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class UpdateInformation extends Command {
