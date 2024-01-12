@@ -42,7 +42,7 @@ class AssemblyController extends Controller {
             //Artisan::call('generate:migrations');
             $output = Artisan::output();
             return $output;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return 'Error: ' . $e->getMessage();
         }
         
