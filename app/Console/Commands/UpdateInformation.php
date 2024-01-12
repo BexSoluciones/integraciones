@@ -40,6 +40,14 @@ class UpdateInformation extends Command {
                     'updated_at'  => now()
                 ]);
                 return 1;
+            }else{
+                DB::connection('mysql')->table('tbl_log')->insert([
+                    'id_table'    => $id_importation,
+                    'type'        => $type,
+                    'descripcion' => $db,
+                    'created_at'  => now(),
+                    'updated_at'  => now()
+                ]);
             }
  
             // Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
