@@ -14,7 +14,7 @@ class CreateT10TblLogTable extends Migration
     public function up()
     {
         Schema::create('t10_tbl_log', function (Blueprint $table) {
-            $table->integer('codigo')->primary()->autoIncrement();
+            $table->integer('codigo')->primary();
             $table->integer('id_table')->nullable();
             $table->string('type')->nullable();
             $table->text('descripcion')->nullable();
