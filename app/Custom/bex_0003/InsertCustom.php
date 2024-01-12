@@ -851,7 +851,7 @@ class InsertCustom
                             'lista'        => $dato->lista,
                             'producto'     => $dato->producto,
                             'precio'       => $dato->precio,
-                            'estadoprecio' => $dato->estadoprecio,
+                            'estadoprecio' => $dato->estadoprecio
                         ];
                     }
                     DB::connection($conectionBex)->table('s1e_precios')->insert($dataToInsert);
@@ -870,13 +870,14 @@ class InsertCustom
             $insertPrecio = DB::connection($conectionBex)
                             ->table('s1e_precios')
                             ->where('estadoprecio','A')
+                            ->groupBy('lista')
                             ->get();   
 
             if (count($insertPrecio) > 0) {
                 $dataToInsert = $insertPrecio->map(function ($dato) {
                     return [
                         'codprecio' => $dato->lista,
-                        'nomprecio' => 'LISTA PRECIO ' . $dato->lista,
+                        'nomprecio' => 'LISTA PRECIO ' . $dato->lista
                     ];
                 })->toArray();
                 DB::connection($conectionBex)->table('tblmprecio')->insert($dataToInsert);
