@@ -91,8 +91,7 @@ class OrderCoreCustom
                     $cadena.=str_pad("",4," ",STR_PAD_LEFT);
                     $cadena.=str_pad(substr($order->mensajemov,0,120),120," ",STR_PAD_RIGHT);
                     $cadena.=str_pad("",173," ",STR_PAD_LEFT);
-                    $cadena.=str_pad("01",2,"0",STR_PAD_LEFT);
-                    // $cadena.=str_pad($order->codiva,2,"0",STR_PAD_LEFT);
+                    $cadena.=str_pad($order->codiva,2,"0",STR_PAD_LEFT);
                     $cadena.="\n";
                     $dcto=0;
                 }
