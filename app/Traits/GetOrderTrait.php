@@ -10,6 +10,7 @@ use App\Models\OrderHeader;
 use App\Models\Ws_Unoee_Config;
 use App\Models\Connection_Bexsoluciones;
 use App\Traits\ConnectionTrait;
+use App\Models\Custom_Sql;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +21,21 @@ trait GetOrderTrait {
 
     public function getOrderHeder($db, $area, $closing){
         try {
+            
+            $codiva = Custom_Sql::join('connection_bexsoluciones as b', 'b.connection_id', '=', 'custom_sql.connection_id')
+                    ->where('custom_sql.category', 'pedidos')
+                    ->where('custom_sql.connection_id', $db)
+                    ->select('custom_sql.txt')
+                    ->first();
+
+            if($codiva){
+                $iva=$codiva->txt;
+            }else{
+                $iva='';
+            }
+                    
             $db = Connection_Bexsoluciones::getAll()->where('id', $db)->value('name');
+
             if($db){
                 $order = DB::connection($db)
                     ->table('tbldmovenc')
@@ -36,7 +51,7 @@ trait GetOrderTrait {
                     ->where('tbldmovenc.codtipodoc', '4')
                     ->selectRaw('tblmvendedor.co,tblmvendedor.tipodoc,tbldmovenc.nummov,nitcliente,succliente,tbldmovenc.codfpagovta,
                                 tbldmovenc.codvendedor,fecmov,tbldmovdet.codproducto,tbldmovdet.codbodega,cantidadmov,tbldmovenc.codprecio,
-                                preciomov,dcto1mov,dcto2mov,dcto3mov,dcto4mov,pluproducto,nomunidademp,mensajemov,dctopiefacaut,dctonc')
+                                preciomov,dcto1mov,dcto2mov,dcto3mov,dcto4mov,pluproducto,nomunidademp,mensajemov,dctopiefacaut,dctonc'.$iva)
                     ->orderBy('tbldmovenc.nummov','asc')
                     ->orderBy('tbldmovdet.codmovdet','asc')
                     ->get();
