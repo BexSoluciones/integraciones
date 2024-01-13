@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Tbl_Log;
 use App\Models\Ws_Config;
-
+use App\Models\Custom_Migration;
 use App\Traits\MigrateTrait;
 use App\Traits\ConnectionTrait;
 use App\Traits\DataImportTrait;
@@ -41,14 +41,6 @@ class UpdateInformation extends Command {
                     'updated_at'  => now()
                 ]);
                 return 1;
-            }else{
-                DB::connection('mysql')->table('tbl_log')->insert([
-                    'id_table'    => $id_importation,
-                    'type'        => $type,
-                    'descripcion' => $db,
-                    'created_at'  => now(),
-                    'updated_at'  => now()
-                ]);
             }
  
             // Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
@@ -78,7 +70,14 @@ class UpdateInformation extends Command {
           
             // Function to configure and migrate tables (MigrateTrait).
             if($archivosPlanos == true){
-                $this->preMigration($db);
+                $customMigrations = Custom_Migration::getAll();
+                foreach ($customMigrations as $migration) {
+                    if($migration->command == ":refresh"){
+                        DB::connection('dynamic_connection')->table($migration->name_table)->truncate();
+                        print '◘ Tabla'.$migration->name_table." truncada.\n";
+                    } 
+                }
+                //$this->preMigration($db);
             }
 
             //Function to read and export flat file to tenant DB
