@@ -134,11 +134,6 @@ trait MigrateTrait {
 
                     rename(app_path('Models') . '/' . $modelName . '.php', $modelPath);
                 } else {
-                    DB::connection('mysql')->table('tbl_log')->insert([
-                        'descripcion' => 'El modelo $modelName ya existe, no se creará nuevamente.'.$db,
-                        'created_at'  => now(),
-                        'updated_at'  => now()
-                    ]);
                     $this->info("El modelo $modelName ya existe, no se creará nuevamente.");
                 }
             

@@ -43,26 +43,26 @@ trait ReadExportDataTrait {
 
         $fileModels = FileModels::join('custom_migrations', 'custom_migrations.id', '=', 'custom_migrations_id')
                 ->where('state', 1)
-                ->get(['name_table', 'files.name as nameFile']); 
+                ->get(['name_table', 'files.name as nameFile', 'required']); 
         
         foreach($fileModels as $file){
             foreach ($availableModels as $modelClass => $tableName) {
                 $content = file_get_contents($folderPath.'/'.$file->nameFile);
                 if ($file->name_table === $tableName) {
                     $this->info("◘ El archivo plano $file->nameFile coincide con el modelo: $tableName");
-                    $this->processFileContent($modelClass, $content, $tableName, $id_importation, $type);
+                    $this->processFileContent($modelClass, $content, $tableName, $id_importation, $type, $file->required);
                 }
             }
         }
     }
 
-    private function processFileContent($modelClass, $content, $tableName, $id_importation, $type) {
+    private function processFileContent($modelClass, $content, $tableName, $id_importation, $type, $required) {
         try {
             $modelInstance = new $modelClass();
             $columnsModelo = $modelInstance->getFillable();
             $autoIncrement = 1;
-    
-            if ($content === false) {
+            
+            if ($content === false && $required == 1) {
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
                     'type'        => $type,
