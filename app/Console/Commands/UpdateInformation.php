@@ -77,7 +77,6 @@ class UpdateInformation extends Command {
                         print '◘ Tabla'.$migration->name_table." truncada.\n";
                     } 
                 }
-                //$this->preMigration($db);
             }
 
             //Function to read and export flat file to tenant DB

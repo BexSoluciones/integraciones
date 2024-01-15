@@ -16,6 +16,7 @@ class File extends Model
         'id', 
         'custom_migrations_id',
         'name',
-        'state'
+        'state',
+        'required'
     ];
 }
