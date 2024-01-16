@@ -23,8 +23,7 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule): void {
         try {
-            $this->currentTime = Carbon::now();
-            $parameters        = Command::getAll()->get();
+            $parameters = Command::getAll()->get();
             
             foreach ($parameters as $parameter) {
                 // Ejecuta el comando
@@ -38,8 +37,6 @@ class Kernel extends ConsoleKernel
                         'state'     => 0,
                         'date_init' => Carbon::now()
                     ]);
-                    Log::info($this->importationAutomatic);
-                    Log::info(Carbon::now());
                 })
                 // Si todo sale bien ejecuta el siguiente comando
                 ->cron($parameter->cron_expression)
@@ -59,23 +56,19 @@ class Kernel extends ConsoleKernel
                     $importationInCurse = Importation_Demand::importationInCurse($parameter->name_db, $parameter->area)->first();
                     if(isset($importationInCurse)){
                         Importation_Demand::updateOrInsert(
-                            ['consecutive' => $importationInCurse->consecutive], ['state' => 3, 'updated_at' => $this->currentTime]
+                            ['consecutive' => $importationInCurse->consecutive], ['state' => 3, 'updated_at' => now()]
                         );
                     }
                     
                     $importationAutomaticToUpdate = Importation_Automatic::find($this->importationAutomatic->id);
-                    $importationAutomaticToUpdate->update(['state' => 3, 'date_end' => $this->currentTime]);
-                    Log::info($this->importationAutomatic);
-                    Log::info($this->currentTime);
+                    $importationAutomaticToUpdate->update(['state' => 3, 'date_init' => $this->importationAutomatic->date_init, 'date_end' => now()]);
                 })
                 //si ocurre un error se se guarda y se cambia a state 1 para que vuelva aquedar activo 
                 ->onFailure(function (Stringable $output) use ($parameter) {
                     $parameter->updateOrInsert(['name_db' => $parameter->name_db], ['state' => '1']);
                    
                     $importationAutomaticToUpdate = Importation_Automatic::find($this->importationAutomatic->id);
-                    $importationAutomaticToUpdate->update(['state' => 4, 'date_end' => $this->currentTime]);
-                    Log::info($this->importationAutomatic);
-                    Log::info($this->currentTime);
+                    $importationAutomaticToUpdate->update(['state' => 4, 'date_init' => $this->importationAutomatic->date_init, 'date_end' => now()]);
                 })
                 // Sirve para que un schedule no se ejecute encima de otro y espere 10 mn
                 ->withoutOverlapping(10);

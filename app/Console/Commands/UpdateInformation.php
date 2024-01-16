@@ -67,8 +67,6 @@ class UpdateInformation extends Command {
                 $archivosPlanos = true;
             } elseif($config->ConecctionType == 'ws') {
                 $archivosPlanos = $this->importData($db);
-            } elseif($config->ConecctionType == 'api'){
-                $token = $this->loginToApi($db);
             }
           
             // Function to configure and migrate tables (MigrateTrait).
