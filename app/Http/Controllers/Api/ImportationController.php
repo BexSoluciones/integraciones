@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tbl_Log;
+use App\Models\Importation_Demand;
 use App\Models\Importation_Automatic;
 use App\Traits\ConnectionTrait;
 
