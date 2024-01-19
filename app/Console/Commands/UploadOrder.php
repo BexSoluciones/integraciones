@@ -3,8 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Models\Tbl_Log;
+use App\Models\Connection_Bexsoluciones;
 use App\Traits\GetOrderTrait;
 use App\Traits\ConnectionTrait;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -15,7 +17,7 @@ class UploadOrder extends Command
 {
     use ConnectionTrait, GetOrderTrait;
 
-    protected $signature = 'command:upload-order {database} {area} {closing}';
+    protected $signature = 'command:upload-order {database} {area} {closing?}';
     protected $description = 'Command upload order to ERP';
 
     public function handle() : int
@@ -24,7 +26,7 @@ class UploadOrder extends Command
             $db      = $this->argument('database');
             $area    = $this->argument('area');
             $closing = $this->argument('closing');
-
+         
             $configDB = $this->connectionDB($db, 'externa', $area); 
             if($configDB != 0){
                 DB::connection('mysql')->table('tbl_log')->insert([
@@ -33,6 +35,24 @@ class UploadOrder extends Command
                     'updated_at'  => now()
                 ]);
                 return 1;
+            }
+       
+            if($closing == null){
+                $db = Connection_Bexsoluciones::getAll()->where('id', $db)->value('name');
+                $closing = DB::connection($db)
+                    ->table('tbldmovenc')
+                    ->where('codtipodoc', 4)
+                    ->whereNotNull('numcierre')
+                    ->min('numcierre');
+
+                if($closing == null){
+                    DB::connection('mysql')->table('tbl_log')->insert([
+                        'descripcion' => 'Commands::UploadOrder[handle()] => Sin numero de cierre en la BD '.$db,
+                        'created_at'  => now(),
+                        'updated_at'  => now()
+                    ]);
+                    return 1;
+                }
             }
           
             $orders = $this->getOrderHeder($db, $area, $closing);
@@ -47,9 +67,12 @@ class UploadOrder extends Command
             }   
             return 1;
         }catch (\Exception $e) {
-            Tbl_Log::create([
-                'descripcion' => 'Commands::UploadOrder[handle()] => '.$e->getMessage()
+            DB::connection('mysql')->table('tbl_log')->insert([
+                'descripcion' => 'Commands::UploadOrder[handle()] => '.$e->getMessage(),
+                'created_at'  => now(),
+                'updated_at'  => now()
             ]);
+            return 1;
         }
     }
 }

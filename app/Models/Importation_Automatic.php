@@ -19,4 +19,9 @@ class Importation_Automatic extends Model
         'date_end'
     ];
     public $timestamps = false;
+
+    public function scopeImportationState($query, $date){
+        return $query->select('id', 'id_table', 'state', 'date_init', 'date_end')
+            ->whereRaw("DATE(date_init) = ?", [$date]);
+    }
 }
