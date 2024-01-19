@@ -16,7 +16,7 @@ trait FlatFileTrait {
                 $data = $item['data'];
                 
                 // No tomar en cuenta la columna 'ws_id' de $data
-                foreach ($data as &$key) {
+                foreach ($data as $key) {
                     unset($key['ws_id']);
                 }
 

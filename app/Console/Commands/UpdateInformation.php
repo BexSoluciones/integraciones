@@ -6,6 +6,7 @@ use App\Models\Tbl_Log;
 use App\Models\Ws_Config;
 use App\Models\Custom_Migration;
 use App\Traits\MigrateTrait;
+use App\Traits\ApiTrait;
 use App\Traits\ConnectionTrait;
 use App\Traits\DataImportTrait;
 use App\Traits\ReadExportDataTrait;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Log;
 
 class UpdateInformation extends Command {
 
-    use MigrateTrait, ConnectionTrait, DataImportTrait, ReadExportDataTrait, BackupFlatFileTrait;
+    use MigrateTrait, ConnectionTrait, DataImportTrait, ReadExportDataTrait, BackupFlatFileTrait, ApiTrait;
 
     protected $signature = 'command:update-information {database} {status?} {id_importation?} {type?}';
     protected $description = "Extract, generate drawings, and store information in the tenant's database";
@@ -66,13 +67,15 @@ class UpdateInformation extends Command {
                 $archivosPlanos = true;
             } elseif($config->ConecctionType == 'ws') {
                 $archivosPlanos = $this->importData($db);
+            } elseif($config->ConecctionType == 'api'){
+                $archivosPlanos = $this->loginToApi($config,$db);
             }
           
             // Function to configure and migrate tables (MigrateTrait).
             if($archivosPlanos == true){
                 $customMigrations = Custom_Migration::getAll();
                 foreach ($customMigrations as $migration) {
-                    if($migration->command == ":refresh"){
+                    if($migration->command == ":refresh" && $migration->custom_inserts_id != null){
                         DB::connection('dynamic_connection')->table($migration->name_table)->truncate();
                         print '◘ Tabla'.$migration->name_table." truncada.\n";
                     } 
