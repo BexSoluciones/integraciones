@@ -73,7 +73,7 @@ class UpdateInformation extends Command {
             if($archivosPlanos == true){
                 $customMigrations = Custom_Migration::getAll();
                 foreach ($customMigrations as $migration) {
-                    if($migration->command == ":refresh"){
+                    if($migration->command == ":refresh" && $migration->custom_inserts_id != null){
                         DB::connection('dynamic_connection')->table($migration->name_table)->truncate();
                         print '◘ Tabla'.$migration->name_table." truncada.\n";
                     } 

@@ -28,4 +28,7 @@ class Ws_Consulta extends Model
     public static function getAll(){
         return static::all()->where('estado', 1);
     }
+    public static function getAllBexTram(){
+        return static::all()->where('desde', 1);
+    }
 }
