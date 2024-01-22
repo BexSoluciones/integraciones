@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 trait ReadExportDataTrait {
 
-    public function readFlatFile($db, $id_importation, $type){
+    public function readFlatFile($db, $id_importation, $type,$area){
 
         //Route of flat file
         $folderPath = storage_path("app/imports/$db/planos");
@@ -41,9 +41,15 @@ trait ReadExportDataTrait {
             }
         }
 
-        $fileModels = FileModels::join('custom_migrations', 'custom_migrations.id', '=', 'custom_migrations_id')
-                ->where('state', 1)
-                ->get(['name_table', 'files.name as nameFile', 'required']); 
+        if($area == 'bexmovil'){
+            $fileModels = FileModels::join('custom_migrations', 'custom_migrations.id', '=', 'custom_migrations_id')
+                    ->where('stateBexMovil', 1)
+                    ->get(['name_table', 'files.name as nameFile', 'requiredBexMovil']); 
+        }elseif($area == 'bextramites'){
+            $fileModels = FileModels::join('custom_migrations', 'custom_migrations.id', '=', 'custom_migrations_id')
+                    ->where('stateBexTramites', 1)
+                    ->get(['name_table', 'files.name as nameFile', 'requiredBexTramites']); 
+        }
         
         foreach($fileModels as $file){
             foreach ($availableModels as $modelClass => $tableName) {

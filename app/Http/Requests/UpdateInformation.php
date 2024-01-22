@@ -91,7 +91,7 @@ class UpdateInformation extends FormRequest
 
     // Valida que exista la BD
     protected function dbValidation(){
-        $connection = Connection::forNameDB($this->name_db)->first();
+        $connection = Connection::forNameDB($this->name_db, $this->area)->first();
         if(!$connection) {
             throw new HttpResponseException(response()->json([
                 'status' => 422,
@@ -123,7 +123,7 @@ class UpdateInformation extends FormRequest
 
     // Valida que una importacion no se este ejecutando
     protected function executingImportValidation(){
-        $importation = Connection::forNameDB($this->name_db)->where('area', $this->area)->first();
+        $importation = Connection::forNameDB($this->name_db,$this->area)->where('area', $this->area)->first();
         if(empty($importation)){
             throw new HttpResponseException(response()->json([
                 'status'   => 422, 
