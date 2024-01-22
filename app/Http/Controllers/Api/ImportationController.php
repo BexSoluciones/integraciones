@@ -74,14 +74,14 @@ class ImportationController extends Controller
 
     public function automaticConsultState(Request $request){
         try{
-            $importations = Importation_Automatic::importationState($request->date)->get();
+            $importations = Importation_Automatic::importationState($request->date)->get(['id', 'state', 'date_init', 'date_end']);
             if(empty($importations)){
                 return response()->json([
                     'status'   => 401,
                     'response' => 'No hay registros de la fecha '.$request->date,
                 ]);
             }
-     
+           
             $configDB = $this->connectionDB($request->name_db, 'local');
             if($configDB != 0){
                 return response()->json([
@@ -89,43 +89,24 @@ class ImportationController extends Controller
                 ]);
             }
 
-            $arrayInfo = [];
-            foreach($importations as $importation){
-                $detailLogs = Tbl_Log::where('id_table', $importation->id)->get();
-                $arrayInfo = $detailLogs;
-            }
-            return $arrayInfo;
-            
-            $arrayTables = [1 => 'commands', 2 => 'importation_demand'];
-            $detailLogs  = Tbl_Log::where('id_table', $request->consecutive)
-                ->get(['type', 'descripcion', 'created_at', 'date_init'])
-                ->map(function ($table) use ($arrayTables) {
-                    $table->table_name = $arrayTables[$table->type] ?? 'Desconocida';
-                    return $table;
-                });
-            return $detailLogs;
             $responseArray = [
                 '1' => 'La importación está en espera.',
                 '2' => 'La importación está en ejecución.',
                 '3' => 'La importación ha finalizado.',
                 '4' => 'La importación ha presentado un error.',
             ];
-            
-            $stateAsString = (string) $importation->state;
-            
-            if (isset($responseArray[$stateAsString])) {
-                return response()->json([
-                    'status'      => 200,
-                    'code'        => $stateAsString,
-                    'response'    => $responseArray[$stateAsString],
-                    'detailsLogs' => $detailLogs
-                ]);
-            } else {
-                return response()->json([
-                    'status'   => 401,
-                    'response' => 'Estado de importación no reconocido.',
-                ]);
+
+            foreach ($importations as $importation) {
+                $importation->response = $responseArray[$importation->state];
+
+                $detailLogs = Tbl_Log::where('id_table', $importation->id)->get(['descripcion', 'created_at', 'updated_at']);
+                $importation->detailLogs = $detailLogs;                
             }
+
+            return response()->json([
+                'status'       => 200,
+                'importations' => $importations
+            ]);
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'descripcion' => 'ImportationController[consultState()] => '.$e->getMessage()
