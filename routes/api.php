@@ -32,6 +32,7 @@ Route::group(['prefix' => 'commands', 'middleware' => ['auth:sanctum']], functio
 // Rutas para consultar el estado de las importaciones
 Route::group(['prefix' => 'importation', 'middleware' => ['auth:sanctum']], function(){
     Route::post('/consult/state', [ImportationController::class, 'consultState']);
+    Route::post('/automatic/consult/state', [ImportationController::class, 'automaticConsultState']);
 });
 
 // Rutas para descargar archivos planos de pedidos

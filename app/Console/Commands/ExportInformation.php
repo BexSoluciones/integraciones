@@ -35,7 +35,12 @@ class ExportInformation extends Command
                 return 1;
             }
 
-            $custom = "App\\Custom\\$tenantDB\\InsertCustom";
+            if($area == 'bexmovil'){
+                $custom = "App\\Custom\\$tenantDB\\InsertCustom";
+            }else{
+                $custom = "App\\Custom\\$tenantDB\\InsertCustomBexTramite";
+            }
+
             if (!$this->customClassExists($custom)) {
                 $this->insertLog($id_importation, $type, 'Commands::ExportInformation[handle()] => No existe el custom ' . $custom);
                 return 1;
@@ -52,7 +57,13 @@ class ExportInformation extends Command
                 return 1;
             }
 
-            $nameTables = Custom_Migration::nameTables()->get();
+            if($area == 'bexmovil'){
+                $nameTables = Custom_Migration::nameTablesBexMovil()->get();
+            }elseif($area == 'bextramites'){
+                $nameTables = Custom_Migration::nameTablesBextramite()->get();
+            }else{
+                $nameTables = Custom_Migration::nameTables()->get();
+            }
             $methods    = Custom_Insert::methods()->get();
 
             $customMethods = $this->combineCustomMethods($nameTables, $methods);

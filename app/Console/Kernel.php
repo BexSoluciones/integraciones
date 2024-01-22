@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use Cron\CronExpression;
 use Carbon\Carbon;
 
 use App\Models\Tbl_Log;
@@ -9,7 +10,6 @@ use App\Models\Command;
 use App\Models\Connection;
 use App\Models\Importation_Demand;
 use App\Models\Importation_Automatic;
-
 use App\Console\Commands\UpdateInformation;
 
 use Illuminate\Support\Stringable;
@@ -23,31 +23,37 @@ class Kernel extends ConsoleKernel
 {
     protected function schedule(Schedule $schedule): void {
         try {
-            $this->currentTime = Carbon::now();
-            $parameters  = Command::getAll()->get();
-            
+            $parameters = Command::getAll()->get();
+
             foreach ($parameters as $parameter) {
+                $cron = CronExpression::factory($parameter->cron_expression);
+
+                // Verifica si la expresión cron coincide con la fecha actual
+                if ($cron->isDue()) {
+                    $this->importationAutomatic = Importation_Automatic::create([
+                        'id_table'  => $parameter->id,
+                        'state'     => 2,
+                        'date_init' => Carbon::now()
+                    ]);
+                }else{
+                    $this->importationAutomatic = null;
+                }
+                
                 // Ejecuta el comando
-                $schedule->command($parameter->command, [$parameter->name_db, '0', $parameter->id, 1])
+                $schedule->command($parameter->command, [$parameter->name_db, '0', $this->importationAutomatic ? $this->importationAutomatic->id : null, 1])
                 ->before(function () use ($parameter) {
                     // Se cambia el state a 2 para saber que se esta ejecutando
                     $parameter->updateOrInsert(['name_db' => $parameter->name_db], ['state' => '2']);
-
-                    $this->importationAutomatic = Importation_Automatic::create([
-                        'id_table'  => $parameter->id,
-                        'state'     => 0,
-                        'date_init' => Carbon::now()
-                    ]);
                 })
-                // Si todo sale bien ejecuta el siguiente comando
                 ->cron($parameter->cron_expression)
+                // Si todo sale bien ejecuta el siguiente comando
                 ->onSuccess(function (Stringable $output) use ($parameter) {
                     // Llamar a otro comando si es necesario
                     Artisan::call('command:export-information', [
                         'tenantDB'         => $parameter->name_db,
                         'connection_bs_id' => $parameter->connection_bexsoluciones_id,
                         'area'             => $parameter->area,
-                        'id_importation'   => $parameter->id,
+                        'id_importation'   => $this->importationAutomatic->id,
                         'type'             => 1
                     ]);
                     
@@ -57,24 +63,22 @@ class Kernel extends ConsoleKernel
                     $importationInCurse = Importation_Demand::importationInCurse($parameter->name_db, $parameter->area)->first();
                     if(isset($importationInCurse)){
                         Importation_Demand::updateOrInsert(
-                            ['consecutive' => $importationInCurse->consecutive], ['state' => 3, 'updated_at' => $this->currentTime]
+                            ['consecutive' => $importationInCurse->consecutive], ['state' => 3, 'updated_at' => now()]
                         );
                     }
-                
-                    Importation_Automatic::updateOrInsert(
-                        ['id' => $this->importationAutomatic->id], ['state' => 3, 'date_end' => $this->currentTime]
-                    );
+                    
+                    $importationAutomaticToUpdate = Importation_Automatic::find($this->importationAutomatic->id);
+                    $importationAutomaticToUpdate->update(['state' => 3, 'date_init' => $this->importationAutomatic->date_init, 'date_end' => now()]);
                 })
                 //si ocurre un error se se guarda y se cambia a state 1 para que vuelva aquedar activo 
                 ->onFailure(function (Stringable $output) use ($parameter) {
                     $parameter->updateOrInsert(['name_db' => $parameter->name_db], ['state' => '1']);
                    
-                    Importation_Automatic::updateOrInsert(
-                        ['id' => $this->importationAutomatic->id], ['state' => 4, 'date_end' => $this->currentTime]
-                    );
+                    $importationAutomaticToUpdate = Importation_Automatic::find($this->importationAutomatic->id);
+                    $importationAutomaticToUpdate->update(['state' => 4, 'date_init' => $this->importationAutomatic->date_init, 'date_end' => now()]);
                 })
-                // Sirve para que un schedule no se ejecute encima de otro y espere 10 mn
-                ->withoutOverlapping(10);
+                // Sirve para que un schedule no se ejecute encima de otro y espere 1 mn
+                ->withoutOverlapping(1);
             }
         } catch (\Exception $e) {
             DB::connection('mysql')->table('tbl_log')->insert([

@@ -27,4 +27,15 @@ class Custom_Migration extends Model
         return $query->select('name_table', 'custom_inserts_id')
             ->where('custom_inserts_id', '!=', null);
     }
+
+    public function scopeNameTablesBexMovil($query){
+        return $query->select('name_table', 'custom_inserts_id')
+            ->where('custom_inserts_id', '>=',1)
+            ->where('custom_inserts_id', '<=',99);
+    }
+
+    public function scopeNameTablesBextramite($query){
+        return $query->select('name_table', 'custom_inserts_id')
+            ->whereIn('custom_inserts_id', [1,2,100,101]);
+    }
 }
