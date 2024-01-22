@@ -20,25 +20,12 @@ trait ApiTrait {
 
     use FlatFileTrait,BackupFlatFileTrait;
     
-    public function loginToApi($config,$db)
-    {
-        //backup txt files
-        $backupFlatFile = $this->backupFlatFile($db, true);
-        if($backupFlatFile != 0){
-            $this->info('Error copia de seguridad archivos panos');
-            dd();
-        }
+    public function loginToApi($config)
+    {  
         $url = $config->url;
-  
-        if($config->IdProveedor == 'corsan'){
-            $credentials = [
-                'email' => $config->NombreConexion,
-                'password' => $config->Clave
-            ];
-        }else{
-            return 0;
-        }
- 
+        $credentials ='';
+        eval("\$credentials = $config->AreaTrabajo;");
+
         $client = new Client();
 
         try {
@@ -53,54 +40,84 @@ trait ApiTrait {
             if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
                 // Obtener el token del encabezado "Authorization"
                 $token = $response->getHeader('Authorization')[0];
-                if($token){
-                    $sentence = Ws_Consulta::getAll();
-                    foreach($sentence as $clave){
-                        $allData = [];
-                        $clie = [];
-                        $url = $clave->sentencia;
-                        
-                        $client = new Client();
-                        $response = Http::withHeaders([
-                            'Authorization' => 'Bearer ' . $token,
-                            'Accept' => 'application/json', 
-                        ])->get($url);
-                
-                        $respon = $response->json();
-                        $data = json_decode(json_encode($respon), true);
-                        if($respon == null){
-                            //Devuelve la copia de seguridad a la carpeta principal
-                            $this->backupFlatFile($db, false);
-                            $this->error('Proceso detenido, la extraccion de datos no puede ser nula');
-                            dd('------------ ERROR API '.$clave->IdConsulta.' ------------');
-                        }
-                        foreach($data['respuesta'] as $key){
-                            eval("\$clie[] = $clave->parametro;");                        
-                        }
-  
-                        $allData[] = [
-                            'data' => $clie,
-                            'descripcion' => $clave->descripcion,
-                            'separador' => $config->separador
-                        ];
-                        $this->generateFlatFile($allData,$db);
-                        
-                    }
-                    $this->info('◘ Proceso archivos planos completado.');
-                    return true;
-                }else{
-                    return 'El token no esta definido';
-                }
+                return $token;
+
             } else {
                 return 'Error en la solicitud '.$response->getStatusCode();
             }
         } catch (\Exception $e) {
             DB::connection('mysql')->table('tbl_log')->insert([
-                'descripcion' => 'Traits::ConnectionTrait[connectionDB()] => Error al configurar la conexión: ' . $e->getMessage(),
+                'descripcion' => 'Traits::ApiTrait[loginToApi()] => Error al configurar la conexión: ' . $e->getMessage(),
                 'created_at'  => now(),
                 'updated_at'  => now()
             ]);
             return 1;
         }
+    }
+
+    public function ConsultaApi($config,$db,$area,$token){
+
+        try{
+            $backupFlatFile = $this->backupFlatFile($db, true);
+            if($backupFlatFile != 0){
+                $this->info('Error copia de seguridad archivos panos');
+                dd();
+            }
+
+            if($token){
+                if($area == 'bexmovil'){
+                    $sentence = Ws_Consulta::getAll();
+                }elseif($area == 'bextramites'){
+                    $sentence = Ws_Consulta::getAllBexTram();
+                }else{
+                    $this->info('◘ Por favor pasarle en el comando el area command:update-information '.$db. ' area?');
+                    dd();
+                }
+                foreach($sentence as $clave){
+                    $allData = [];
+                    $clie = [];
+                    $url = $clave->sentencia;
+                    
+                    $client = new Client();
+                    $response = Http::withHeaders([
+                        'Authorization' => 'Bearer ' . $token,
+                        'Accept' => 'application/json', 
+                    ])->get($url);
+            
+                    $respon = $response->json();
+                    $data = json_decode(json_encode($respon), true);
+                    if($respon == null){
+                        //Devuelve la copia de seguridad a la carpeta principal
+                        $this->backupFlatFile($db, false);
+                        $this->error('Proceso detenido, la extraccion de datos no puede ser nula');
+                        dd('------------ ERROR API '.$clave->IdConsulta.' ------------');
+                    }
+                    foreach($data['respuesta'] as $key){
+                        eval("\$clie[] = $clave->parametro;");                        
+                    }
+
+                    $allData[] = [
+                        'data' => $clie,
+                        'descripcion' => $clave->descripcion,
+                        'separador' => $config->separador
+                    ];
+                    $this->generateFlatFile($allData,$db);                    
+            }
+                $this->info('◘ Proceso archivos planos completado.');
+                return true;
+        }else{
+            return 'El token no esta definido';
+        }
+
+        } catch (\Exception $e) {
+            DB::connection('mysql')->table('tbl_log')->insert([
+                'descripcion' => 'Traits::ApiTrait[ConsultaApi()] =>    n: ' . $e->getMessage(),
+                'created_at'  => now(),
+                'updated_at'  => now()
+            ]);
+            return 1;
+        }
+        //backup txt files
+        
     }
 }

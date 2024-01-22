@@ -23,7 +23,6 @@ class InsertCustomBexTramite
             $cartera = $modelInstance::CarteraBexTramite()->get();
 
             $datosAInsertarJson = json_decode(json_encode($cartera,true));
-            
             if(sizeof($datosAInsertarJson) != 0){
                 foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
                     $Insert = [];
@@ -229,6 +228,51 @@ class InsertCustomBexTramite
                 'id_table'    => $id_importation,
                 'type'        => $type,
                 'descripcion' => 'Custom::Custom::bex_0006/InsertCustomBexTramite[insertObligacionesCustom()] => '.$e->getMessage()
+            ]);
+            return 1;
+        }
+    }
+
+    public function insertDetalleFacturaBexTramitesCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance, $tableName)
+    {   
+        try {
+            
+            DB::connection($conectionBex)->table('pi_detallefactura')->truncate();
+            print '◘ Tabla pi_detallefactura truncada' . PHP_EOL;
+
+            $datosAInsertarJson = json_decode(json_encode($datosAInsertar,true));
+            
+            if(sizeof($datosAInsertarJson) != 0){
+                foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
+                    $Insert = [];
+                    $count = count($dato);
+                    for($i=0;$i<$count;$i++) {
+                        $Insert[] = [
+                            'codcliente'    => '',
+                            'nitcliente'    => $dato[$i]->nitcliente,
+                            'codobligacion' => '',
+                            'tipodoc'       => $dato[$i]->tipodoc,
+                            'tipoCredito'   => $dato[$i]->tipoCredito,
+                            'codproducto'   => $dato[$i]->codproducto,
+                            'nomproducto'   =>$dato[$i]->nomproducto,
+                            'cantidad'      => $dato[$i]->cantidad,
+                            'valorUnitario' => $dato[$i]->valorUnitario,
+                            'valorTotal'    => $dato[$i]->valorTotal,
+                            'numobligacion' => $dato[$i]->numeroFactura
+                        ];    
+                    }
+                    DB::connection($conectionBex)->table('pi_detallefactura')->insert($Insert);
+                }
+                print '◘ Datos insertados la tabla pi_detallefactura' . PHP_EOL;
+            }
+                         
+            print '◘ Datos actualizados en la tabla pi_detallefactura' . PHP_EOL;
+
+        } catch (\Exception $e) {
+            Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'type'        => $type,
+                'descripcion' => 'Custom::Custom::bex_0006/InsertCustomBexTramite[insertDetalleFacturaCustom()] => '.$e->getMessage()
             ]);
             return 1;
         }
