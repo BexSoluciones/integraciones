@@ -33,9 +33,8 @@ jobs:
     - name: Deploy to EC2
       run: |
         rsync -avzP --backup --backup-dir=/var/www/html/backup -e "ssh -i ~/.ssh/id_rsa" ./ heider_zapa@${{ secrets.EC2_PUBLIC_IP }}:/var/www/html/prueba | grep failed
-        ssh -i ~/.ssh/id_rsa heider_zapa@${{ secrets.EC2_PUBLIC_IP }} 'cd /var/www/html/prueba && composer install --no-interaction --prefer-dist --optimize-autoloader && php artisan optimize:clear'
-        sudo service cron restart
-        sudo service supervisor restart
+        ssh -i ~/.ssh/id_rsa heider_zapa@${{ secrets.EC2_PUBLIC_IP }} 'cd /var/www/html/prueba && composer install --no-interaction --prefer-dist --optimize-autoloader && php artisan optimize:clear  && sudo service cron restart && sudo service supervisor restart'
+
 
     - name: Clear SSH key
       run: rm ~/.ssh/id_rsa
