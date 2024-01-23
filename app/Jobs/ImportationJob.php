@@ -40,7 +40,7 @@ class ImportationJob implements ShouldQueue
         try {
             $importation = Command::forNameBD($dataImport->name_db, $dataImport->area)->first();
             if (!$importation) {
-                $connections = Connection::forNameDB($dataImport->name_db)->first();
+                $connections = Connection::forNameDB($dataImport->name_db,$dataImport->area)->first();
                 if(!$connections){
                     Tbl_Log::create([
                         'id_table'    => $this->consecutive,
@@ -57,6 +57,7 @@ class ImportationJob implements ShouldQueue
                 
                 $updateInformation = Artisan::call('command:update-information', [
                     'database'       => $dataImport->name_db,
+                    'area'           => $dataImport->area,
                     'id_importation' => $this->consecutive,
                     'type'           => 2
                 ]);
@@ -103,6 +104,7 @@ class ImportationJob implements ShouldQueue
                 
                 $updateInformation = Artisan::call($dataImport->command, [
                     'database'       => $dataImport->name_db,
+                    'area'           => $dataImport->area,
                     'id_importation' => $this->consecutive,
                     'type'           => 2
                 ]);

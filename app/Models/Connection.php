@@ -28,9 +28,10 @@ class Connection extends Model
             'updated_at');
     }
 
-    public function scopeForNameDB($query, $name_db){
+    public function scopeForNameDB($query, $name_db, $area){
         return $query->select('connection_bexsoluciones.id', 'connections.name', 'area')
             ->join('connection_bexsoluciones', 'connections.id', 'connection_bexsoluciones.connection_id')
-            ->where('connections.name', $name_db);
+            ->where('connections.name', $name_db)
+            ->where('connection_bexsoluciones.area', $area);
     }
 }

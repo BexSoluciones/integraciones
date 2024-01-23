@@ -20,13 +20,14 @@ class UpdateInformation extends Command {
 
     use MigrateTrait, ConnectionTrait, DataImportTrait, ReadExportDataTrait, BackupFlatFileTrait, ApiTrait;
 
-    protected $signature = 'command:update-information {database} {status?} {id_importation?} {type?}';
+    protected $signature = 'command:update-information {database} {area} {status?} {id_importation?} {type?}';
     protected $description = "Extract, generate drawings, and store information in the tenant's database";
 
     public function handle(): int {
         try {
             // Name of the database where we are going to migrate
             $db             = $this->argument('database'); 
+            $area             = $this->argument('area'); 
             $status         = $this->argument('status', false);
             $id_importation = $this->argument('id_importation', null);
             $type           = $this->argument('type', null);
@@ -47,7 +48,7 @@ class UpdateInformation extends Command {
             // Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
             if($status == 'new'){
                 $this->preMigration($db);
-                print '◘ Ya puedes ejecutar el comando: php artisan command:update-information '.$db . PHP_EOL;
+                print '◘ Ya puedes ejecutar el comando: php artisan command:update-information '.$db .' '.$area. PHP_EOL;
                 return 0;
             }
             
@@ -61,29 +62,38 @@ class UpdateInformation extends Command {
                 ]);
                 return 1;
             }
-       
+
             // Cuando el ws_config no tiene informacion es porque los planos se suben automaticamente sin necesidad de conexion
             if ($config->ConecctionType == 'planos') {
                 $archivosPlanos = true;
             } elseif($config->ConecctionType == 'ws') {
                 $archivosPlanos = $this->importData($db);
             } elseif($config->ConecctionType == 'api') {
-                $archivosPlanos = $this->loginToApi($config,$db);
+                $token = $this->loginToApi($config);
+                $archivosPlanos = $this->ConsultaApi($config,$db,$area,$token);
+
             }
-          
+
             // Function to configure and migrate tables (MigrateTrait).
             if($archivosPlanos == true){
-                $customMigrations = Custom_Migration::getAll();
+                if($area == 'bexmovil'){
+                    $customMigrations = Custom_Migration::getAllBexMovil();
+                }elseif($area == 'bextramites'){
+                    $customMigrations = Custom_Migration::getAllBexTramite();
+                }
                 foreach ($customMigrations as $migration) {
-                    if($migration->command == ":refresh" && $migration->custom_inserts_id != null){
+                    if($migration->command == ":refresh"){
                         DB::connection('dynamic_connection')->table($migration->name_table)->truncate();
                         print '◘ Tabla'.$migration->name_table." truncada.\n";
                     } 
                 }
+            }else{
+                echo '!Error de conexión: Client error 404 not Found';
+                return 1;
             }
 
             //Function to read and export flat file to tenant DB
-            $flatFile = $this->readFlatFile($db, $id_importation, $type);
+            $flatFile = $this->readFlatFile($db, $id_importation, $type,$area);
             if($flatFile == 1){
                 return 1;
             }

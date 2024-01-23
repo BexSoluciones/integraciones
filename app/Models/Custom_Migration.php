@@ -23,6 +23,15 @@ class Custom_Migration extends Model
         return static::all();
     }
 
+    public static function getAllBexMovil(){
+        return static::all()->where('custom_inserts_id', '>=',1)
+                            ->where('custom_inserts_id', '<=',99);
+    }
+
+    public static function getAllBexTramite(){
+        return static::all()->whereIn('custom_inserts_id', [1,2,100,101,102]);
+    }
+
     public function scopeNameTables($query){
         return $query->select('name_table', 'custom_inserts_id')
             ->where('custom_inserts_id', '!=', null);
@@ -36,6 +45,6 @@ class Custom_Migration extends Model
 
     public function scopeNameTablesBextramite($query){
         return $query->select('name_table', 'custom_inserts_id')
-            ->whereIn('custom_inserts_id', [1,2,100,101]);
+            ->whereIn('custom_inserts_id', [1,2,100,101,102]);
     }
 }
