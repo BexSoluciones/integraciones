@@ -1089,23 +1089,7 @@ class InsertCustom
                     }
                     print '◘ Datos insertados en la tabla s1e_ruteros' . PHP_EOL;
                 }
-                /*
-                $Insert = [];
-                foreach ($datosAInsertar as $dato) {
-                    $Insert[] = [
-                        'codvendedor'    => $dato->tercvendedor,
-                        'dia'            => $dato->dia,
-                        'dia_descrip'    => $dato->dia_descrip,
-                        'cliente'        => $dato->cliente,
-                        'dv'             => $dato->dv,
-                        'sucursal'       => $dato->sucursal,
-                        'secuencia'      => $dato->secuencia,
-                        'estadodiarutero'=> $dato->estadodiarutero
-                    ];    
-                }
-                DB::connection($conectionBex)->table('s1e_ruteros')->insert($Insert);
-                print '◘ Datos insertados en la tabla s1e_ruteros' . PHP_EOL;
-                */
+
                 DB::connection($conectionBex)
                     ->table('s1e_ruteros')
                     ->join('tblmdiarutero','s1e_ruteros.dia','=','tblmdiarutero.diarutero')
