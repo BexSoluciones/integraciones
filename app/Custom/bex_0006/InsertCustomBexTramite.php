@@ -141,7 +141,7 @@ class InsertCustomBexTramite
                     $count = count($dato);
                     for($i=0;$i<$count;$i++) {
                         $Insert[] = [
-                            'codclientealt' => $dato[$i]->codclientealt,
+                            'codclientealt' => $dato[$i]->codcliente,
                             'succliente'    => $dato[$i]->succliente,
                             'tipocredito'   => $dato[$i]->tipocredito,
                             'numobligacion' => $dato[$i]->numobligacion,
