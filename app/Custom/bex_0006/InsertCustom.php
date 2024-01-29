@@ -1182,7 +1182,7 @@ class InsertCustom
             $decuento = DB::connection($conectionBex)->table('tblmdescuento')->get()->count();
             if($decuento == 0){
                 DB::connection($conectionBex)->table('tblmdescuento')->insert([
-                    'coddescuento' => '0',
+                    'coddescuento' => '000',
                     'nomdescuento' => 'N.A'
                 ]);
                 print '◘ Datos insertados en la tabla tblmdescuento' . PHP_EOL;
@@ -1200,8 +1200,8 @@ class InsertCustom
             $grupodcto = DB::connection($conectionBex)->table('tblmportafolio')->get()->count();
             if($grupodcto == 0){
                 DB::connection($conectionBex)->table('tblmportafolio')->insert([
-                    'CODPORTAFOLIO' => 'ALL',
-                    'NOMPORTAFOLIO' => 'PORTAFOLIO ALL'
+                    'CODPORTAFOLIO' => '0',
+                    'NOMPORTAFOLIO' => 'PORTAFOLIO 0'
                 ]);
                 print '◘ Datos insertados en la tabla tblmportafolio' . PHP_EOL;
             }
@@ -1238,7 +1238,9 @@ class InsertCustom
                 DB::connection($conectionBex)
                     ->table('tblmvendedor')
                     ->join('s1e_vendedores','tblmvendedor.CODVENDEDOR','=','s1e_vendedores.codvendedor')
-                    ->update(['tblmvendedor.CO' => DB::raw('s1e_vendedores.centro_ope')]);
+                    ->update([
+                        'tblmvendedor.CO' => DB::raw('s1e_vendedores.centro_ope'),
+                        'tblmvendedor.TERCVENDEDOR' => DB::raw('s1e_vendedores.codvendedor')]);
                 print "◘ Datos actualizados en la tabla s1e_vendedores" . PHP_EOL;
 
                  
