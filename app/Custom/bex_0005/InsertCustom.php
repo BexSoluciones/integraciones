@@ -1115,7 +1115,39 @@ class InsertCustom
                     print '◘ Datos insertados en la tabla tblmdiarutero' . PHP_EOL;
                 }
                             
-                DB::connection($conectionBex)
+                $tblslicencias = DB::connection($conectionSys)
+                ->table('tblslicencias')
+                ->select('borrarruteroimportando')
+                ->where('bdlicencias', 'platafor_pi131')
+                ->first();
+    
+                if($tblslicencias->borrarruteroimportando == "S"){
+                    DB::connection($conectionBex)->table('tblmrutero')->truncate();
+                    print '◘ Datos eliminados con exito en la tabla tblmrutero' . PHP_EOL;
+
+                    DB::connection($conectionBex)
+                    ->table('tblmrutero')
+                    ->insertUsing([
+                            'CODVENDEDOR', 'DIARUTERO','SECUENCIARUTERO','CODCLIENTE','CUPO','CODPRECIO','CODGRUPODCTO'
+                        ], function ($query) {
+                                $query->selectRaw('tblmvendedor.codvendedor,dia, secuencia,
+                                codcliente, cupo, "0" as precio,"0" as codgrupodcto')
+                                ->distinct()
+                                ->from('s1e_ruteros')
+                                ->join('tblmcliente', function ($join) {
+                                    $join->on('s1e_ruteros.cliente', '=', 'tblmcliente.nitcliente')
+                                        ->on('s1e_ruteros.sucursal', '=', 'tblmcliente.succliente');
+                                })
+                                ->join('tblmvendedor', 's1e_ruteros.codvendedor', '=', 'tblmvendedor.tercvendedor')
+                                ->join('tblmdiarutero', 's1e_ruteros.dia', '=', 'tblmdiarutero.diarutero')
+                                ->where('s1e_ruteros.cliente', '<>', '')
+                                ->get();
+                            }
+                            );
+
+                    print "◘ Datos insertados en la tabla tblmrutero." . PHP_EOL;
+                }else{
+                    DB::connection($conectionBex)
                     ->table('s1e_ruteros')
                     ->join('s1e_clientes','s1e_ruteros.cliente','=','s1e_clientes.codigo')
                     ->join('tblmvendedor','s1e_ruteros.codvendedor','=','tblmvendedor.CODVENDEDOR')
@@ -1127,14 +1159,17 @@ class InsertCustom
                             's1e_clientes.codgrupodcto')
                     ->distinct()
                     ->get();
+                }
 
                 DB::connection($conectionBex)
                     ->table('tblmrutero')
                     ->join('s1e_clientes','tblmrutero.CODCLIENTE','=','s1e_clientes.codcliente')
-                    ->update(['tblmrutero.CUPO' => DB::raw('s1e_clientes.cupo')]);
+                    ->update([
+                        'tblmrutero.CUPO' => DB::raw('s1e_clientes.cupo'),
+                        'tblmrutero.CODPRECIO' => DB::raw('s1e_clientes.precio')]);
                 print '◘ Datos Actualizados en la tabla tblmrutero' . PHP_EOL;
             }else{
-                print '◘ No hay datos para insertar en la tabla ruteros' . PHP_EOL;
+                print '◘ No hay datos para insertar en la tabla ruteros.' . PHP_EOL;
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
@@ -1174,7 +1209,8 @@ class InsertCustom
                 DB::connection($conectionBex)
                     ->table('tblmvendedor')
                     ->join('s1e_vendedores','tblmvendedor.CODVENDEDOR','=','s1e_vendedores.codvendedor')
-                    ->update(['tblmvendedor.CO' => DB::raw('s1e_vendedores.centro_ope')]);
+                    ->update(['tblmvendedor.CO' => DB::raw('s1e_vendedores.centro_ope'),
+                    'tblmvendedor.TERCVENDEDOR' => DB::raw('s1e_vendedores.codvendedor')]);
                 print "◘ Datos actualizados en la tabla s1e_vendedores" . PHP_EOL;
 
                  
