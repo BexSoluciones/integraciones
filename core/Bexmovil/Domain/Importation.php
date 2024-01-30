@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Core\Bexmovil\Domain;
 
-use Core\Bexmovil\Domain\ValueObjects\CommandNameDb;
-use Core\Bexmovil\Domain\ValueObjects\CommandArea;
-use Core\Bexmovil\Domain\ValueObjects\CommandDate;
-use Core\Bexmovil\Domain\ValueObjects\CommandHour;
+use Core\Bexmovil\Domain\ValueObjects\ImportationNameDb;
+use Core\Bexmovil\Domain\ValueObjects\ImportationArea;
+use Core\Bexmovil\Domain\ValueObjects\ImportationDate;
+use Core\Bexmovil\Domain\ValueObjects\ImportationHour;
 
-final class Command
+final class Importation
 {
     private $name_db;
     private $area;
@@ -17,10 +17,10 @@ final class Command
     private $hour;
 
     public function __construct(
-        CommandNameDb $name_db,
-        CommandArea $area,
-        CommandDate $date,
-        CommandHour $hour,
+        ImportationNameDb $name_db,
+        ImportationArea $area,
+        ImportationDate $date,
+        ImportationHour $hour,
     )
     {
         $this->name_db   = $name_db;
@@ -29,34 +29,34 @@ final class Command
         $this->hour      = $hour;
     }
 
-    public function name_db(): CommandNameDb
+    public function name_db(): ImportationNameDb
     {
         return $this->name_db;
     }
 
-    public function area(): CommandArea
+    public function area(): ImportationArea
     {
         return $this->area;
     }
 
-    public function date(): CommandDate
+    public function date(): ImportationDate
     {
         return $this->date;
     }
 
-    public function hour(): CommandHour
+    public function hour(): ImportationHour
     {
         return $this->hour;
     }
 
     public static function create(
-        CommandNameDb $name_db,
-        CommandArea $area,
-        CommandDate $date,
-        CommandHour $hour,
-    ): Command
+        ImportationNameDb $name_db,
+        ImportationArea $area,
+        ImportationDate $date,
+        ImportationHour $hour,
+    ): Importation
     {
-        $command = new self($name_db, $area, $date, $area);
-        return $command;
+        $Importation = new self($name_db, $area, $date, $area);
+        return $Importation;
     }
 }

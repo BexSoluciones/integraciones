@@ -6,12 +6,12 @@ namespace Src\BoundedContext\User\Domain\ValueObjects;
 
 use InvalidArgumentException;
 
-final class CommanNameDb
+final class ImportationNameDb
 {
     private $value;
 
     /**
-     * CommanNameDb constructor.
+     * ImportationNameDb constructor.
      * @param string $name_db
      * @throws InvalidArgumentException
      */

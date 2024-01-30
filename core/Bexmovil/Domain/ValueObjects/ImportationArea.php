@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Src\BoundedContext\User\Domain\ValueObjects;
 
-final class CommandArea
+final class ImportationArea
 {
     private $value;
 

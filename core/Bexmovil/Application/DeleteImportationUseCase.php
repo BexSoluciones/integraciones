@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Src\BoundedContext\User\Application;
+namespace Core\Bexmovil\Application;
 
-use Src\BoundedContext\User\Domain\Contracts\UserRepositoryContract;
-use Src\BoundedContext\User\Domain\ValueObjects\UserId;
+use Core\Bexmovil\Importation\Domain\Contracts\ImportationRepositoryContract;
+use Core\Bexmovil\Importation\Domain\ValueObjects\ImportationId;
 
-final class DeleteUserUseCase
+final class DeleteImportationUseCase
 {
     private $repository;
 
-    public function __construct(UserRepositoryContract $repository)
+    public function __construct(ImportationRepositoryContract $repository)
     {
         $this->repository = $repository;
     }
 
-    public function __invoke(int $userId): void
+    public function __invoke(int $ImportationId): void
     {
-        $id = new UserId($userId);
+        $id = new ImportationId($ImportationId);
 
         $this->repository->delete($id);
     }

@@ -6,7 +6,7 @@ namespace Src\BoundedContext\User\Domain\ValueObjects;
 
 use DateTime;
 
-final class CommandDate
+final class ImportationDate
 {
     private $value;
 

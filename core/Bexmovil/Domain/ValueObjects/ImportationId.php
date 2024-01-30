@@ -6,12 +6,12 @@ namespace Src\BoundedContext\User\Domain\ValueObjects;
 
 use InvalidArgumentException;
 
-final class CommandId
+final class ImportationId
 {
     private $value;
 
     /**
-     * CommandId constructor.
+     * ImportationId constructor.
      * @param int $id
      * @throws InvalidArgumentException
      */

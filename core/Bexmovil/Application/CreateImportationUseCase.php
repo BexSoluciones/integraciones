@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Core\Bexmovil\Application;
 
 use DateTime;
-use Core\Bexmovil\Domain\Contracts\CommandRepositoryContract;
-use Core\Bexmovil\Domain\Command;
-use Core\Bexmovil\Domain\ValueObjects\CommandNameDb;
-use Core\Bexmovil\Domain\ValueObjects\CommandArea;
-use Core\Bexmovil\Domain\ValueObjects\CommandDate;
-use Core\Bexmovil\Domain\ValueObjects\CommandHour;
+use Core\Bexmovil\Domain\Contracts\ImportationRepositoryContract;
+use Core\Bexmovil\Domain\Importation;
+use Core\Bexmovil\Domain\ValueObjects\ImportationNameDb;
+use Core\Bexmovil\Domain\ValueObjects\ImportationArea;
+use Core\Bexmovil\Domain\ValueObjects\ImportationDate;
+use Core\Bexmovil\Domain\ValueObjects\ImportationHour;
 
-final class CreateCommandUseCase
+final class CreateImportationUseCase
 {
     private $repository;
 
-    public function __construct(CommandRepositoryContract $repository)
+    public function __construct(ImportationRepositoryContract $repository)
     {
         $this->repository = $repository;
     }
@@ -28,13 +28,13 @@ final class CreateCommandUseCase
         ?DateTime $hour,
     ): void
     {
-        $name_db     = new CommandNameDb($name_db);
-        $area        = new CommandArea($area);
-        $date        = new CommandDate($date);
-        $hour        = new CommandHour($hour);
+        $name_db     = new ImportationNameDb($name_db);
+        $area        = new ImportationArea($area);
+        $date        = new ImportationDate($date);
+        $hour        = new ImportationHour($hour);
 
-        $command = Command::create($name_db, $area, $date, $hour);
+        $Importation = Importation::create($name_db, $area, $date, $hour);
 
-        $this->repository->save($command);
+        $this->repository->save($Importation);
     }
 }

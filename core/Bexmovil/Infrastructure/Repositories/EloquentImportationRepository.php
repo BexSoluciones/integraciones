@@ -4,84 +4,82 @@ declare(strict_types=1);
 
 namespace Core\Bexmovil\User\Infrastructure\Repositories;
 
-use App\User as EloquentCommandModel;
-use Core\Bexmovil\Domain\Contracts\CommandRepositoryContract;
-use Core\Bexmovil\Domain\Command;
-use Core\Bexmovil\Domain\ValueObjects\CommandId;
-use Core\Bexmovil\Domain\ValueObjects\CommandNameDb;
-use Core\Bexmovil\Domain\ValueObjects\CommandArea;
-use Core\Bexmovil\Domain\ValueObjects\CommandDate;
-use Core\Bexmovil\Domain\ValueObjects\CommandHour;
+use App\User as EloquentImportationModel;
+use Core\Bexmovil\Domain\Contracts\ImportationRepositoryContract;
+use Core\Bexmovil\Domain\Importation;
+use Core\Bexmovil\Domain\ValueObjects\ImportationId;
+use Core\Bexmovil\Domain\ValueObjects\ImportationNameDb;
+use Core\Bexmovil\Domain\ValueObjects\ImportationArea;
+use Core\Bexmovil\Domain\ValueObjects\ImportationDate;
+use Core\Bexmovil\Domain\ValueObjects\ImportationHour;
 
-final class EloquentCommandRepository implements CommandRepositoryContract
+final class EloquentImportationRepository implements ImportationRepositoryContract
 {
-    private $eloquentCommandModel;
+    private $eloquentImportationModel;
 
     public function __construct()
     {
-        $this->eloquentCommandModel = new EloquentCommandModel;
+        $this->eloquentImportationModel = new EloquentImportationModel;
     }
 
-    public function find(CommandId $id): ?Command
+    public function find(ImportationId $id): ?Importation
     {
-        $command = $this->eloquentCommandModel->findOrFail($id->value());
+        $Importation = $this->eloquentImportationModel->findOrFail($id->value());
 
         // Return Domain User model
-        return new Command(
-            new CommandNameDb($command->name_db),
-            new CommandArea($command->area),
-            new CommandDate($command->date),
-            new CommandHour($command->hour),
+        return new Importation(
+            new ImportationNameDb($Importation->name_db),
+            new ImportationArea($Importation->area),
+            new ImportationDate($Importation->date),
+            new ImportationHour($Importation->hour),
         );
     }
 
-    public function findByCriteria(UserName $name, UserEmail $email): ?Command
+    public function findByCriteria(ImportationNameDb $name_db, ImportationArea $area): ?Importation
     {
         $user = $this->eloquentUserModel
-            ->where('name', $name->value())
-            ->where('email', $email->value())
+            ->where('name_db', $name->value())
+            ->where('area', $area->value())
             ->firstOrFail();
 
-        // Return Domain User model
-        return new User(
-            new UserName($user->name),
-            new UserEmail($user->email),
-            new UserEmailVerifiedDate($user->email_verified_at),
-            new UserPassword($user->password),
-            new UserRememberToken($user->remember_token)
+        // Return Domain Importation model
+        return new Importation(
+            new ImportationNameDb($user->name),
+            new ImportationArea($user->email),
+            new ImportationDate($user->email_verified_at),
+            new ImportationHour($user->password),
         );
     }
 
-    public function save(User $user): void
+    public function save(Importation $importation): void
     {
-        $newUser = $this->eloquentUserModel;
+        $newImportation = $this->eloquentImportationModel;
 
         $data = [
-            'name'              => $user->name()->value(),
-            'email'             => $user->email()->value(),
-            'email_verified_at' => $user->emailVerifiedDate()->value(),
-            'password'          => $user->password()->value(),
-            'remember_token'    => $user->rememberToken()->value(),
+            'name_db'    => $user->name_db()->value(),
+            'area'       => $user->area()->value(),
+            'date'       => $user->date()->value(),
+            'hour'       => $user->hour()->value(),
         ];
 
-        $newUser->create($data);
+        $newImportation->create($data);
     }
 
-    public function update(UserId $id, User $user): void
+    public function update(UserId $id, Importation $importation): void
     {
-        $userToUpdate = $this->eloquentUserModel;
+        $importationToUpdate = $this->eloquentImportationModel;
 
         $data = [
-            'name'  => $user->name()->value(),
-            'email' => $user->email()->value(),
+            'name_db'  => $user->name_db()->value(),
+            'area'     => $user->area()->value(),
         ];
 
-        $userToUpdate
+        $importationToUpdate
             ->findOrFail($id->value())
             ->update($data);
     }
 
-    public function delete(UserId $id): void
+    public function delete(ImportationId $id): void
     {
         $this->eloquentUserModel
             ->findOrFail($id->value())

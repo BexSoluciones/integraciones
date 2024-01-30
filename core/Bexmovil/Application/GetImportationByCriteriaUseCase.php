@@ -4,27 +4,27 @@ declare(strict_types=1);
 
 namespace Core\Bexmovil\Application;
 
-use Core\Bexmovil\Domain\Contracts\UserRepositoryContract;
-use Core\Bexmovil\Domain\User;
-use Core\Bexmovil\Domain\ValueObjects\UserEmail;
-use Core\Bexmovil\Domain\ValueObjects\UserName;
+use Core\Bexmovil\Domain\Contracts\ImportationRepositoryContract;
+use Core\Bexmovil\Domain\Importation;
+use Core\Bexmovil\Domain\ValueObjects\ImportationNameDb;
+use Core\Bexmovil\Domain\ValueObjects\ImportationArea;
 
-final class GetUserByCriteriaUseCase
+final class GetImportationByCriteriaUseCase
 {
     private $repository;
 
-    public function __construct(UserRepositoryContract $repository)
+    public function __construct(ImportationRepositoryContract $repository)
     {
         $this->repository = $repository;
     }
 
-    public function __invoke(string $userName, string $userEmail): ?User
+    public function __invoke(string $ImportationNameDb, string $ImportationArea): ?Importation
     {
-        $name  = new UserName($userName);
-        $email = new UserEmail($userEmail);
+        $name_db  = new ImportationNameDb($ImportationName);
+        $area = new ImportationArea($ImportationNameDb);
 
-        $user = $this->repository->findByCriteria($name, $email);
+        $importation = $this->repository->findByCriteria($name_db, $area);
 
-        return $user;
+        return $importation;
     }
 }
