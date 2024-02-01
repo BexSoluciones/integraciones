@@ -10,7 +10,7 @@ trait ConversionSentencesSqlTrait {
     public function convertionSentenceSql($sentence, $cia, $desde, $cuantos, $idConsulta){
 
         try {
-            $sentence = "SET QUOTED_IDENTIFIER OFF; ".$sentence." SET QUOTED_IDENTIFIER ON;";
+            // $sentence = "SET QUOTED_IDENTIFIER OFF; ".$sentence." SET QUOTED_IDENTIFIER ON;";
             //Replace double quotes with single quotes
             $singleQuotes = str_replace("'", '"', $sentence);
             //Replace greater than
