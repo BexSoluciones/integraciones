@@ -31,7 +31,7 @@ trait WebServiceSiesaTrait {
         }
     }
     
-    public static function SOAP($url, $parameters, $IdConsulta, $timeout = 5.0) {
+    public static function SOAP($url, $parameters, $IdConsulta, $timeout = 20.0) {
         $finish = 1;
         do {
             $startTime = microtime(true); // Registrar el tiempo de inicio
@@ -71,7 +71,8 @@ trait WebServiceSiesaTrait {
     
             if ($executionTime > $timeout) {
                 // La consulta se ha demorado más de lo esperado
-                return ('El proceso ha finalizado porque la consulta '.$IdConsulta.' expiro en tiemo de espera ('. $executionTime. ' segundos).');
+                echo 'El proceso ha finalizado porque la consulta '.$IdConsulta.' expiro en tiemo de espera ('. $executionTime. ' segundos).';
+                return null;
             }
         } while ($finish != 0);
     }

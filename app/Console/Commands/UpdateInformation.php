@@ -69,9 +69,11 @@ class UpdateInformation extends Command {
                 $archivosPlanos = true;
             } elseif($config->ConecctionType == 'ws') {
                 $archivosPlanos = $this->importData($db);
+                dd('TERMINO!!.................');
             } elseif($config->ConecctionType == 'api') {
                 $token = $this->loginToApi($config);
                 $archivosPlanos = $this->ConsultaApi($config,$db,$area,$token);
+
             } elseif($config->ConecctionType == 'db'){
                 $archivosPlanios = $this->connectionDBSQL($config);
                 dd($archivosPlanios);

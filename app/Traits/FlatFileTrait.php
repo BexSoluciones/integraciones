@@ -23,12 +23,12 @@ trait FlatFileTrait {
                 $content = '';
 
                 foreach ($data as $clave => $key) {
-                    $content .= json_encode(implode($separador, $key), JSON_PRETTY_PRINT) . "\n";
+                    $content .= implode($separador, $key). "\n";
                 }
-                
+                $content = rtrim($content, "\n");
                 $namefile = strtolower($descripcion ) . '.txt';
                 
-                Storage::disk('local')->put('imports/'.$db.'/planos/'. $namefile, str_replace('"','',$content));
+                Storage::disk('local')->append('imports/'.$db.'/planos/'. $namefile, str_replace('"','',$content));
                 $this->info('◘ Archivo '.$descripcion.'.txt guardado con exito');
                 $this->info('-------------------------------------------------------------------');
             }
