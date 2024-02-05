@@ -8,6 +8,7 @@ use App\Custom\bex_0003\OrderCoreCustom as OrderCoreCustom3;
 use App\Custom\bex_0004\OrderCoreCustom as OrderCoreCustom4;
 use App\Custom\bex_0005\OrderCoreCustom as OrderCoreCustom5;
 use App\Custom\bex_0006\OrderCoreCustom as OrderCoreCustom6;
+use App\Custom\bex_0008\OrderCoreCustom as OrderCoreCustom8;
 use App\Models\Tbl_Log;
 
 use Illuminate\Bus\Queueable;
@@ -57,6 +58,9 @@ class ProcessOrderUploadERP implements ShouldQueue
             }elseif($this->cia->bdlicencias == 'platafor_pi287'){
                 $objOrederCore = new OrderCoreCustom6();
                 $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing, $this->connection_id); 
+            }elseif($this->cia->bdlicencias == 'platafor_pi001'){
+                $objOrederCore = new OrderCoreCustom8();
+                $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing); 
             }else{
                 $objOrederCore = new OrderCoreCustomGeneral();
                 $objOrederCore->uploadOrder($this->order, $this->orderDetail, $this->cia);    

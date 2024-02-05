@@ -104,7 +104,7 @@ class OrderCoreCustom
                 $structureHeader[] = [
                     "bodega" => intval($encabezado->codbodega),
                     "sw" => 1,
-                    "nit" => 98571076,
+                    "nit" => intval($encabezado->nitcliente),
                     "vendedor" => intval($encabezado->codvendedor),
                     "fecha" =>   date('Y-m-d\TH:i:s', strtotime($encabezado->fecmov)),
                     "condicion" => $encabezado->codfpagovta,
@@ -115,7 +115,7 @@ class OrderCoreCustom
                     "anulado" => 0, 
                     "notas" => $encabezado->mensajemov,
                     "usuario" => $encabezado->codvendedor,
-                    "pc" => $encabezado->codvendedor,
+                    "pc" => 'Bex',
                     "duracion" => 120,
                     "concepto" => null,
                     "moneda" => null,
@@ -198,8 +198,18 @@ class OrderCoreCustom
                         ->where('CODTIPODOC', '4')
                         ->where('codvendedor', $encabezado->codvendedor)
                         ->update(['estadoenviows' => '2', 'fechamovws' => now()]);
+                        
+                        return 0;
+                    }else{
+                        DB::connection($nameDB)
+                        ->table('tbldmovenc')
+                        ->where('NUMMOV',  $encabezado->nummov)
+                        ->where('CODTIPODOC', '4')
+                        ->where('codvendedor', $encabezado->codvendedor)
+                        ->update(['estadoenviows' => '3', 'fechamovws' => now(), 'fechamovws' => 'Error al enviar el pedido']);
+
+                        return 1;
                     }
-                    return 0;
                 }
             }
 
@@ -235,9 +245,8 @@ class OrderCoreCustom
             $rutaArchivo = storage_path('app/tu_archivo.txt');
 
             // Guardar el contenido en el archivo
-            $namefile= $closing.'_'.$nummov.'.PE0';
+            $namefile= $closing.'_'.$nummov.'.json';
             Storage::disk('public')->put('export/bex_0006/bexmovil/pedidos_txt/' . $namefile, $contenidoJSON);
-            
             return 0;
         } catch (\Exception $e) {
             Tbl_Log::create([
@@ -277,6 +286,8 @@ class OrderCoreCustom
         $details = $this->sendDetailsApi($numero, $orders, $nummov, $closing, $config, $token);
         if($details == 0){
             return 0;
+        }else{
+            return 1;
         }
         //dd('termino');
     }
@@ -284,9 +295,10 @@ class OrderCoreCustom
     private function sendDetailsApi($numero, $orders, $nummov, $closing, $config, $token){
         try{
             $i = 0;
+            
             foreach($orders as $detail){
                 if($detail->nummov == $nummov){
-                    $jsonDetail = [
+                    $jsonDetail[] =
                         [
                             "sw" => intval($detail->numvisita),
                             "numero" => $numero,
@@ -316,12 +328,15 @@ class OrderCoreCustom
                             "colorExterno" => "",
                             "modelo" => "",
                             "ano" => intval(date('Y', strtotime($detail->fecmov))),
-                            "idAdmonPedCot" => '',
+                            "idAdmonPedCot" => "",
                             "descripcionItemAdicional" => $detail->nomproducto
-                        ]
+                        
                     ];
-                    Log::info($jsonDetail);
-                    $namefile = $closing.'_'.$nummov.'.PE0';
+                }  
+
+            }
+
+                    $namefile = $closing.'_'.$nummov.'.json';
                     $jsonHeader = json_decode(Storage::disk('public')->get('export/bex_0006/bexmovil/pedidos_txt/' . $namefile), true);
         
                     // Unimos los resultados
@@ -335,7 +350,7 @@ class OrderCoreCustom
 
                     // Enviar al Api de detalle
                     $urlDetalle = $config->urlEnvioDetalle;
-                  
+
                     $response = Http::withHeaders([
                         'Authorization' => 'Bearer ' . $token,
                         'Accept' => 'application/json',
@@ -344,10 +359,13 @@ class OrderCoreCustom
 
                     $result = $response->json();
                     Log::info($result);
-                    dd('parar');
-                    return 0;
-                }
-            }
+                    if($response['codigo'] == 'OK'){
+                        return 0;
+                    }else{
+                        return 1;
+                    }
+                
+            
         } catch (\Exception $e) {
             Log::info($e);
             Tbl_Log::create([

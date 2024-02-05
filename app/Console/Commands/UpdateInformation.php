@@ -75,7 +75,7 @@ class UpdateInformation extends Command {
                 $archivosPlanos = $this->ConsultaApi($config,$db,$area,$token);
 
             } elseif($config->ConecctionType == 'db'){
-                $archivosPlanios = $this->connectionDBSQL($config);
+                $archivosPlanios = $this->connectionDBSQL($config,$db);
                 dd($archivosPlanios);
             }
 
