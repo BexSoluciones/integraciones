@@ -58,7 +58,7 @@ class UploadOrder extends Command
                         'created_at'  => now(),
                         'updated_at'  => now()
                     ]);
-                    //return 1;
+                    return 1;
                 }
             }
            

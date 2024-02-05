@@ -18,7 +18,7 @@ trait ReadExportDataTrait {
         //Route of flat file
         $folderPath = storage_path("app/imports/$db/planos");
        
-        $txtFiles   = glob("$folderPath/*.txt");dd($txtFiles);
+        $txtFiles   = glob("$folderPath/*.txt");
         if(count($txtFiles) == 0){
             Tbl_Log::create([
                 'id_table'    => $id_importation,
