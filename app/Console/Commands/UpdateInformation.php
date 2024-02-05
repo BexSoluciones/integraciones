@@ -98,7 +98,7 @@ class UpdateInformation extends Command {
             }
 
             //Function to read and export flat file to tenant DB
-            $flatFile = $this->readFlatFile($db, $id_importation, $type,$area);
+            $flatFile = $this->readFlatFile($db, $id_importation, $type, $area);
             if($flatFile == 1){
                 return 1;
             }

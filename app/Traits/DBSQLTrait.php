@@ -16,8 +16,6 @@ trait DBSQLTrait {
     use BackupFlatFileTrait, FlatFileTrait;
     
     public function connectionDBSQL($config,$db){
-
-     
         try {
             Config::set('database.connections.' . $config->proxy_host,  [
                     'driver'    => 'mysql',
@@ -40,15 +38,15 @@ trait DBSQLTrait {
                 dd();
             }
             foreach($sentences as $sentence){  
-                $allData =[];
-                    $responds = DB::connection($config->proxy_host)->select($sentence->sentencia);
-                    $respond = json_decode(json_encode($responds),true);
-                    $allData[] = [
-                        'data' => $respond,
-                        'descripcion' => $sentence->descripcion,
-                        'separador' => $config->separador
-                    ];
-                    $this->generateFlatFile($allData,$db);  
+                $allData  = [];
+                $responds = DB::connection($config->proxy_host)->select($sentence->sentencia);
+                $respond  = json_decode(json_encode($responds),true);
+                $allData[] = [
+                    'data' => $respond,
+                    'descripcion' => $sentence->descripcion,
+                    'separador' => $config->separador
+                ];
+                $this->generateFlatFile($allData,$db);  
 
             }
             $this->info('◘ Proceso archivos planos completado.');
