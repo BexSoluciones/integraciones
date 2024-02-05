@@ -40,16 +40,17 @@ class UploadOrder extends Command
                 ]);
                 return 1;
             }
-        
+         
             if($closing == null || $closing == 'null'){
                 $db = Connection_Bexsoluciones::getAll()->where('id', $db)->first();
+               
                 $closing = DB::connection($db->name)
                     ->table('tbldmovenc')
                     ->where('codtipodoc', '4')
                     ->where('estadoenviows', '0')
                     ->whereNotNull('numcierre')
                     ->min('numcierre');
-
+               
                 if($closing == null){
                     DB::connection('mysql')->table('tbl_log')->insert([
                         'id_table'    => $id_importation,
@@ -61,8 +62,13 @@ class UploadOrder extends Command
                     return 1;
                 }
             }
-           
-            $orders = $this->getOrderHeder($db->id, $area, $closing);
+          
+            if($closing == null || $closing == 'null'){
+                $orders = $this->getOrderHeder($db, $area, $closing);
+            }else{
+                $orders = $this->getOrderHeder($db->id, $area, $closing);
+            }
+            
           
             if($orders == 0){
                 return 0;
