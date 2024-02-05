@@ -45,11 +45,11 @@ trait ReadExportDataTrait {
         if($area == 'bexmovil'){
             $fileModels = FileModels::join('custom_migrations', 'custom_migrations.id', '=', 'custom_migrations_id')
                     ->where('stateBexMovil', 1)
-                    ->get(['name_table', 'files.name as nameFile', 'requiredBexMovil']); 
+                    ->get(['name_table', 'files.name as nameFile', 'requiredBexMovil as required']); 
         }elseif($area == 'bextramites'){
             $fileModels = FileModels::join('custom_migrations', 'custom_migrations.id', '=', 'custom_migrations_id')
                     ->where('stateBexTramites', 1)
-                    ->get(['name_table', 'files.name as nameFile', 'requiredBexTramites']); 
+                    ->get(['name_table', 'files.name as nameFile', 'requiredBexTramites as required']); 
         }
         
         foreach($fileModels as $file){
