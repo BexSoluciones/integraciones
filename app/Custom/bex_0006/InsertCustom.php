@@ -904,6 +904,21 @@ class InsertCustom
                 }
             }
 
+            DB::connection($conectionBex)
+                ->table('s1e_productos')
+                ->update([
+                    'codunidademp' => DB::raw("CASE 
+                        WHEN codunidademp = 'Kilogramo' THEN 'KIL'
+                        WHEN codunidademp = 'Millar' THEN 'MIL'
+                        WHEN codunidademp = 'Rollo' THEN 'ROL'
+                        WHEN codunidademp = 'Caja' THEN 'CAJ'
+                        WHEN codunidademp = 'Libra' THEN 'LIB'
+                        WHEN codunidademp = 'Gruesa' THEN 'GRU'
+                        WHEN codunidademp = 'Cubeta' THEN 'CUB'
+                        WHEN codunidademp = 'Unidad' THEN 'UND'
+                        ELSE ''
+                    END")
+                ]);
             // Update estado_unidademp tabla s1e_productos
             DB::connection($conectionBex)
                 ->table('s1e_productos')
