@@ -24,8 +24,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void {
         try {
             $parameters = Command::getAll()->get();
-
+         
             foreach ($parameters as $parameter) {
+             
                 $cron = CronExpression::factory($parameter->cron_expression);
 
                 // Verifica si la expresión cron coincide con la fecha actual
