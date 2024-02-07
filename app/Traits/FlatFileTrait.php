@@ -3,12 +3,14 @@ namespace App\Traits;
 
 use Exception;
 
+use App\Models\Tbl_Log;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 trait FlatFileTrait {
     
-    public function generateFlatFile($dataWS, $db){
+    public function generateFlatFile($dataWS, $db, $id_importation, $type){
         try {
             foreach ($dataWS as $item) {
                 $separador = $item['separador'];
@@ -33,15 +35,23 @@ trait FlatFileTrait {
                 $this->info('-------------------------------------------------------------------');
 
                 if($db == 'bex_0007'){
-                    $this->sendToSFTP($namefile, $content);
+                   $sendToSFTP = $this->sendToSFTP($namefile, $content, $id_importation, $type);
+                   if($sendToSFTP == 1){
+                        return 1;
+                   }
                 }
             }
         } catch (\Exception $e) {
-            $this->error("Ha ocurrido un error (Creación archivo plano): " . $e->getMessage());
+            Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'type'        => $type,
+                'descripcion' => 'Traits::FlatFileTrait[generateFlatFile()] => '.$e->getMessage()
+            ]);
+            return 1;
         }
     }
 
-    private function sendToFTP($filename, $content) {
+    private function sendToSFTP($filename, $content, $id_importation, $type) {
         try {
             $ftpHost = 'tornillosatlanticosas.bexsoluciones.com'; // Reemplaza con la dirección del servidor FTP
             $ftpUser = 'bexmovil_260'; // Reemplaza con tu nombre de usuario FTP
@@ -63,19 +73,32 @@ trait FlatFileTrait {
                     if ($upload) {
                         $this->info('◘ Archivo ' . $filename . ' enviado al servidor FTP con éxito');
                     } else {
-                        $this->error('Error al subir archivo al servidor FTP');
+                        Tbl_Log::create([
+                            'id_table'    => $id_importation,
+                            'type'        => $type,
+                            'descripcion' => 'Traits::FlatFileTrait[sendToSFTP()] => Error al subir archivo al servidor FTP'
+                        ]);
+                        return 1;
                     }
 
                     // Cerrar sesión FTP
                     ftp_close($connId);
-                } else {
-                    $this->error('Error al conectar al servidor FTP');
                 }
             } else {
-                $this->error('Error al establecer conexión FTP');
+                Tbl_Log::create([
+                    'id_table'    => $id_importation,
+                    'type'        => $type,
+                    'descripcion' => 'Traits::FlatFileTrait[sendToSFTP()] => Error al conectar al servidor FTP'
+                ]);
+                return 1;
             }
         } catch (\Exception $e) {
-            $this->error("Ha ocurrido un error (Envío a FTP): " . $e->getMessage());
+            Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'type'        => $type,
+                'descripcion' => 'Traits::FlatFileTrait[sendToSFTP()] => '.$e->getMessage()
+            ]);
+            return 1;
         }
     }
 

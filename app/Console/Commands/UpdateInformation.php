@@ -74,8 +74,14 @@ class UpdateInformation extends Command {
                 $token = $this->loginToApi($config);
                 $archivosPlanos = $this->ConsultaApi($config,$db,$area,$token);
             } elseif($config->ConecctionType == 'db'){
-                $archivosPlanios = $this->connectionDBSQL($config,$db);
-                dd($archivosPlanios);
+                $connection = $this->connectionDBSQL($config);
+                if($connection == 1){
+                    return 1;
+                }
+                $archivosPlanos = $this->sentencesDBSQL($config, $db, $id_importation, $type);
+                if($archivosPlanos == 1){
+                    return 1;
+                }
             }
 
             // Function to configure and migrate tables (MigrateTrait).
