@@ -74,6 +74,7 @@ trait ApiTrait {
                     dd();
                 }
                 foreach($sentence as $clave){
+                    $timeoutInSeconds = 60;
                     $allData = [];
                     $clie = [];
                     $url = $clave->sentencia;
@@ -82,7 +83,7 @@ trait ApiTrait {
                     $response = Http::withHeaders([
                         'Authorization' => 'Bearer ' . $token,
                         'Accept' => 'application/json', 
-                    ])->get($url);
+                    ])->timeout($timeoutInSeconds)->get($url);
             
                     $respon = $response->json();
                     $data = json_decode(json_encode($respon), true);
