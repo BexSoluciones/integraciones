@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
             $parameters = Command::getAll()->get();
          
             foreach ($parameters as $parameter) {
-             
+              
                 $cron = CronExpression::factory($parameter->cron_expression);
 
                 // Verifica si la expresión cron coincide con la fecha actual
@@ -34,6 +34,7 @@ class Kernel extends ConsoleKernel
                     $this->importationAutomatic = Importation_Automatic::create([
                         'id_table'  => $parameter->id,
                         'state'     => 2,
+                        'area'      => $parameter->area,
                         'date_init' => Carbon::now()
                     ]);
                 }else{

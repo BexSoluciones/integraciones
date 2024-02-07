@@ -15,6 +15,7 @@ class Importation_Automatic extends Model
         'id',
         'id_table', 
         'state',
+        'area',
         'date_init',
         'date_end'
     ];
