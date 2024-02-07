@@ -73,12 +73,6 @@ class Kernel extends ConsoleKernel
                         //si ocurre un error se se guarda y se cambia a state 1 para que vuelva aquedar activo 
                         ->onFailure(function (Stringable $output) use ($parameter) {
                             $parameter->updateOrInsert(['name_db' => $parameter->name_db, 'area' => $parameter->area], ['state' => '1']);
-                            
-                            DB::connection('mysql')->table('tbl_log')->insert([
-                                'descripcion' => $this->importationAutomatic,
-                                'created_at'  => now(),
-                                'updated_at'  => now()
-                            ]);
 
                             $importationAutomaticToUpdate = Importation_Automatic::find($this->importationAutomatic->id);
                             $importationAutomaticToUpdate->update(['state' => 4, 'date_init' => $this->importationAutomatic->date_init, 'date_end' => now()]);
