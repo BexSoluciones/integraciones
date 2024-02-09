@@ -43,14 +43,18 @@ trait DBSQLTrait {
     public function sentencesDBSQL($config, $db, $id_importation, $type){
         try {
             $sentences = Ws_Consulta::getAll();
-
-            /*
+    
             //backup txt files
             $backupFlatFile = $this->backupFlatFile($db, true);
             if($backupFlatFile != 0){
-                $this->info('Error copia de seguridad archivos panos');
-                dd();
-            }*/
+                Tbl_Log::create([
+                    'id_table'    => $id_importation,
+                    'type'        => $type,
+                    'descripcion' => 'Traits::DBSQLTrait[sentencesDBSQL()] => '.$e->getMessage()
+                ]);
+                return 1;
+            }
+            
             foreach($sentences as $sentence){  
                 $allData  = [];
                 $responds = DB::connection($config->proxy_host)->select($sentence->sentencia);
@@ -61,6 +65,7 @@ trait DBSQLTrait {
                     'separador' => $config->separador
                 ];
                 $generateFlatFile = $this->generateFlatFile($allData, $db, $id_importation, $type);  
+               
                 if($generateFlatFile == 1){
                     return 1;
                 }

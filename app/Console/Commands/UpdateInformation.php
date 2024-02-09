@@ -83,7 +83,7 @@ class UpdateInformation extends Command {
                     return 1;
                 }
             }
-
+        
             // Function to configure and migrate tables (MigrateTrait).
             if($archivosPlanos == true){
                 if($area == 'bexmovil'){
