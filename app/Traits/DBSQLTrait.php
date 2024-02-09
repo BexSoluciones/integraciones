@@ -15,7 +15,7 @@ trait DBSQLTrait {
     
     use BackupFlatFileTrait, FlatFileTrait;
     
-    public function connectionDBSQL($config,$db){
+    public function connectionDBSQL($config){
         try {
             Config::set('database.connections.' . $config->proxy_host,  [
                     'driver'    => 'mysql',
@@ -29,14 +29,28 @@ trait DBSQLTrait {
                 ],
             );
 
+            return 0;
+        } catch (\Exception $e) {
+            Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'type'        => $type,
+                'descripcion' => 'Traits::DBSQLTrait[connectionDBSQL()] => Error al conectar con la DB '.$config->proxy_host
+            ]);
+            return 1;
+        }
+    }
+
+    public function sentencesDBSQL($config, $db, $id_importation, $type){
+        try {
             $sentences = Ws_Consulta::getAll();
 
+            /*
             //backup txt files
             $backupFlatFile = $this->backupFlatFile($db, true);
             if($backupFlatFile != 0){
                 $this->info('Error copia de seguridad archivos panos');
                 dd();
-            }
+            }*/
             foreach($sentences as $sentence){  
                 $allData  = [];
                 $responds = DB::connection($config->proxy_host)->select($sentence->sentencia);
@@ -46,17 +60,19 @@ trait DBSQLTrait {
                     'descripcion' => $sentence->descripcion,
                     'separador' => $config->separador
                 ];
-                $this->generateFlatFile($allData,$db);  
-
+                $generateFlatFile = $this->generateFlatFile($allData, $db, $id_importation, $type);  
+                if($generateFlatFile == 1){
+                    return 1;
+                }
             }
             $this->info('◘ Proceso archivos planos completado.');
             return true;
 
         } catch (\Exception $e) {
-            DB::connection('mysql')->table('tbl_log')->insert([
-                'descripcion' => 'Traits::DBSQLTrait[connectionDBSQL()] => Error al configurar la conexión: ' . $e->getMessage(),
-                'created_at'  => now(),
-                'updated_at'  => now()
+            Tbl_Log::create([
+                'id_table'    => $id_importation,
+                'type'        => $type,
+                'descripcion' => 'Traits::DBSQLTrait[sentencesDBSQL()] => '.$e->getMessage()
             ]);
             return 1;
         }
