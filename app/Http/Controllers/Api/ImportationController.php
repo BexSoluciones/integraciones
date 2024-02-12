@@ -74,7 +74,8 @@ class ImportationController extends Controller
 
     public function automaticConsultState(Request $request){
         try{
-            $importations = Importation_Automatic::importationState($request->date)->get(['id', 'state', 'date_init', 'date_end']);
+            $importations = Importation_Automatic::importationState($request->date, $request->name_db, $request->area)
+                ->get(['id', 'state', 'date_init', 'date_end']);
             if(empty($importations)){
                 return response()->json([
                     'status'   => 401,
@@ -108,6 +109,7 @@ class ImportationController extends Controller
                 'importations' => $importations
             ]);
         } catch (\Exception $e) {
+            return $e->getMessage();
             Tbl_Log::create([
                 'descripcion' => 'ImportationController[consultState()] => '.$e->getMessage()
             ]);
