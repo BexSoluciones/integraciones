@@ -42,7 +42,13 @@ class ProcessOrderUploadERP implements ShouldQueue
 
     public function handle(): void
     {  
-        try{
+        try{/*
+            if($this->cia == 123){
+                $objOrederCore = new OrderCoreCustom8();
+                $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing, $this->connection_id); 
+            }
+            dd('parar');*/
+
             if($this->cia->bdlicencias == 'platafor_pi055'){
                 $objOrederCore = new OrderCoreCustom2();
                 $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing);
@@ -60,7 +66,7 @@ class ProcessOrderUploadERP implements ShouldQueue
                 $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing, $this->connection_id); 
             }elseif($this->cia->bdlicencias == 'platafor_pi001'){
                 $objOrederCore = new OrderCoreCustom8();
-                $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing); 
+                $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing, $this->connection_id); 
             }else{
                 $objOrederCore = new OrderCoreCustomGeneral();
                 $objOrederCore->uploadOrder($this->order, $this->orderDetail, $this->cia);    

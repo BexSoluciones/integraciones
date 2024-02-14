@@ -15,8 +15,8 @@ class CreateT29BexProductosTable extends Migration
     {
         Schema::create('t29_bex_productos', function (Blueprint $table) {
             $table->string('codigo', 50)->nullable();
-            $table->string('descripcion')->nullable();
-            $table->string('codunidademp', 10)->nullable();
+            $table->string('descripcion', 50)->nullable();
+            $table->string('codunidademp', 4)->nullable();
             $table->string('peso', 20)->nullable();
             $table->string('codproveedor', 20)->nullable();
             $table->string('nomproveedor', 50)->nullable();

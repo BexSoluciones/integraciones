@@ -31,7 +31,6 @@ class CreateT01WsConfigTable extends Migration
             $table->enum('ConecctionType', ['api', 'db', 'planos', 'ws']);
             $table->string('proxy_host')->nullable();
             $table->string('proxy_port')->nullable();
-            $table->string('urlEnvio')->nullable();
         });
     }
 
