@@ -12,7 +12,7 @@ class T29BexProductos extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't29_bex_productos';
-protected $fillable = ['codigo', 'descripcion', 'codunidademp', 'peso', 'codproveedor', 'nomproveedor', 'unidadventa', 'codindadventa', 'estado', 'estado_unidademp', 'estadoproveedor'];
+protected $fillable = ['plu', 'descripcion','codigo', 'codunidademp','nomunidademp', 'factor', 'codproveedor', 'nomproveedor', 'codbarra', 'comb_009', 'comb_010','codmarca','nommarca','codunidadcaja','ivaproducto','talla','color', 'estado_unidademp','estado','estado_marca', 'estadoproveedor'];
 public $timestamps = false;
 
 public function scopeDataToInsertUnidadEmp($query){

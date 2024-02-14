@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 trait ReadExportDataTrait {
 
-    public function readFlatFile($db, $id_importation, $type,$area){
+    public function readFlatFile($db, $id_importation, $type,$area,$separador){
 
         //Route of flat file
         $folderPath = storage_path("app/imports/$db/planos");
@@ -57,13 +57,13 @@ trait ReadExportDataTrait {
                 $content = file_get_contents($folderPath.'/'.$file->nameFile);
                 if ($file->name_table === $tableName) {
                     $this->info("◘ El archivo plano $file->nameFile coincide con el modelo: $tableName");
-                    $this->processFileContent($modelClass, $content, $tableName, $id_importation, $type, $file->required);
+                    $this->processFileContent($modelClass, $content, $tableName, $id_importation, $type, $file->required,$separador);
                 }
             }
         }
     }
 
-    private function processFileContent($modelClass, $content, $tableName, $id_importation, $type, $required) {
+    private function processFileContent($modelClass, $content, $tableName, $id_importation, $type, $required,$separador) {
         try {
             $modelInstance = new $modelClass();
             $columnsModelo = $modelInstance->getFillable();
@@ -86,7 +86,7 @@ trait ReadExportDataTrait {
                 // Verificar si la línea no está vacía antes de procesarla
                 if (!empty($line)) {
                     // Split each line into columns using the |
-                    $columns = explode("|", $line);
+                    $columns = explode($separador, $line);
 
                     // Esta condicion sirve para que tenga en cuenta el autoincrementable
                     if ($tableName == 't05_bex_clientes' || $tableName == 't38_bex_entregas') {

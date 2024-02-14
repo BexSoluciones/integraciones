@@ -47,6 +47,23 @@ class InsertCustom
                 }
                 print '◘ Datos insertados la tabla s1e_cartera' . PHP_EOL;
             }
+
+            DB::connection($conectionBex)
+                ->table('s1e_cartera')
+                ->join('tblmtipodoc','s1e_cartera.codtipodoc','=','tblmtipodoc.codtipodoc')
+                ->update(['s1e_cartera.estadotipodoc' => 'C']);
+            
+            DB::connection($conectionBex)
+                ->table('tblmtipodoc')
+                ->insertUsing(['codtipodoc','nomtipodoc'],
+                function ($query) {
+                    $query->select('codtipodoc', DB::raw("concat('TIPO DOCUMENTO ', codtipodoc) as nomtipodoc"))
+                        ->from('s1e_cartera')
+                        ->where('estadotipodoc', '=', 'A')
+                        ->groupBy('s1e_cartera.codtipodoc');
+                }
+            );
+            print '◘ Datos insertados en la tabla tblmtipodoc' . PHP_EOL;
             
             //Actualiza codcliente en la tabla s1e_cartera
             DB::connection($conectionBex)
