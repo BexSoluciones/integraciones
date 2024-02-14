@@ -7,7 +7,7 @@ use App\Models\Tbl_log;
 
 trait WebServiceSiesaTrait {
 
-    public static function structureXML($NombreConexion, $IdCia, $IdProveedor, $Usuario, $Clave, $sentencia, $IdConsulta, $printError, $cacheWSDL) {
+    public static function structureXML($NombreConexion, $IdCia, $IdProveedor, $Usuario, $Clave, $sentencia, $IdConsulta, $printError, $cacheWSDL,$proxy_host = null,$proxy_port = null) {
         try {
             $parameters = [
                 'printTipoError'     => $printError,
@@ -24,6 +24,12 @@ trait WebServiceSiesaTrait {
                                             </Parametros>
                                         </Consulta>"
             ];
+            if ($proxy_host != null || $proxy_host != '') {
+                $parameters['proxy_host'] = $proxy_host;
+            }
+            if ($proxy_port != null || $proxy_port != '') {
+                $parameters['proxy_port'] = $proxy_port;
+            }
 
             return $parameters;
         } catch (\Exception $e) {

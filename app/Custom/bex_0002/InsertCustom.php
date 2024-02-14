@@ -37,11 +37,27 @@ class InsertCustom
                     'estadotipodoc' => 'A',
                 ];
             });
-        
+            
             // Insertar los datos en la tabla s1e_cartera
             DB::connection($conectionBex)->table('s1e_cartera')->insert($dataToInsert->toArray());
             print '◘ Datos insertados en la tabla s1e_cartera' . PHP_EOL;
 
+            DB::connection($conectionBex)
+            ->table('s1e_cartera')
+            ->join('tblmtipodoc','s1e_cartera.codtipodoc','=','tblmtipodoc.codtipodoc')
+            ->update(['s1e_cartera.estadotipodoc' => 'C']);
+        
+            DB::connection($conectionBex)
+            ->table('tblmtipodoc')
+            ->insertUsing(['codtipodoc','nomtipodoc'],
+            function ($query) {
+                $query->select('codtipodoc', DB::raw("concat('TIPO DOCUMENTO ', codtipodoc) as nomtipodoc"))
+                    ->from('s1e_cartera')
+                    ->where('estadotipodoc', '=', 'A')
+                    ->groupBy('s1e_cartera.codtipodoc');
+                }
+            );
+        print '◘ Datos insertados en la tabla tblmtipodoc' . PHP_EOL;
             //Actualiza codcliente en la tabla s1e_cartera
             DB::connection($conectionBex)
                 ->table('s1e_cartera')
@@ -84,15 +100,6 @@ class InsertCustom
                 ->update(['preciomov' => DB::raw('preciomov * (-1)')]);
             print '◘ Se actualizo la columna preciomov en la tabla tbldcartera' . PHP_EOL;
 
-            /*
-            DB::connection($conectionBex)
-                ->statement('CREATE TABLE IF NOT EXISTS s1e_dptos (
-                    codpais varchar(5),
-                    coddpto varchar(5),
-                    descripcion varchar(50)                          
-                )');
-
-            DB::connection($conectionBex)->statement('DROP TABLE IF EXISTS s1e_dptos');*/
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,

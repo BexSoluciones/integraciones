@@ -69,7 +69,6 @@ class UpdateInformation extends Command {
                 $archivosPlanos = true;
             } elseif($config->ConecctionType == 'ws') {
                 $archivosPlanos = $this->importData($db);
-                dd('TERMINO!!.................');
             } elseif($config->ConecctionType == 'api') {
                 $token = $this->loginToApi($config);
                 $archivosPlanos = $this->ConsultaApi($config,$db,$area,$token);
@@ -97,7 +96,7 @@ class UpdateInformation extends Command {
             }
 
             //Function to read and export flat file to tenant DB
-            $flatFile = $this->readFlatFile($db, $id_importation, $type, $area);
+            $flatFile = $this->readFlatFile($db, $id_importation, $type, $area,$config->separador);
             if($flatFile == 1){
                 return 1;
             }
