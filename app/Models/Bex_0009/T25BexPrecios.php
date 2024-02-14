@@ -11,6 +11,6 @@ class T25BexPrecios extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't25_bex_precios';
-protected $fillable = ['lista', 'producto', 'precio', 'ico', 'estadoprecio'];
+protected $fillable = ['lista', 'producto', 'precio', 'estadoprecio'];
 public $timestamps = false;
 }

@@ -29,7 +29,7 @@ trait GetOrderTrait {
                     ->where('custom_sql.connection_id', $db)
                     ->select('custom_sql.txt')
                     ->first();
-          
+     
             if($codiva){
                 $iva=$codiva->txt;
             }else{
@@ -37,7 +37,7 @@ trait GetOrderTrait {
             }
             
             $db = Connection_Bexsoluciones::getAll()->where('id', $db)->value('name');
-           
+        
             if($db){
                 $order = DB::connection($db)
                     ->table('tbldmovenc')
@@ -51,13 +51,16 @@ trait GetOrderTrait {
                     ->whereColumn('tbldmovenc.codtipodoc','tbldmovdet.codtipodoc')
                     ->where('numcierre', $closing)
                     ->where('tbldmovenc.codtipodoc', '4')
-                    ->selectRaw('tblmvendedor.co,tblmvendedor.tipodoc,tbldmovenc.nummov,nitcliente,succliente,tbldmovenc.codfpagovta,
-                                tbldmovenc.codvendedor,fecmov,tbldmovdet.codproducto,tbldmovdet.codbodega,cantidadmov,tbldmovenc.codprecio,
-                                preciomov,dcto1mov,dcto2mov,dcto3mov,dcto4mov,pluproducto,nomunidademp,tblmproducto.codunidademp,mensajemov,dctopiefacaut,dctonc,numvisita,fechorfinvisita,fechorentregacli,ivamov,nomproducto'.$iva)
+                    ->selectRaw('tblmvendedor.co,tblmvendedor.tipodoc,tbldmovenc.nummov,nitcliente,succliente,
+                                tbldmovenc.codfpagovta, tbldmovenc.codvendedor,fecmov,tbldmovdet.codproducto,
+                                tbldmovdet.codbodega,cantidadmov,tbldmovenc.codprecio,preciomov,dcto1mov,dcto2mov,dcto3mov,
+                                dcto4mov,pluproducto,nomunidademp,tblmproducto.codunidademp,mensajemov,dctopiefacaut,dctonc,
+                                numvisita,fechorfinvisita,fechorentregacli,origen,ordendecompra,tblmvendedor.cedula,
+                                tbldmovdet.prepack,ivamov,nomproducto'.$iva)
                     ->orderBy('tbldmovenc.nummov','asc')
                     ->orderBy('tbldmovdet.codmovdet','asc')
                     ->get();
-               
+                    
                 $plataforSys = 2;
                 $config = $this->connectionDB($plataforSys, 'externa', $area);
                 if($config != 0){
@@ -74,7 +77,7 @@ trait GetOrderTrait {
                         ->table('tblslicencias')
                         ->where('bdlicencias', $db)
                         ->first();
-             
+                //$cia = 123;    
                 ProcessOrderUploadERP::dispatch($order, $cia, $closing, null, $connection_id)->onQueue('pedidos')->onConnection('sync');
                 return 0;
             } else {
