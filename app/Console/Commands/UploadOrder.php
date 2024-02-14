@@ -28,7 +28,7 @@ class UploadOrder extends Command
             $closing        = $this->argument('closing');
             $id_importation = $this->argument('id_importation', null);
             $type           = $this->argument('type', null);
-         
+        
             $configDB = $this->connectionDB($db, 'externa', $area); 
             if($configDB != 0){
                 DB::connection('mysql')->table('tbl_log')->insert([
@@ -40,7 +40,7 @@ class UploadOrder extends Command
                 ]);
                 return 1;
             }
-         
+        
             if($closing == null || $closing == 'null'){
                 $db = Connection_Bexsoluciones::getAll()->where('id', $db)->first();
                
@@ -62,14 +62,13 @@ class UploadOrder extends Command
                     return 1;
                 }
             }
-          
+           
             if($closing == null || $closing == 'null'){
                 $orders = $this->getOrderHeder($db->id, $area, $closing);
             }else{
                 $orders = $this->getOrderHeder($db, $area, $closing);
             }
             
-          
             if($orders == 0){
                 return 0;
             }

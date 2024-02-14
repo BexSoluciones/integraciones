@@ -16,17 +16,15 @@ class CreateT04BexCarteraTable extends Migration
         Schema::create('t04_bex_cartera', function (Blueprint $table) {
             $table->string('nitcliente', 15)->nullable()->index('i_nit');
             $table->char('dv', 1)->nullable();
-            $table->string('succliente', 20)->nullable()->index('i_suc');
-            $table->string('codtipodoc', 5)->nullable();
+            $table->string('succliente', 3)->nullable()->index('i_suc');
+            $table->string('codtipodoc', 3)->nullable();
             $table->string('documento', 20)->nullable();
             $table->date('fecmov')->nullable();
             $table->date('fechavenci')->nullable();
-            $table->string('vrpostf', 15)->nullable();
             $table->string('valor', 15)->nullable();
             $table->string('codvendedor', 10)->nullable();
-            $table->string('diasmora', 10)->nullable();
-            $table->string('debcre', 1)->nullable();
             $table->string('codcliente', 17)->nullable();
+            $table->string('debcre', 1)->nullable();
             $table->string('recpro', 7)->nullable();
             $table->string('co_docto', 3)->nullable();
             $table->string('co_odc', 3)->nullable();

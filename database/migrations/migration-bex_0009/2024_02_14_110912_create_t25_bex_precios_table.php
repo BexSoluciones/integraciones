@@ -17,7 +17,6 @@ class CreateT25BexPreciosTable extends Migration
             $table->string('lista', 50)->nullable();
             $table->string('producto', 50)->nullable();
             $table->string('precio', 50)->nullable();
-            $table->string('ico', 50)->nullable();
             $table->string('estadoprecio', 1)->default('A');
         });
     }
