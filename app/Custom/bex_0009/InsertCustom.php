@@ -90,18 +90,18 @@ class InsertCustom
             ->insertUsing(
             ['codvendedor', 'codcliente', 'codtipodoc', 'nummov', 'fecmov', 'fecven', 'preciomov', 'debcre', 'co_docto', 'co_odc', 'tipdoc_odc', 'docto_odc', 'planilla', 'aux_cruce', 'co_cruce', 'un_cruce', 'tipdoc_cruce', 'numdoc_cruce'],
             function ($query) {
-            $query->select(
-                'tblmrutero.codvendedor','s1e_cartera.codcliente','s1e_cartera.codtipodoc','documento','s1e_cartera.fecmov','fechavenci','valor','debcre','co_docto',
-                'co_odc','tipdoc_odc','docto_odc','planilla','aux_cruce','co_cruce','un_cruce','tipdoc_cruce','numdoc_cruce')
-            ->from('s1e_cartera')
-            ->leftJoin('tblmvendedor', 's1e_cartera.tercvendedor', '=', 'tblmvendedor.tercvendedor')
-            ->join('tblmcliente', 's1e_cartera.codcliente', '=', 'tblmcliente.codcliente')
-            ->join('tblmtipodoc', 'tblmtipodoc.codtipodoc', '=', 's1e_cartera.codtipodoc')
-            ->join('tblmrutero', 's1e_cartera.codcliente', '=', 'tblmrutero.codcliente')
-            ->whereNull('tblmvendedor.tercvendedor')
-            ->distinct();
-        }
-    );
+                $query->select(
+                    'tblmrutero.codvendedor','s1e_cartera.codcliente','s1e_cartera.codtipodoc','documento','s1e_cartera.fecmov','fechavenci','valor','debcre','co_docto',
+                    'co_odc','tipdoc_odc','docto_odc','planilla','aux_cruce','co_cruce','un_cruce','tipdoc_cruce','numdoc_cruce')
+                ->from('s1e_cartera')
+                ->leftJoin('tblmvendedor', 's1e_cartera.tercvendedor', '=', 'tblmvendedor.tercvendedor')
+                ->join('tblmcliente', 's1e_cartera.codcliente', '=', 'tblmcliente.codcliente')
+                ->join('tblmtipodoc', 'tblmtipodoc.codtipodoc', '=', 's1e_cartera.codtipodoc')
+                ->join('tblmrutero', 's1e_cartera.codcliente', '=', 'tblmrutero.codcliente')
+                ->whereNull('tblmvendedor.tercvendedor')
+                ->distinct();
+                }
+            );
             DB::connection($conectionBex)
                 ->table('tbldcartera')
                 ->where('preciomov','>=',0)
@@ -617,6 +617,10 @@ class InsertCustom
                     }
                     
                     if($stock>0){
+
+                        DB::connection($conectionBex)->table('s1e_inventarios')->truncate();
+                        print '◘ Datos eliminados con exito en la tabla s1e_inventarios' . PHP_EOL;
+                        
                         foreach (array_chunk($datosAInsert,3000) as $dato) {
                             $Insert = [];
                             $count = count($dato);

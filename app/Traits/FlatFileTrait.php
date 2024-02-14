@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 trait FlatFileTrait {
     
-    public function generateFlatFile($dataWS, $db, $id_importation, $type) {
+    public function generateFlatFile($dataWS, $db, $id_importation = null, $type = null) {
         try {
             foreach ($dataWS as $item) {
                 $separador = $item['separador'];

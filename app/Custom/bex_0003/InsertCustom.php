@@ -603,6 +603,10 @@ class InsertCustom
                     }
 
                     if($stock>0){
+                        
+                        DB::connection($conectionBex)->table('s1e_inventarios')->truncate();
+                        print '◘ Datos eliminados con exito en la tabla s1e_inventarios' . PHP_EOL;
+                        
                         foreach (array_chunk($datosAInsert,3000) as $dato) {
                             $Insert = [];
                             $count = count($dato);
