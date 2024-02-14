@@ -75,7 +75,7 @@ class ExportInformation extends Command
                 $modelInstance = new $modelClass;
                 $datosAInsertar = $modelInstance::get();
 
-                if ($tableName == 't16_bex_inventarios') {
+                if ($tableName == 't16_bex_inventarios' && $area == 'bexmovil') {
                     $conectionSys = 2;
                     $configDB = $this->setupDatabaseConnection($conectionSys, 'externa', $area);
                     if ($configDB !== 0) {

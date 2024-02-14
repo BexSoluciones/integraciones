@@ -56,7 +56,7 @@ trait DataImportTrait {
                                                 $config->Usuario, 
                                                 $config->Clave, 
                                                 $sentenceSQL, 
-                                                $config->IdConsulta, 1, 0);
+                                                $config->IdConsulta, 1, 0,$config->proxy_host,$config->proxy_port);
                     if($xml){
                         $this->info('◘ Archivo XML '.$sentence->IdConsulta.' generado');
                     }
