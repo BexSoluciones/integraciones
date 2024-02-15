@@ -338,47 +338,56 @@ class InsertCustom
                 print '◘ Tabla s1e_estadopedidos truncada' . PHP_EOL;
                 
                 // Insertar datos en la tabla s1e_estadopedidos
-                $datosAInsertarArray = $datosAInsertar->toArray();
-                $chunks = array_chunk($datosAInsertarArray, 200); 
-                foreach ($chunks as $chunk) {
+                $datosAInsertarJson = json_decode(json_encode($datosAInsertar,true));
+
+                foreach ($datosAInsertarJson as &$dato) {
+                    foreach ($dato as $key => &$value) {
+                        $value = iconv("UTF-8", "ISO-8859-1//TRANSLIT", $value);
+                    }
+                }
+                unset($dato); // Desvincula la última referencia a $dato
+                unset($value); // Desvincula la última referencia a $value
+
+                foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
                     $dataToInsert = [];
-                    foreach ($chunk as $data) {
+                    $count = count($dato);
+                    for($i=0;$i<$count;$i++) {
                         $dataToInsert[] = [
-                            'codemp'     => $data['codemp'],
-                            'codvend'    => $data['codvend'],
-                            'tipoped'    => $data['tipoped'],
-                            'numped'     => $data['numped'],
-                            'nitcli'     => $data['nitcli'],
-                            'succli'     => $data['succli'],
-                            'fecped'     => $data['fecped'],
-                            'ordenped'   => $data['ordenped'],
-                            'codpro'     => $data['codpro'],
-                            'refer'      => $data['refer'],
-                            'descrip'    => $data['descrip'],
-                            'cantped'    => $data['cantped'],
-                            'vlrbruped'  => $data['vlrbruped'],
-                            'ivabruped'  => $data['ivabruped'],
-                            'vlrnetoped' => $data['vlrnetoped'],
-                            'cantfacped' => $data['cantfacped'],
-                            'estado'     => $data['estado'],
-                            'tipo'       => $data['tipo'],
-                            'tipofac'    => $data['tipofac'],
-                            'factura'    => $data['factura'],
-                            'ordenfac'   => $data['ordenfac'],
-                            'cantfac'    => $data['cantfac'],
-                            'vlrbrufac'  => $data['vlrbrufac'],
-                            'ivabrufac'  => $data['ivabrufac'],
-                            'vlrnetofac' => $data['vlrnetofac'],
-                            'obsped'     => $data['obsped'],
-                            'ws_id'      => $data['ws_id'],
+                            'codemp'     => $dato[$i]->codemp,
+                            'codvend'    => $dato[$i]->codvend,
+                            'tipoped'    => $dato[$i]->tipoped,
+                            'numped'     => $dato[$i]->numped,
+                            'nitcli'     => $dato[$i]->nitcli,
+                            'succli'     => $dato[$i]->succli,
+                            'fecped'     => $dato[$i]->fecped,
+                            'ordenped'   => $dato[$i]->ordenped,
+                            'codpro'     => $dato[$i]->codpro,
+                            'refer'      => $dato[$i]->refer,
+                            'descrip'    => $dato[$i]->descrip,
+                            'cantped'    => $dato[$i]->cantped,
+                            'vlrbruped'  => $dato[$i]->vlrbruped,
+                            'ivabruped'  => $dato[$i]->ivabruped,
+                            'vlrnetoped' => $dato[$i]->vlrnetoped,
+                            'cantfacped' => $dato[$i]->cantfacped,
+                            'estado'     => $dato[$i]->estado,
+                            'tipo'       => $dato[$i]->tipo,
+                            'tipofac'    => $dato[$i]->tipofac,
+                            'factura'    => $dato[$i]->factura,
+                            'ordenfac'   => $dato[$i]->ordenfac,
+                            'cantfac'    => $dato[$i]->cantfac,
+                            'vlrbrufac'  => $dato[$i]->vlrbrufac,
+                            'ivabrufac'  => $dato[$i]->ivabrufac,
+                            'vlrnetofac' => $dato[$i]->vlrnetofac,
+                            'obsped'     => $dato[$i]->obsped,
+                            'ws_id'      => $dato[$i]->ws_id,
                             'codcliente' => null,
-                            'codvendedor'=> $data['codvend']
+                            'codvendedor'=> $dato[$i]->codvend
                         ];
                     }
                     DB::connection($conectionBex)->table('s1e_estadopedidos')->insert($dataToInsert);
                 }
                 print '◘ Datos insertados en la tabla s1e_estadopedidos' . PHP_EOL;
-
+                
                 // Actualizar columna codcliente
                 $updateCodcliente = DB::connection($conectionBex)
                     ->table('s1e_estadopedidos')
