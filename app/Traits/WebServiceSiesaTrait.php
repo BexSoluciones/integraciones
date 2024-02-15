@@ -3,7 +3,7 @@ namespace App\Traits;
 
 use Exception;
 use SoapClient;
-use App\Models\Tbl_log;
+use App\Models\Tbl_Log;
 
 trait WebServiceSiesaTrait {
 
@@ -62,7 +62,7 @@ trait WebServiceSiesaTrait {
             } catch (\Exception $e) {
                 $error = self::errorSOAP($e->getMessage());
                 if ($error == true) {
-                    $reg = new Tbl_log;
+                    $reg = new Tbl_Log;
                     $reg->descripcion =  'CONSULTA => '.$e->getMessage();
                     if ($reg->save()) {
                         $finish = 0;

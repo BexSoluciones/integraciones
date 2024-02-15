@@ -7,6 +7,7 @@ use App\Models\Ws_Config;
 use App\Models\Connection;
 use App\Models\Connection_Bexsoluciones;
 
+use Illuminate\Support\Facades\DB;
 use App\Models\LogErrorImportacionModel;
 use App\Traits\ConnectionTrait;
 
