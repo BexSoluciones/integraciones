@@ -78,9 +78,10 @@ class UpdateInformation extends Command {
                     return 1;
                 }
                 $archivosPlanos = $this->sentencesDBSQL($config, $db, $id_importation, $type);
-                if($archivosPlanos == 1){
-                    return 1;
+                if($archivosPlanos == true){
+                    return 0;
                 }
+                return 1;
             }
         
             // Function to configure and migrate tables (MigrateTrait).
