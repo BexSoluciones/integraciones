@@ -762,16 +762,10 @@ class InsertCustom
                     print '◘ Datos insertado en la tabla tblmmpio' . PHP_EOL;
                 }
 
-                /* DB::connection($conectionBex)
-                    ->table('tblmmpio')
-                    ->join('s1e_mpios','tblmmpio.CODMPIO','=','CONCAT(s1e_mpios.coddpto,s1e_mpios.codmpio)')
-                    ->whereColumn('tblmmpio.CODDPTO','s1e_mpios.coddpto')
-                    ->update(['tblmmpio.NOMMPIO' => DB::raw('s1e_mpios.descripcion')]);
-                */
             }else{
                 print '◘ No hay datos para insertar en la tabla tblmmpio' . PHP_EOL;
             }
-            $barrio = DB::table('s1e_clientes')
+            $barrio = DB::connection($conectionBex)->table('s1e_clientes')
                     ->leftJoin('tblmbarrio', 's1e_clientes.barrio', '=', 'tblmbarrio.nombarrio')
                     ->select('s1e_clientes.barrio', 's1e_clientes.codmpio')
                     ->whereNull('tblmbarrio.codbarrio')
