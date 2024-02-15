@@ -48,6 +48,23 @@ class Kernel extends ConsoleKernel
                         ->cron($parameter->cron_expression)
                         // Si todo sale bien ejecuta el siguiente comando
                         ->onSuccess(function (Stringable $output) use ($parameter) {
+                            if($parameter->name_db == 'bex_0007'){
+                                //Si finaliza correctamente se cambio a state 1 para que pueda volver a ejecutarse
+                                $parameter->updateOrInsert(['name_db' => $parameter->name_db, 'area' => $parameter->area], ['state' => '1']);
+                                
+                                $importationInCurse = Importation_Demand::importationInCurse($parameter->name_db, $parameter->area)->first();
+                                if(isset($importationInCurse)){
+                                    Importation_Demand::updateOrInsert(
+                                        ['consecutive' => $importationInCurse->consecutive], ['state' => 3, 'updated_at' => now()]
+                                    );
+                                }
+                                
+                                $importationAutomaticToUpdate = Importation_Automatic::find($this->importationAutomatic->id);
+                                $importationAutomaticToUpdate->update(['state' => 3, 'date_init' => $this->importationAutomatic->date_init, 'date_end' => now()]);
+
+                                return;
+                            }
+
                             // Segundo comando para pasar a la exportacion de informacion
                             Artisan::call('command:export-information', [
                                 'tenantDB'         => $parameter->name_db,
@@ -72,6 +89,15 @@ class Kernel extends ConsoleKernel
                         })
                         //si ocurre un error se se guarda y se cambia a state 1 para que vuelva aquedar activo 
                         ->onFailure(function (Stringable $output) use ($parameter) {
+
+                            if($parameter->name_db == 'bex_0007'){
+                                $parameter->updateOrInsert(['name_db' => $parameter->name_db, 'area' => $parameter->area], ['state' => '1']);
+
+                                $importationAutomaticToUpdate = Importation_Automatic::find($this->importationAutomatic->id);
+                                $importationAutomaticToUpdate->update(['state' => 4, 'date_init' => $this->importationAutomatic->date_init, 'date_end' => now()]);
+                                return;
+                            }
+
                             $parameter->updateOrInsert(['name_db' => $parameter->name_db, 'area' => $parameter->area], ['state' => '1']);
 
                             $importationAutomaticToUpdate = Importation_Automatic::find($this->importationAutomatic->id);
