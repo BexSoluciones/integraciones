@@ -1256,7 +1256,7 @@ class InsertCustom
 
                         $vendedorMax= DB::connection($conectionBex)
                         ->table('tblmvendedor')
-                        ->selectRaw('MAX(estado) + 1 as tervendedor')
+                        ->selectRaw('MAX(CODVENDEDOR) + 1 as tervendedor')
                         ->get();
 
                         $dataToInsert[] = [

@@ -165,6 +165,15 @@ class InsertCustom
             $datosAInsertarJson = json_decode(json_encode($datosAInsertar,true));
             
             if(sizeof($datosAInsertarJson) != 0){
+
+                foreach ($datosAInsertarJson as &$dato) {
+                    foreach ($dato as $key => &$value) {
+                        $value = iconv("UTF-8", "ISO-8859-1//TRANSLIT", $value);
+                    }
+                }
+                unset($dato); // Desvincula la última referencia a $dato
+                unset($value); // Desvincula la última referencia a $value
+                
                 foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
                     $Insert = [];
                     $count = count($dato);
