@@ -155,8 +155,6 @@ trait ReadExportDataTrait {
                 return 1;
             }
         } catch (\Exception $e) {
-            $this->info($e->getMessage());
-
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
