@@ -62,13 +62,21 @@ class ImportationJob implements ShouldQueue
                     'type'           => 2
                 ]);
                 
+                if($updateInformation == 0 && $dataImport->name_db == "bex_0007") {
+                    // [Estado:3] => Significa que la importación finalizo
+                    Importation_Demand::updateOrInsert(
+                        ['consecutive' => $this->consecutive], ['state' => 3, 'updated_at' => $currentTime]
+                    );  
+                    return;
+                }
+
                 if($updateInformation == 1) {
                     // [Estado:4] => Significa que la importación finalizo
                     Importation_Demand::updateOrInsert(
                         ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
                     );
                     return;
-                }
+                } 
              
                 $exportInformation = Artisan::call('command:export-information', [
                     'tenantDB'         => $connections->name,
@@ -108,6 +116,17 @@ class ImportationJob implements ShouldQueue
                     'id_importation' => $this->consecutive,
                     'type'           => 2
                 ]);
+
+                if($updateInformation == 0 && $dataImport->name_db == "bex_0007") {
+                    // [Estado:3] => Significa que la importación finalizo
+                    Importation_Demand::updateOrInsert(
+                        ['consecutive' => $this->consecutive], ['state' => 3, 'updated_at' => $currentTime]
+                    );  
+                    // Apenas termine vuelve a activar la importacion programada
+                    $importation->updateOrInsert(['name_db' => $importation->name_db], ['state' => '1']);
+                    
+                    return;
+                }
 
                 if($updateInformation == 1) {
                     // [Estado:4] => Significa que la importación finalizo

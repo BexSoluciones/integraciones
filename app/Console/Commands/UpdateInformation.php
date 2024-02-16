@@ -7,6 +7,7 @@ use App\Models\Ws_Config;
 use App\Models\Custom_Migration;
 use App\Traits\MigrateTrait;
 use App\Traits\ApiTrait;
+use App\Traits\DBSQLTrait;
 use App\Traits\ConnectionTrait;
 use App\Traits\DataImportTrait;
 use App\Traits\ReadExportDataTrait;
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\Log;
 
 class UpdateInformation extends Command {
 
-    use MigrateTrait, ConnectionTrait, DataImportTrait, ReadExportDataTrait, BackupFlatFileTrait, ApiTrait;
+    use MigrateTrait, ConnectionTrait, DataImportTrait, ReadExportDataTrait, BackupFlatFileTrait, ApiTrait, DBSQLTrait;
 
     protected $signature = 'command:update-information {database} {area} {status?} {id_importation?} {type?}';
     protected $description = "Extract, generate drawings, and store information in the tenant's database";
@@ -27,7 +28,7 @@ class UpdateInformation extends Command {
         try {
             // Name of the database where we are going to migrate
             $db             = $this->argument('database'); 
-            $area             = $this->argument('area'); 
+            $area           = $this->argument('area'); 
             $status         = $this->argument('status', false);
             $id_importation = $this->argument('id_importation', null);
             $type           = $this->argument('type', null);
@@ -71,9 +72,18 @@ class UpdateInformation extends Command {
             } elseif($config->ConecctionType == 'api') {
                 $token = $this->loginToApi($config);
                 $archivosPlanos = $this->ConsultaApi($config,$db,$area,$token);
-
+            } elseif($config->ConecctionType == 'db'){
+                $connection = $this->connectionDBSQL($config);
+                if($connection == 1){
+                    return 1;
+                }
+                $archivosPlanos = $this->sentencesDBSQL($config, $db, $id_importation, $type);
+                if($archivosPlanos == true){
+                    return 0;
+                }
+                return 1;
             }
-
+        
             // Function to configure and migrate tables (MigrateTrait).
             if($archivosPlanos == true){
                 if($area == 'bexmovil'){
@@ -93,7 +103,8 @@ class UpdateInformation extends Command {
             }
 
             //Function to read and export flat file to tenant DB
-            $flatFile = $this->readFlatFile($db, $id_importation, $type,$area);
+            $flatFile = $this->readFlatFile($db, $id_importation, $type, $area,$config->separador);
+
             if($flatFile == 1){
                 return 1;
             }
@@ -109,10 +120,12 @@ class UpdateInformation extends Command {
             print '◘ La ejecucion "command:update-information '.$db.'" ha finalizado.';
             return 0;
         } catch (\Exception $e) {
-            Tbl_Log::create([
+            DB::connection('mysql')->table('tbl_log')->insert([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Commands::UpdateInformation[handle()] => '.$e->getMessage()
+                'descripcion' => 'Commands::UpdateInformation[handle()] => '.$e->getMessage(),
+                'created_at'  => now(),
+                'updated_at'  => now()
             ]);
             return 1;
         }

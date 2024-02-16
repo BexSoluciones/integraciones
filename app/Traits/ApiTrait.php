@@ -61,7 +61,12 @@ trait ApiTrait {
             $backupFlatFile = $this->backupFlatFile($db, true);
             if($backupFlatFile != 0){
                 $this->info('Error copia de seguridad archivos panos');
-                dd();
+                DB::connection('mysql')->table('tbl_log')->insert([
+                    'descripcion' => 'Traits::ApiTrait[ConsultaApi()] =>  Error copia de seguridad archivos panos.',
+                    'created_at'  => now(),
+                    'updated_at'  => now()
+                ]);
+                return 1;
             }
 
             if($token){
@@ -71,9 +76,15 @@ trait ApiTrait {
                     $sentence = Ws_Consulta::getAllBexTram();
                 }else{
                     $this->info('◘ Por favor pasarle en el comando el area command:update-information '.$db. ' area?');
-                    dd();
+                    DB::connection('mysql')->table('tbl_log')->insert([
+                        'descripcion' => 'Traits::ApiTrait[ConsultaApi()] =>  No se paso el atributo area en command:update-information '.$db. ' area?',
+                        'created_at'  => now(),
+                        'updated_at'  => now()
+                    ]);
+                    return 1;
                 }
                 foreach($sentence as $clave){
+                    $timeoutInSeconds = 60;
                     $allData = [];
                     $clie = [];
                     $url = $clave->sentencia;
@@ -82,7 +93,7 @@ trait ApiTrait {
                     $response = Http::withHeaders([
                         'Authorization' => 'Bearer ' . $token,
                         'Accept' => 'application/json', 
-                    ])->get($url);
+                    ])->timeout($timeoutInSeconds)->get($url);
             
                     $respon = $response->json();
                     $data = json_decode(json_encode($respon), true);
@@ -117,7 +128,5 @@ trait ApiTrait {
             ]);
             return 1;
         }
-        //backup txt files
-        
     }
 }

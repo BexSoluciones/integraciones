@@ -22,9 +22,15 @@ trait MigrateTrait {
                     $table->string('name');
                     $table->string('name_table');
                     $table->string('command')->default('');
+                    $table->integer('custom_inserts_id')->default(0);
                     $table->timestamps();
                 });
             } catch (\Exception $e) {
+                DB::connection('mysql')->table('tbl_log')->insert([
+                    'descripcion' => 'Error al crear la tabla custom_migrations: ' . $e->getMessage(),
+                    'created_at'  => now(),
+                    'updated_at'  => now()
+                ]);
                 $this->error('Error al crear la tabla custom_migrations: ' . $e->getMessage());
             }
 

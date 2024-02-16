@@ -37,11 +37,27 @@ class InsertCustom
                     'estadotipodoc' => 'A',
                 ];
             });
-        
+            
             // Insertar los datos en la tabla s1e_cartera
             DB::connection($conectionBex)->table('s1e_cartera')->insert($dataToInsert->toArray());
             print '◘ Datos insertados en la tabla s1e_cartera' . PHP_EOL;
 
+            DB::connection($conectionBex)
+            ->table('s1e_cartera')
+            ->join('tblmtipodoc','s1e_cartera.codtipodoc','=','tblmtipodoc.codtipodoc')
+            ->update(['s1e_cartera.estadotipodoc' => 'C']);
+        
+            DB::connection($conectionBex)
+            ->table('tblmtipodoc')
+            ->insertUsing(['codtipodoc','nomtipodoc'],
+            function ($query) {
+                $query->select('codtipodoc', DB::raw("concat('TIPO DOCUMENTO ', codtipodoc) as nomtipodoc"))
+                    ->from('s1e_cartera')
+                    ->where('estadotipodoc', '=', 'A')
+                    ->groupBy('s1e_cartera.codtipodoc');
+                }
+            );
+        print '◘ Datos insertados en la tabla tblmtipodoc' . PHP_EOL;
             //Actualiza codcliente en la tabla s1e_cartera
             DB::connection($conectionBex)
                 ->table('s1e_cartera')
@@ -84,15 +100,6 @@ class InsertCustom
                 ->update(['preciomov' => DB::raw('preciomov * (-1)')]);
             print '◘ Se actualizo la columna preciomov en la tabla tbldcartera' . PHP_EOL;
 
-            /*
-            DB::connection($conectionBex)
-                ->statement('CREATE TABLE IF NOT EXISTS s1e_dptos (
-                    codpais varchar(5),
-                    coddpto varchar(5),
-                    descripcion varchar(50)                          
-                )');
-
-            DB::connection($conectionBex)->statement('DROP TABLE IF EXISTS s1e_dptos');*/
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
@@ -229,6 +236,7 @@ class InsertCustom
                     'tblmcliente.TELCLIENTE' => DB::raw('s1e_clientes.telefono'),
                     'tblmcliente.CODFPAGOVTA' => DB::raw('s1e_clientes.conpag'),
                     'tblmcliente.CODPRECIO' => DB::raw('s1e_clientes.precio'),
+                    'tblmcliente.CUPO' => DB::raw('s1e_clientes.cupo'),
                     'tblmcliente.EMAIL' => DB::raw('s1e_clientes.email') 
                 ]);
             print '◘ Datos actualizados en la tabla tblmcliente' . PHP_EOL;
@@ -331,47 +339,56 @@ class InsertCustom
                 print '◘ Tabla s1e_estadopedidos truncada' . PHP_EOL;
                 
                 // Insertar datos en la tabla s1e_estadopedidos
-                $datosAInsertarArray = $datosAInsertar->toArray();
-                $chunks = array_chunk($datosAInsertarArray, 200); 
-                foreach ($chunks as $chunk) {
+                $datosAInsertarJson = json_decode(json_encode($datosAInsertar,true));
+
+                foreach ($datosAInsertarJson as &$dato) {
+                    foreach ($dato as $key => &$value) {
+                        $value = iconv("UTF-8", "ISO-8859-1//TRANSLIT", $value);
+                    }
+                }
+                unset($dato); // Desvincula la última referencia a $dato
+                unset($value); // Desvincula la última referencia a $value
+
+                foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
                     $dataToInsert = [];
-                    foreach ($chunk as $data) {
+                    $count = count($dato);
+                    for($i=0;$i<$count;$i++) {
                         $dataToInsert[] = [
-                            'codemp'     => $data['codemp'],
-                            'codvend'    => $data['codvend'],
-                            'tipoped'    => $data['tipoped'],
-                            'numped'     => $data['numped'],
-                            'nitcli'     => $data['nitcli'],
-                            'succli'     => $data['succli'],
-                            'fecped'     => $data['fecped'],
-                            'ordenped'   => $data['ordenped'],
-                            'codpro'     => $data['codpro'],
-                            'refer'      => $data['refer'],
-                            'descrip'    => $data['descrip'],
-                            'cantped'    => $data['cantped'],
-                            'vlrbruped'  => $data['vlrbruped'],
-                            'ivabruped'  => $data['ivabruped'],
-                            'vlrnetoped' => $data['vlrnetoped'],
-                            'cantfacped' => $data['cantfacped'],
-                            'estado'     => $data['estado'],
-                            'tipo'       => $data['tipo'],
-                            'tipofac'    => $data['tipofac'],
-                            'factura'    => $data['factura'],
-                            'ordenfac'   => $data['ordenfac'],
-                            'cantfac'    => $data['cantfac'],
-                            'vlrbrufac'  => $data['vlrbrufac'],
-                            'ivabrufac'  => $data['ivabrufac'],
-                            'vlrnetofac' => $data['vlrnetofac'],
-                            'obsped'     => $data['obsped'],
-                            'ws_id'      => $data['ws_id'],
+                            'codemp'     => $dato[$i]->codemp,
+                            'codvend'    => $dato[$i]->codvend,
+                            'tipoped'    => $dato[$i]->tipoped,
+                            'numped'     => $dato[$i]->numped,
+                            'nitcli'     => $dato[$i]->nitcli,
+                            'succli'     => $dato[$i]->succli,
+                            'fecped'     => $dato[$i]->fecped,
+                            'ordenped'   => $dato[$i]->ordenped,
+                            'codpro'     => $dato[$i]->codpro,
+                            'refer'      => $dato[$i]->refer,
+                            'descrip'    => $dato[$i]->descrip,
+                            'cantped'    => $dato[$i]->cantped,
+                            'vlrbruped'  => $dato[$i]->vlrbruped,
+                            'ivabruped'  => $dato[$i]->ivabruped,
+                            'vlrnetoped' => $dato[$i]->vlrnetoped,
+                            'cantfacped' => $dato[$i]->cantfacped,
+                            'estado'     => $dato[$i]->estado,
+                            'tipo'       => $dato[$i]->tipo,
+                            'tipofac'    => $dato[$i]->tipofac,
+                            'factura'    => $dato[$i]->factura,
+                            'ordenfac'   => $dato[$i]->ordenfac,
+                            'cantfac'    => $dato[$i]->cantfac,
+                            'vlrbrufac'  => $dato[$i]->vlrbrufac,
+                            'ivabrufac'  => $dato[$i]->ivabrufac,
+                            'vlrnetofac' => $dato[$i]->vlrnetofac,
+                            'obsped'     => $dato[$i]->obsped,
+                            'ws_id'      => $dato[$i]->ws_id,
                             'codcliente' => null,
-                            'codvendedor'=> $data['codvend']
+                            'codvendedor'=> $dato[$i]->codvend
                         ];
                     }
                     DB::connection($conectionBex)->table('s1e_estadopedidos')->insert($dataToInsert);
                 }
                 print '◘ Datos insertados en la tabla s1e_estadopedidos' . PHP_EOL;
-
+                
                 // Actualizar columna codcliente
                 $updateCodcliente = DB::connection($conectionBex)
                     ->table('s1e_estadopedidos')
@@ -538,6 +555,10 @@ class InsertCustom
                     }
 
                     if($stock>0){
+
+                        DB::connection($conectionBex)->table('s1e_inventarios')->truncate();
+                        print '◘ Datos eliminados con exito en la tabla s1e_inventarios' . PHP_EOL;
+                        
                         foreach (array_chunk($datosAInsert,3000) as $dato) {
                             $Insert = [];
                             $count = count($dato);
@@ -892,11 +913,11 @@ class InsertCustom
                     ->insertUsing([
                         'codunidademp', 'NOMUNIDADEMP'
                     ],function ($query) {
-                        $query->selectRaw('codunidademp,codunidademp as NOMUNIDADEMP')
+                        $query->select('codunidademp', DB::raw('CONCAT(codunidademp) AS NOMUNIDADEMP'))
                         ->from('s1e_productos')
                         ->where('estadounidademp', 'A')
                         ->where('codigo','<>','')
-                        ->get();
+                        ->groupBy('codunidademp');
                     }
                 );
                 print '◘ Datos Actualizados en la tabla tblmunidademp' . PHP_EOL;
@@ -914,21 +935,21 @@ class InsertCustom
                 ->where('codigo','<>','')
                 ->get();   
 
-            if( count($insertProveed) > 0){
-                DB::connection($conectionBex)
-                    ->table('tblmproveedor')
-                    ->insertUsing([
-                        'CODPROVEEDOR', 'NOMPROVEEDOR'
-                    ],function ($query) {
-                        $query->selectRaw('codunidademp,codunidademp as NOMUNIDADEMP')
-                        ->from('s1e_productos')
-                        ->where('estadoproveedor', 'A')
-                        ->where('codigo','<>','')
-                        ->get();
-                    }
-                );
-                print '◘ Datos Actualizados en la tabla tblmproveedor' . PHP_EOL;
-            }
+                if( count($insertProveed) > 0){
+                    DB::connection($conectionBex)
+                        ->table('tblmproveedor')
+                        ->insertUsing([
+                            'CODPROVEEDOR', 'NOMPROVEEDOR'
+                        ],function ($query) {
+                            $query->select('codproveedor', DB::raw('CONCAT(nomproveedor) as NOMPROVEEDOR'))
+                            ->from('s1e_productos')
+                            ->where('estadoproveedor', 'A')
+                            ->where('codigo','<>','')
+                            ->groupBy('codproveedor');
+                        }
+                    );
+                    print '◘ Datos Actualizados en la tabla tblmproveedor' . PHP_EOL;
+                }
             
             DB::connection($conectionBex)
                 ->table('tblmproducto')

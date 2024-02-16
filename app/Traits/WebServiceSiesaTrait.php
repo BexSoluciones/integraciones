@@ -3,11 +3,11 @@ namespace App\Traits;
 
 use Exception;
 use SoapClient;
-use App\Models\Tbl_log;
+use App\Models\Tbl_Log;
 
 trait WebServiceSiesaTrait {
 
-    public static function structureXML($NombreConexion, $IdCia, $IdProveedor, $Usuario, $Clave, $sentencia, $IdConsulta, $printError, $cacheWSDL) {
+    public static function structureXML($NombreConexion, $IdCia, $IdProveedor, $Usuario, $Clave, $sentencia, $IdConsulta, $printError, $cacheWSDL,$proxy_host = null,$proxy_port = null) {
         try {
             $parameters = [
                 'printTipoError'     => $printError,
@@ -24,6 +24,12 @@ trait WebServiceSiesaTrait {
                                             </Parametros>
                                         </Consulta>"
             ];
+            if ($proxy_host != null || $proxy_host != '') {
+                $parameters['proxy_host'] = $proxy_host;
+            }
+            if ($proxy_port != null || $proxy_port != '') {
+                $parameters['proxy_port'] = $proxy_port;
+            }
 
             return $parameters;
         } catch (\Exception $e) {
@@ -31,7 +37,7 @@ trait WebServiceSiesaTrait {
         }
     }
     
-    public static function SOAP($url, $parameters, $IdConsulta, $timeout = 5.0) {
+    public static function SOAP($url, $parameters, $IdConsulta, $timeout = 20.0) {
         $finish = 1;
         do {
             $startTime = microtime(true); // Registrar el tiempo de inicio
@@ -56,7 +62,7 @@ trait WebServiceSiesaTrait {
             } catch (\Exception $e) {
                 $error = self::errorSOAP($e->getMessage());
                 if ($error == true) {
-                    $reg = new Tbl_log;
+                    $reg = new Tbl_Log;
                     $reg->descripcion =  'CONSULTA => '.$e->getMessage();
                     if ($reg->save()) {
                         $finish = 0;
@@ -71,7 +77,8 @@ trait WebServiceSiesaTrait {
     
             if ($executionTime > $timeout) {
                 // La consulta se ha demorado más de lo esperado
-                return ('El proceso ha finalizado porque la consulta '.$IdConsulta.' expiro en tiemo de espera ('. $executionTime. ' segundos).');
+                echo 'El proceso ha finalizado porque la consulta '.$IdConsulta.' expiro en tiemo de espera ('. $executionTime. ' segundos).';
+                return null;
             }
         } while ($finish != 0);
     }

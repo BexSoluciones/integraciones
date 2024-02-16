@@ -15,13 +15,17 @@ class Importation_Automatic extends Model
         'id',
         'id_table', 
         'state',
+        'area',
         'date_init',
         'date_end'
     ];
     public $timestamps = false;
 
-    public function scopeImportationState($query, $date){
-        return $query->select('id', 'id_table', 'state', 'date_init', 'date_end')
-            ->whereRaw("DATE(date_init) = ?", [$date]);
+    public function scopeImportationState($query, $date, $name_db, $area){
+        return $query->select('importation_automatic.id', 'id_table', 'importation_automatic.state', 'importation_automatic.area', 'date_init', 'date_end', 'alias')
+            ->join('commands', 'commands.id', '=', 'id_table')
+            ->whereRaw("DATE(date_init) = ?", [$date])
+            ->where('alias', $name_db)
+            ->where('importation_automatic.area', $area);
     }
 }

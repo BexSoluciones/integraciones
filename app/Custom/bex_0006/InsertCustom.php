@@ -47,6 +47,23 @@ class InsertCustom
                 }
                 print '◘ Datos insertados la tabla s1e_cartera' . PHP_EOL;
             }
+
+            DB::connection($conectionBex)
+                ->table('s1e_cartera')
+                ->join('tblmtipodoc','s1e_cartera.codtipodoc','=','tblmtipodoc.codtipodoc')
+                ->update(['s1e_cartera.estadotipodoc' => 'C']);
+            
+            DB::connection($conectionBex)
+                ->table('tblmtipodoc')
+                ->insertUsing(['codtipodoc','nomtipodoc'],
+                function ($query) {
+                    $query->select('codtipodoc', DB::raw("concat('TIPO DOCUMENTO ', codtipodoc) as nomtipodoc"))
+                        ->from('s1e_cartera')
+                        ->where('estadotipodoc', '=', 'A')
+                        ->groupBy('s1e_cartera.codtipodoc');
+                }
+            );
+            print '◘ Datos insertados en la tabla tblmtipodoc' . PHP_EOL;
             
             //Actualiza codcliente en la tabla s1e_cartera
             DB::connection($conectionBex)
@@ -148,6 +165,15 @@ class InsertCustom
             $datosAInsertarJson = json_decode(json_encode($datosAInsertar,true));
             
             if(sizeof($datosAInsertarJson) != 0){
+
+                foreach ($datosAInsertarJson as &$dato) {
+                    foreach ($dato as $key => &$value) {
+                        $value = iconv("UTF-8", "ISO-8859-1//TRANSLIT", $value);
+                    }
+                }
+                unset($dato); // Desvincula la última referencia a $dato
+                unset($value); // Desvincula la última referencia a $value
+                
                 foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
                     $Insert = [];
                     $count = count($dato);
@@ -167,6 +193,7 @@ class InsertCustom
                             'cupo'          => $dato[$i]->cupo,
                             'codgrupodcto'  => $dato[$i]->codgrupodcto,
                             'email'         => $dato[$i]->email,
+                            'bloqueo'       => $dato[$i]->bloqueo,
                             'codcliente'    => '0',
                             'estado'        => $dato[$i]->estado,
                             'estadofpagovta'=> $dato[$i]->estadofpagovta
@@ -244,9 +271,12 @@ class InsertCustom
                     'tblmcliente.TELCLIENTE' => DB::raw('s1e_clientes.telefono'),
                     'tblmcliente.CODFPAGOVTA' => DB::raw('s1e_clientes.conpag'),
                     'tblmcliente.CODPRECIO' => DB::raw('s1e_clientes.precio'),
-                    'tblmcliente.EMAIL' => DB::raw('s1e_clientes.email') 
+                    'tblmcliente.EMAIL' => DB::raw('s1e_clientes.email'),
+                    'tblmcliente.CUPO' => DB::raw('s1e_clientes.cupo'),
+                    'tblmcliente.bloqueo' => DB::raw("IF(s1e_clientes.bloqueo=1, 'S', 'N')") 
                 ]);
             print '◘ Datos actualizados en la tabla tblmcliente' . PHP_EOL;
+
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
@@ -596,6 +626,10 @@ class InsertCustom
                     }
                     
                     if($stock>0){
+
+                        DB::connection($conectionBex)->table('s1e_inventarios')->truncate();
+                        print '◘ Datos eliminados con exito en la tabla s1e_inventarios' . PHP_EOL;
+                        
                         foreach (array_chunk($datosAInsert,3000) as $dato) {
                             $Insert = [];
                             $count = count($dato);
@@ -881,6 +915,15 @@ class InsertCustom
             print '◘ Tabla s1e_productos truncada' . PHP_EOL;
 
             $datosAInsert = json_decode(json_encode($datosAInsertar), true);
+
+            foreach ($datosAInsert as &$dato) {
+                foreach ($dato as $key => &$value) {
+                    $value = iconv("UTF-8", "ISO-8859-1//TRANSLIT", $value);
+                }
+            }
+            unset($dato); // Desvincula la última referencia a $dato
+            unset($value); // Desvincula la última referencia a $value
+
             if (!empty($datosAInsert)) {
                 $chunkedData = array_chunk($datosAInsert, 3000);
                 foreach ($chunkedData as $chunk) {
@@ -904,6 +947,21 @@ class InsertCustom
                 }
             }
 
+            DB::connection($conectionBex)
+                ->table('s1e_productos')
+                ->update([
+                    'codunidademp' => DB::raw("CASE 
+                        WHEN codunidademp = 'Kilogramo' THEN 'KIL'
+                        WHEN codunidademp = 'Millar' THEN 'MIL'
+                        WHEN codunidademp = 'Rollo' THEN 'ROL'
+                        WHEN codunidademp = 'Caja' THEN 'CAJ'
+                        WHEN codunidademp = 'Libra' THEN 'LIB'
+                        WHEN codunidademp = 'Gruesa' THEN 'GRU'
+                        WHEN codunidademp = 'Cubeta' THEN 'CUB'
+                        WHEN codunidademp = 'Unidad' THEN 'UND'
+                        ELSE ''
+                    END")
+                ]);
             // Update estado_unidademp tabla s1e_productos
             DB::connection($conectionBex)
                 ->table('s1e_productos')

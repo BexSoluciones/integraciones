@@ -48,6 +48,23 @@ class InsertCustom
                 print '◘ Datos insertados la tabla s1e_cartera' . PHP_EOL;
             }
      
+            DB::connection($conectionBex)
+            ->table('s1e_cartera')
+            ->join('tblmtipodoc','s1e_cartera.codtipodoc','=','tblmtipodoc.codtipodoc')
+            ->update(['s1e_cartera.estadotipodoc' => 'C']);
+        
+            DB::connection($conectionBex)
+                ->table('tblmtipodoc')
+                ->insertUsing(['codtipodoc','nomtipodoc'],
+                function ($query) {
+                    $query->select('codtipodoc', DB::raw("concat('TIPO DOCUMENTO ', codtipodoc) as nomtipodoc"))
+                        ->from('s1e_cartera')
+                        ->where('estadotipodoc', '=', 'A')
+                        ->groupBy('s1e_cartera.codtipodoc');
+                    }
+                );
+            print '◘ Datos insertados en la tabla tblmtipodoc' . PHP_EOL;
+
             //Actualiza codcliente en la tabla s1e_cartera
             DB::connection($conectionBex)
                 ->table('s1e_cartera')
@@ -588,6 +605,10 @@ class InsertCustom
                     }
                     
                     if($stock>0){
+
+                        DB::connection($conectionBex)->table('s1e_inventarios')->truncate();
+                        print '◘ Datos eliminados con exito en la tabla s1e_inventarios' . PHP_EOL;
+                        
                         foreach (array_chunk($datosAInsert,3000) as $dato) {
                             $Insert = [];
                             $count = count($dato);
@@ -942,11 +963,11 @@ class InsertCustom
                     ->insertUsing([
                         'codunidademp', 'NOMUNIDADEMP'
                     ],function ($query) {
-                        $query->selectRaw('codunidademp,codunidademp as NOMUNIDADEMP')
+                        $query->select('codunidademp', DB::raw('CONCAT(codunidademp) AS NOMUNIDADEMP'))
                         ->from('s1e_productos')
                         ->where('estadounidademp', 'A')
                         ->where('codigo','<>','')
-                        ->get();
+                        ->groupBy('codunidademp');
                     }
                 );
                 print '◘ Datos Actualizados en la tabla tblmunidademp' . PHP_EOL;
@@ -964,21 +985,21 @@ class InsertCustom
                 ->where('codigo','<>','')
                 ->get();   
 
-            if( count($insertProveed) > 0){
-                DB::connection($conectionBex)
-                    ->table('tblmproveedor')
-                    ->insertUsing([
-                        'CODPROVEEDOR', 'NOMPROVEEDOR'
-                    ],function ($query) {
-                        $query->selectRaw('codunidademp,codunidademp as NOMUNIDADEMP')
-                        ->from('s1e_productos')
-                        ->where('estadoproveedor', 'A')
-                        ->where('codigo','<>','')
-                        ->get();
-                    }
-                );
-                print '◘ Datos Actualizados en la tabla tblmproveedor' . PHP_EOL;
-            }
+                if( count($insertProveed) > 0){
+                    DB::connection($conectionBex)
+                        ->table('tblmproveedor')
+                        ->insertUsing([
+                            'CODPROVEEDOR', 'NOMPROVEEDOR'
+                        ],function ($query) {
+                            $query->select('codproveedor', DB::raw('CONCAT(nomproveedor) as NOMPROVEEDOR'))
+                            ->from('s1e_productos')
+                            ->where('estadoproveedor', 'A')
+                            ->where('codigo','<>','')
+                            ->groupBy('codproveedor');
+                        }
+                    );
+                    print '◘ Datos Actualizados en la tabla tblmproveedor' . PHP_EOL;
+                }
             
             DB::connection($conectionBex)
                 ->table('tblmproducto')
@@ -1235,7 +1256,7 @@ class InsertCustom
 
                         $vendedorMax= DB::connection($conectionBex)
                         ->table('tblmvendedor')
-                        ->selectRaw('MAX(estado) + 1 as tervendedor')
+                        ->selectRaw('MAX(CODVENDEDOR) + 1 as tervendedor')
                         ->get();
 
                         $dataToInsert[] = [

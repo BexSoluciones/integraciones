@@ -29,6 +29,8 @@ class Ws_Config extends Model
         'IdConsulta',
         'ConecctionType',
         'proxy_host',
-        'proxy_port'
+        'proxy_port',
+        'urlEnvio',
+        'urlEnvioDetalle'
     ];
 }

@@ -31,57 +31,65 @@ trait DataImportTrait {
             
             //backup txt files
             $backupFlatFile = $this->backupFlatFile($db, true);
-            if($backupFlatFile != true){
-                dd($info->error('Error copia de seguridad archivos panos'));
+            if($backupFlatFile != 0){
+                $this->info('Error copia de seguridad archivos panos');
+                dd();
             }
           
-            $allData = [];
             foreach($sentences as $sentence){
-                
-                // Convertion of sentence defined in the ConversionSentencesSqlTrait
-                $sentenceSQL = $this->convertionSentenceSql($sentence->sentencia, 
-                                                            $config->IdCia, 
-                                                            $sentence->desde, 
-                                                            $sentence->cuantos,
-                                                            $sentence->IdConsulta);
+                $continuar = true;
+                $desde=$sentence->desde;
+                while($continuar == true){
+                    $allData = [];
+                    
+                    // Convertion of sentence defined in the ConversionSentencesSqlTrait
+                    $sentenceSQL = $this->convertionSentenceSql($sentence->sentencia, 
+                                                                $config->IdCia, 
+                                                                $desde, 
+                                                                $sentence->cuantos,
+                                                                $sentence->IdConsulta);
 
-                //StructureXML function defined in the WebServiceSiesaTrait
-                $xml = $this->structureXML($config->NombreConexion, 
-                                            $config->IdCia, 
-                                            $config->IdProveedor,
-                                            $config->Usuario, 
-                                            $config->Clave, 
-                                            $sentenceSQL, 
-                                            $config->IdConsulta, 1, 0);
-                if($xml){
-                    $this->info('◘ Archivo XML '.$sentence->IdConsulta.' generado');
-                }
-                               
-                // SOAP function defined in the WebServiceSiesaTrait
-                $results = $this->SOAP($config->url, $xml, $sentence->IdConsulta); 
-                if($results == null){
-                    //Devuelve la copia de seguridad a la carpeta principal
-                    $this->backupFlatFile($db, false);
-                    $this->error('Proceso detenido, la extraccion de datos no puede ser nula');
-                    dd('------------ ERROR SOAP '.$sentence->IdConsulta.' ------------');
-                }
+                    //StructureXML function defined in the WebServiceSiesaTrait
+                    $xml = $this->structureXML($config->NombreConexion, 
+                                                $config->IdCia, 
+                                                $config->IdProveedor,
+                                                $config->Usuario, 
+                                                $config->Clave, 
+                                                $sentenceSQL, 
+                                                $config->IdConsulta, 1, 0,$config->proxy_host,$config->proxy_port);
+                    if($xml){
+                        $this->info('◘ Archivo XML '.$sentence->IdConsulta.' generado');
+                    }
 
-                if($results){
-                    $this->info('◘ Importacion datos '.$sentence->IdConsulta.' exitosa');
-                }
-                
-                $data = json_decode($results, true);
-                
-                $allData[] = [
-                    'data' => $data,
-                    'descripcion' => $sentence->descripcion,
-                    'separador' => $config->separador
-                ];
+                    // SOAP function defined in the WebServiceSiesaTrait
+                    $results = $this->SOAP($config->url, $xml, $sentence->IdConsulta); 
+                    if($results == null){
+                        //Devuelve la copia de seguridad a la carpeta principal
+                        $continuar = false;
+                        // $this->backupFlatFile($db, false);
+                        // $this->error('Proceso detenido, la extraccion de datos no puede ser nula');
+                        // dd('------------ ERROR SOAP '.$sentence->IdConsulta.' ------------');
+                    }else{
+                        $continuar = true;
+                        $data = json_decode($results, true);
+                        $allData[] = [
+                            'data' => $data,
+                            'descripcion' => $sentence->descripcion,
+                            'separador' => $config->separador
+                        ];
+    
+                        //Fuction to generate flat file (FlatFileTrait)
+                        $this->generateFlatFile($allData, $db);
+                        $desde= $desde+$sentence->cuantos;
+                    }
 
-                //Fuction to generate flat file (FlatFileTrait)
-                $this->generateFlatFile($allData, $db);
-            }
+                    if($results){
+                        $this->info('◘ Importacion datos '.$sentence->IdConsulta.' exitosa');
+                    }
+
+                }
            
+            }
             $this->info('◘ Proceso archivos planos completado.');
             return true;
         } catch (\Exception $e) {
