@@ -104,7 +104,6 @@ trait ReadExportDataTrait {
                                                 => Columnas archivo plano: '.$columnsCount.', Columnas esperadas: '.count($columnsModelo).'
                                                 => Info linea archivo plano que ocasiona conflicto: '.json_encode($columns)
                         ]);
-                        return 1;
                     }
                     
                     // Construct an associative array of data for insertion

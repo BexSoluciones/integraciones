@@ -39,6 +39,11 @@ class T05BexClientes extends Model
         'estado', 
         'estadofpagovta'
     ];
+    
+    public function scopeGetColumns(){
+        return 15;
+    }
+
     public $timestamps = false;
 
     public function scopeCodPago($query){

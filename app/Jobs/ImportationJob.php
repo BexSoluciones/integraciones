@@ -68,12 +68,6 @@ class ImportationJob implements ShouldQueue
                         ['consecutive' => $this->consecutive], ['state' => 3, 'updated_at' => $currentTime]
                     );  
                     return;
-                } else {
-                    // [Estado:4] => Significa que la importación finalizo
-                    Importation_Demand::updateOrInsert(
-                        ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
-                    );
-                    return;
                 }
 
                 if($updateInformation == 1) {
@@ -82,7 +76,7 @@ class ImportationJob implements ShouldQueue
                         ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
                     );
                     return;
-                }
+                } 
              
                 $exportInformation = Artisan::call('command:export-information', [
                     'tenantDB'         => $connections->name,
@@ -131,16 +125,6 @@ class ImportationJob implements ShouldQueue
                     // Apenas termine vuelve a activar la importacion programada
                     $importation->updateOrInsert(['name_db' => $importation->name_db], ['state' => '1']);
                     
-                    return;
-                } else {
-                    // [Estado:4] => Significa que la importación finalizo
-                    Importation_Demand::updateOrInsert(
-                        ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
-                    );
-
-                    // Apenas termine vuelve a activar la importacion programada
-                    $importation->updateOrInsert(['name_db' => $importation->name_db], ['state' => '1']);
-
                     return;
                 }
 
