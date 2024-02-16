@@ -15,7 +15,7 @@ protected $fillable = ['consecutivo', 'codigo', 'dv', 'sucursal', 'razsoc', 'rep
 public $timestamps = false;
 
 public function scopeGetColumns(){
-    return 14;
+    return 13;
 }
 
 public function scopeCodPago($query){

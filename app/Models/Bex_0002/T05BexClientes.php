@@ -41,7 +41,7 @@ class T05BexClientes extends Model
     ];
     
     public function scopeGetColumns(){
-        return 16;
+        return 15;
     }
 
     public $timestamps = false;
