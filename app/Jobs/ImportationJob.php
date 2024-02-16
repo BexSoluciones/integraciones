@@ -71,7 +71,7 @@ class ImportationJob implements ShouldQueue
                 } else {
                     // [Estado:4] => Significa que la importación finalizo
                     Importation_Demand::updateOrInsert(
-                        ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
+                        ['consecutive' => $this->consecutive], ['state' => 5, 'updated_at' => $currentTime]
                     );
                     return;
                 }
