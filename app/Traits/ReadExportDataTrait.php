@@ -71,7 +71,10 @@ trait ReadExportDataTrait {
                 $columnsModelo = $modelInstance->getFillable();
                 $columnsCustomModelo = $modelInstance->getColumns();
             } else {
-                unset($columnsCustomModelo);
+                if(isset($columnsCustomModelo)) {
+                    unset($columnsCustomModelo);
+                }
+                
                 $columnsModelo = $modelInstance->getFillable();
             }
             
@@ -83,7 +86,7 @@ trait ReadExportDataTrait {
                     'type'        => $type,
                     'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => No se pudo leer el archivo plano '.$modelInstance
                 ]);
-                return 1;
+                // return 1;
             }
     
             // Split the content into lines
@@ -152,7 +155,7 @@ trait ReadExportDataTrait {
                     'type'  => $type,
                     'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => Error al insertar datos en la tabla '.$tableName
                 ]);
-                return 1;
+                // return 1;
             }
         } catch (\Exception $e) {
             Tbl_Log::create([
