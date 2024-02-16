@@ -68,12 +68,6 @@ class ImportationJob implements ShouldQueue
                         ['consecutive' => $this->consecutive], ['state' => 3, 'updated_at' => $currentTime]
                     );  
                     return;
-                } else {
-                    // [Estado:4] => Significa que la importación finalizo
-                    Importation_Demand::updateOrInsert(
-                        ['consecutive' => $this->consecutive], ['state' => 5, 'updated_at' => $currentTime]
-                    );
-                    return;
                 }
 
                 if($updateInformation == 1) {
@@ -82,6 +76,11 @@ class ImportationJob implements ShouldQueue
                         ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
                     );
                     return;
+                } else {
+                    // [Estado:4] => Significa que la importación finalizo
+                    Importation_Demand::updateOrInsert(
+                        ['consecutive' => $this->consecutive], ['state' => 3, 'updated_at' => $currentTime]
+                    );
                 }
              
                 $exportInformation = Artisan::call('command:export-information', [
