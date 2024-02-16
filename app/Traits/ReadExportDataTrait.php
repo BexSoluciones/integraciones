@@ -67,16 +67,6 @@ trait ReadExportDataTrait {
         try {
             $modelInstance = new $modelClass();
             $columnsModelo = $modelInstance->getFillable();
-
-            if($tableName == 't05_bex_clientes'){
-                $columnsCustomModelo = $modelInstance->getColumns();
-            } else {
-                if(isset($columnsCustomModelo)) {
-                    $this->info("la variable se destuye");
-                    unset($columnsCustomModelo);
-                }
-            }
-            
             $autoIncrement = 1;
             
             if ($content === false && $required == 1) {
@@ -91,7 +81,7 @@ trait ReadExportDataTrait {
             // Split the content into lines
             $lines = explode("\n", $content);
             $dataToInsert = [];
-
+           
             foreach ($lines as $line) {
                 // Verificar si la línea no está vacía antes de procesarla
                 if (!empty($line)) {
@@ -104,49 +94,45 @@ trait ReadExportDataTrait {
                     }else{
                         $columnsCount = count($columns);
                     }
-
-                    if($columnsCount > (isset($columnsCustomModelo) ? $columnsCustomModelo : count($columnsModelo))){
+             
+                    if($columnsCount > count($columnsModelo)){
                         Tbl_Log::create([
                             'id_table'    => $id_importation,
                             'type'        => $type,
                             'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => El numero de columnas es mayor al esperado.
                                                 => Tabla: '.$tableName.' 
                                                 => Columnas archivo plano: '.$columnsCount.', Columnas esperadas: '.count($columnsModelo).'
-                                                => Info linea archivo plano que ocasiona conflicto: '
-                        ]);                        
-                    } else {
-                        // Construct an associative array of data for insertion
-                        $rowData = [];
-
-                        // Fill rowData with values from $columns, up to the number of fillable columns
-                        for ($i = 0; $i < count($columns); $i++) {
-                            if ($tableName == 't05_bex_clientes' || $tableName == 't38_bex_entregas') {
-                                $j = $i + 1;
-                            } else {
-                                $j = $i;
-                            }
-                            $rowData[$columnsModelo[$j]] = isset($columns[$i]) ? trim($columns[$i]) : null;
-                        }
-
-                        // Insert the data into the array to be bulk-inserted
-                        if ($tableName == 't05_bex_clientes' && !empty($rowData)) {
-                            //Inserta un autoincrement
-                            $rowData['consecutivo'] = $autoIncrement++;
-                        }
-                        $dataToInsert[] = array_map('utf8_encode', $rowData);  
+                                                => Info linea archivo plano que ocasiona conflicto: '.json_encode($columns)
+                        ]);
                     }
-                   
+                    
+                    // Construct an associative array of data for insertion
+                    $rowData = [];
+                    // Fill rowData with values from $columns, up to the number of fillable columns
+                    for ($i = 0; $i < count($columns); $i++) {
+                        if ($tableName == 't05_bex_clientes' || $tableName == 't38_bex_entregas') {
+                            $j = $i + 1;
+                        } else {
+                            $j = $i;
+                        }
+                        $rowData[$columnsModelo[$j]] = isset($columns[$i]) ? trim($columns[$i]) : null;
+                    }
+                    
+                    // Insert the data into the array to be bulk-inserted
+                    if ($tableName == 't05_bex_clientes' && !empty($rowData)) {
+                        //Inserta un autoincrement
+                        $rowData['consecutivo'] = $autoIncrement++;
+                    }
+                    $dataToInsert[] = array_map('utf8_encode', $rowData);
                 }
             }
-
-            $this->info("cantidad de registros" . count($dataToInsert));
-
+            
             // Bulk insert the data into the corresponding model
             if ($modelInstance && !empty($dataToInsert)) {
                 $chunks = array_chunk($dataToInsert, 1000); // Divide en lotes de 1000 registros
                 foreach ($chunks as $chunk) {
                     DB::transaction(function () use ($modelInstance, $chunk, $tableName) {
-                        $modelInstance->insertOrIgnore($chunk);
+                        $modelInstance->insert($chunk);
                     });
                 }
                 $this->info("◘ Datos insertados en la tabla " . $tableName);
@@ -162,7 +148,7 @@ trait ReadExportDataTrait {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => ' . $e->getMessage()
+                'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => '.$e->getMessage()
             ]);
             return 1;
         }
