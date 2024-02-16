@@ -66,16 +66,15 @@ trait ReadExportDataTrait {
     private function processFileContent($modelClass, $content, $tableName, $id_importation, $type, $required,$separador) {
         try {
             $modelInstance = new $modelClass();
+            $columnsModelo = $modelInstance->getFillable();
 
             if($tableName == 't05_bex_clientes'){
-                $columnsModelo = $modelInstance->getFillable();
                 $columnsCustomModelo = $modelInstance->getColumns();
             } else {
                 if(isset($columnsCustomModelo)) {
+                    $this->info("la variable se destuye");
                     unset($columnsCustomModelo);
                 }
-                
-                $columnsModelo = $modelInstance->getFillable();
             }
             
             $autoIncrement = 1;
@@ -139,6 +138,8 @@ trait ReadExportDataTrait {
                    
                 }
             }
+
+            $this->info("cantidad de registros" . count($dataToInsert));
 
             // Bulk insert the data into the corresponding model
             if ($modelInstance && !empty($dataToInsert)) {
