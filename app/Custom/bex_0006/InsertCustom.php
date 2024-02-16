@@ -272,6 +272,7 @@ class InsertCustom
                     'tblmcliente.CODFPAGOVTA' => DB::raw('s1e_clientes.conpag'),
                     'tblmcliente.CODPRECIO' => DB::raw('s1e_clientes.precio'),
                     'tblmcliente.EMAIL' => DB::raw('s1e_clientes.email'),
+                    'tblmcliente.CUPO' => DB::raw('s1e_clientes.cupo'),
                     'tblmcliente.bloqueo' => DB::raw("IF(s1e_clientes.bloqueo=1, 'S', 'N')") 
                 ]);
             print '◘ Datos actualizados en la tabla tblmcliente' . PHP_EOL;
