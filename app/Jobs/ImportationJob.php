@@ -81,6 +81,7 @@ class ImportationJob implements ShouldQueue
                     Importation_Demand::updateOrInsert(
                         ['consecutive' => $this->consecutive], ['state' => 3, 'updated_at' => $currentTime]
                     );
+                    return;
                 }
              
                 $exportInformation = Artisan::call('command:export-information', [
