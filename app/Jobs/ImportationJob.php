@@ -132,7 +132,9 @@ class ImportationJob implements ShouldQueue
                     $importation->updateOrInsert(['name_db' => $importation->name_db], ['state' => '1']);
                     
                     return;
-                } else {
+                }
+
+                if($updateInformation == 1) {
                     // [Estado:4] => Significa que la importación finalizo
                     Importation_Demand::updateOrInsert(
                         ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
@@ -140,14 +142,11 @@ class ImportationJob implements ShouldQueue
 
                     // Apenas termine vuelve a activar la importacion programada
                     $importation->updateOrInsert(['name_db' => $importation->name_db], ['state' => '1']);
-
                     return;
-                }
-
-                if($updateInformation == 1) {
+                } else {
                     // [Estado:4] => Significa que la importación finalizo
                     Importation_Demand::updateOrInsert(
-                        ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
+                        ['consecutive' => $this->consecutive], ['state' => 3, 'updated_at' => $currentTime]
                     );
 
                     // Apenas termine vuelve a activar la importacion programada
