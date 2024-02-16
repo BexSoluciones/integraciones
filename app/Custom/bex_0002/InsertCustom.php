@@ -236,6 +236,7 @@ class InsertCustom
                     'tblmcliente.TELCLIENTE' => DB::raw('s1e_clientes.telefono'),
                     'tblmcliente.CODFPAGOVTA' => DB::raw('s1e_clientes.conpag'),
                     'tblmcliente.CODPRECIO' => DB::raw('s1e_clientes.precio'),
+                    'tblmcliente.CUPO' => DB::raw('s1e_clientes.cupo'),
                     'tblmcliente.EMAIL' => DB::raw('s1e_clientes.email') 
                 ]);
             print '◘ Datos actualizados en la tabla tblmcliente' . PHP_EOL;
@@ -912,11 +913,11 @@ class InsertCustom
                     ->insertUsing([
                         'codunidademp', 'NOMUNIDADEMP'
                     ],function ($query) {
-                        $query->selectRaw('codunidademp,codunidademp as NOMUNIDADEMP')
+                        $query->select('codunidademp', DB::raw('CONCAT(codunidademp) AS NOMUNIDADEMP'))
                         ->from('s1e_productos')
                         ->where('estadounidademp', 'A')
                         ->where('codigo','<>','')
-                        ->get();
+                        ->groupBy('codunidademp');
                     }
                 );
                 print '◘ Datos Actualizados en la tabla tblmunidademp' . PHP_EOL;
@@ -934,21 +935,21 @@ class InsertCustom
                 ->where('codigo','<>','')
                 ->get();   
 
-            if( count($insertProveed) > 0){
-                DB::connection($conectionBex)
-                    ->table('tblmproveedor')
-                    ->insertUsing([
-                        'CODPROVEEDOR', 'NOMPROVEEDOR'
-                    ],function ($query) {
-                        $query->selectRaw('codunidademp,codunidademp as NOMUNIDADEMP')
-                        ->from('s1e_productos')
-                        ->where('estadoproveedor', 'A')
-                        ->where('codigo','<>','')
-                        ->get();
-                    }
-                );
-                print '◘ Datos Actualizados en la tabla tblmproveedor' . PHP_EOL;
-            }
+                if( count($insertProveed) > 0){
+                    DB::connection($conectionBex)
+                        ->table('tblmproveedor')
+                        ->insertUsing([
+                            'CODPROVEEDOR', 'NOMPROVEEDOR'
+                        ],function ($query) {
+                            $query->select('codproveedor', DB::raw('CONCAT(nomproveedor) as NOMPROVEEDOR'))
+                            ->from('s1e_productos')
+                            ->where('estadoproveedor', 'A')
+                            ->where('codigo','<>','')
+                            ->groupBy('codproveedor');
+                        }
+                    );
+                    print '◘ Datos Actualizados en la tabla tblmproveedor' . PHP_EOL;
+                }
             
             DB::connection($conectionBex)
                 ->table('tblmproducto')
