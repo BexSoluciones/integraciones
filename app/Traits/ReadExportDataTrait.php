@@ -71,7 +71,7 @@ trait ReadExportDataTrait {
                 $columnsModelo = $modelInstance->getFillable();
                 $columnsCustomModelo = $modelInstance->getColumns();
             } else {
-                
+                unset($columnsCustomModelo);
                 $columnsModelo = $modelInstance->getFillable();
             }
             
