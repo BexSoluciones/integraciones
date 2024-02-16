@@ -162,7 +162,7 @@ trait ReadExportDataTrait {
             Tbl_Log::create([
                 'id_table'    => $id_importation,
                 'type'        => $type,
-                'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => '
+                'descripcion' => 'Traits::ReadExportDataTrait[processFileContent()] => ' . $e->getMessage()
             ]);
             return 1;
         }
