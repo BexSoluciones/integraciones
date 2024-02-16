@@ -105,14 +105,6 @@ class UpdateInformation extends Command {
             //Function to read and export flat file to tenant DB
             $flatFile = $this->readFlatFile($db, $id_importation, $type, $area,$config->separador);
 
-            DB::connection('mysql')->table('tbl_log')->insert([
-                'id_table'    => $id_importation,
-                'type'        => $type,
-                'descripcion' => $flatFile,
-                'created_at'  => now(),
-                'updated_at'  => now()
-            ]);
-
             if($flatFile == 1){
                 return 1;
             }
