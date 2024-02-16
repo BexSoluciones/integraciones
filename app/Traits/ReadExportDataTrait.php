@@ -105,7 +105,7 @@ trait ReadExportDataTrait {
                         $columnsCount = count($columns);
                     }
 
-                    if($columnsCount > ($columnsCustomModelo ?? count($columnsModelo))){
+                    if($columnsCount > (isset($columnsCustomModelo) ? $columnsCustomModelo : count($columnsModelo))){
                         Tbl_Log::create([
                             'id_table'    => $id_importation,
                             'type'        => $type,
