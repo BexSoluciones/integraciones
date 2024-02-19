@@ -56,7 +56,8 @@ trait GetOrderTrait {
                                 tbldmovdet.codbodega,cantidadmov,tbldmovenc.codprecio,preciomov,dcto1mov,dcto2mov,dcto3mov,
                                 dcto4mov,pluproducto,nomunidademp,tblmproducto.codunidademp,mensajemov,dctopiefacaut,dctonc,
                                 numvisita,fechorfinvisita,fechorentregacli,origen,ordendecompra,tblmvendedor.cedula,
-                                tbldmovdet.prepack,ivamov,nomproducto'.$iva)
+                                tbldmovdet.prepack,ivamov,nomproducto,dctovalor,tblmvendedor.tercvendedor,tbldmovdet.bonificado,tblmproducto.codproveedor,
+                                tbldmovdet.ocultoporcval,tbldmovenc.codtipodoc,tbldmovenc.prefmov,tbldmovenc.numcierre,estadoenviows,tblmproducto.ccostos'.$iva)
                     ->orderBy('tbldmovenc.nummov','asc')
                     ->orderBy('tbldmovdet.codmovdet','asc')
                     ->get();

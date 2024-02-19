@@ -1363,6 +1363,7 @@ class InsertCustom
                     ->join('s1e_vendedores','tblmvendedor.TERCVENDEDOR','=','s1e_vendedores.tercvendedor')
                     ->update([
                         'tblmvendedor.CO' => DB::raw('s1e_vendedores.centroop'),
+                        'tblmvendedor.CODBODEGA' => DB::raw('s1e_vendedores.bodega'),
                         'tblmvendedor.NOMVENDEDOR' => DB::raw('s1e_vendedores.nomvendedor')]);
                 print "◘ Datos actualizados en la tabla s1e_vendedores" . PHP_EOL;
 
