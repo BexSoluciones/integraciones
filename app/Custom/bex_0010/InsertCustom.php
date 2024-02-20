@@ -1477,19 +1477,16 @@ class InsertCustom
                         ];
                         DB::connection($conectionBex)->table('tblsusugru')->insert($dataToInsertGroup);
                         print "◘ Datos insertados en la tabla tblsusugru" . PHP_EOL;
-                    }
-                }
 
-                $dataToInsert=[];
-                if(count($NuevoVend)>0){
-                    foreach($NuevoVend as $vendedor){
-                        $dataToInsert[] = [
-                            'CODUSUARIO' => $vendedor->tercvendedor,
+
+                        $dataToInsertEmp=[];
+                        $dataToInsertEmp[] = [
+                            'CODUSUARIO' => $vendedor['CODVENDEDOR'],
                             'CODEMPRESA' => '001'
                         ];
+                        DB::connection($conectionBex)->table('tbldusuarioempresa')->insert($dataToInsertEmp);
+                        print '◘ Datos insertados en la tabla tbldusuarioempresa' . PHP_EOL;
                     }
-                    DB::connection($conectionBex)->table('tbldusuarioempresa')->insert($dataToInsert);
-                    print '◘ Datos insertados en la tabla tbldusuarioempresa' . PHP_EOL;
                 }
             }else{
                 print '◘ No hay datos para insertar en la tabla vendedores' . PHP_EOL;
