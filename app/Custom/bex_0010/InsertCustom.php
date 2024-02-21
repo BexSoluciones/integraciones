@@ -1317,14 +1317,15 @@ class InsertCustom
                 print '◘ Datos insertados en la tabla tblmportafolio' . PHP_EOL;
             }
             
-            $inset = count($datosAInsertar);
+            $datosAInsert = json_decode(json_encode($datosAInsertar,true));
+            $inset = count($datosAInsert);
 
             if ($inset > 0) {
                 // Trunca la tabla
                 DB::connection($conectionBex)->table('s1e_vendedores')->truncate();
                 print "◘ Tabla s1e_vendedores truncada" . PHP_EOL;
 
-                foreach ($datosAInsertar as &$dato) {
+                foreach ($datosAInsert as &$dato) {
                     foreach ($dato as $key => &$value) {
                         $value = iconv("UTF-8", "ISO-8859-1//TRANSLIT", $value);
                     }
@@ -1333,7 +1334,7 @@ class InsertCustom
                 unset($value); // Desvincula la última referencia a $value
 
                 $dataToInsert = [];
-                foreach ($datosAInsertar as $dato) {
+                foreach ($datosAInsert as $dato) {
                     $dataToInsert[] = [
                         'compania'      => $dato->compania,
                         'tercvendedor'  => $dato->tercvendedor,
@@ -1359,6 +1360,7 @@ class InsertCustom
                     ->join('s1e_vendedores','tblmvendedor.TERCVENDEDOR','=','s1e_vendedores.tercvendedor')
                     ->update([
                         'tblmvendedor.CO' => DB::raw('s1e_vendedores.centroop'),
+                        'tblmvendedor.CODBODEGA' => DB::raw('s1e_vendedores.bodega'),
                         'tblmvendedor.NOMVENDEDOR' => DB::raw('s1e_vendedores.nomvendedor')]);
                 print "◘ Datos actualizados en la tabla s1e_vendedores" . PHP_EOL;
 
@@ -1475,19 +1477,16 @@ class InsertCustom
                         ];
                         DB::connection($conectionBex)->table('tblsusugru')->insert($dataToInsertGroup);
                         print "◘ Datos insertados en la tabla tblsusugru" . PHP_EOL;
-                    }
-                }
 
-                $dataToInsert=[];
-                if(count($NuevoVend)>0){
-                    foreach($NuevoVend as $vendedor){
-                        $dataToInsert[] = [
-                            'CODUSUARIO' => $vendedor->tercvendedor,
+
+                        $dataToInsertEmp=[];
+                        $dataToInsertEmp[] = [
+                            'CODUSUARIO' => $vendedor['CODVENDEDOR'],
                             'CODEMPRESA' => '001'
                         ];
+                        DB::connection($conectionBex)->table('tbldusuarioempresa')->insert($dataToInsertEmp);
+                        print '◘ Datos insertados en la tabla tbldusuarioempresa' . PHP_EOL;
                     }
-                    DB::connection($conectionBex)->table('tbldusuarioempresa')->insert($dataToInsert);
-                    print '◘ Datos insertados en la tabla tbldusuarioempresa' . PHP_EOL;
                 }
             }else{
                 print '◘ No hay datos para insertar en la tabla vendedores' . PHP_EOL;
