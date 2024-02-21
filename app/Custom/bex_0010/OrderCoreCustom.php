@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Custom\bex_0008;
+namespace App\Custom\bex_0010;
 
 use App\Models\Tbl_Log;
 use App\Models\Ws_Config;
@@ -193,7 +193,7 @@ class OrderCoreCustom
                 $lines = explode("\n", $chain);
 
                 $namefile = $closing.'_'.$order[0]->nummov. '.txt';
-                Storage::disk('public')->put('export/bex_0008/bexmovil/pedidos_txt/' . $namefile, $chain); dd('finalizar');// CAMBIAR EL NOMBRE DE LA COMPAÑIA
+                Storage::disk('public')->put('export/bex_0010/bexmovil/pedidos_txt/' . $namefile, $chain); dd('finalizar');// CAMBIAR EL NOMBRE DE LA COMPAÑIA
                 $xmlOrder = $this->crearXmlPedido($lines, $order[0]->nummov);
                 dd($xmlOrder);
                 if (!$this->existePedidoSiesa($cia['IdCia'], $order['TIPODOC'], str_pad($order['NUMMOV'], 15, "Y", STR_PAD_LEFT)) && $import === true) {
@@ -242,7 +242,7 @@ class OrderCoreCustom
             
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::bex_0008/OrderCoreCustom[uploadOrder()] => '.$e->getMessage()
+                'descripcion' => 'Custom::bex_0010/OrderCoreCustom[uploadOrder()] => '.$e->getMessage()
             ]);
             return print '▲ Error en uploadOrder';
         }

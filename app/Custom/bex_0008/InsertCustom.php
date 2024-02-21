@@ -1364,7 +1364,8 @@ class InsertCustom
                     ->update([
                         'tblmvendedor.CO' => DB::raw('s1e_vendedores.centroop'),
                         'tblmvendedor.CODBODEGA' => DB::raw('s1e_vendedores.bodega'),
-                        'tblmvendedor.NOMVENDEDOR' => DB::raw('s1e_vendedores.nomvendedor')]);
+                        'tblmvendedor.NOMVENDEDOR' => DB::raw('s1e_vendedores.nomvendedor'),
+                        'tblmvendedor.TIPODOC' => DB::raw('s1e_vendedores.tipodoc')]);
                 print "◘ Datos actualizados en la tabla s1e_vendedores" . PHP_EOL;
 
                  
