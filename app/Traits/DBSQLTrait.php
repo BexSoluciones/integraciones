@@ -50,7 +50,7 @@ trait DBSQLTrait {
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
                     'type'        => $type,
-                    'descripcion' => 'Traits::DBSQLTrait[sentencesDBSQL()] => '.$e->getMessage()
+                    'descripcion' => 'Traits::DBSQLTrait[sentencesDBSQL()] => No se pudo realizar backup archivos planos'
                 ]);
                 return 1;
             }

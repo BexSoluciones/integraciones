@@ -22,7 +22,7 @@ trait BackupFlatFileTrait {
             
             //List flat file 
             $files = Storage::files($flatFilesRoute);
-            
+        
             foreach ($files as $file) {
                 // Check if the file is a .txt file
                 if (pathinfo($file, PATHINFO_EXTENSION) === 'txt') {
@@ -30,9 +30,10 @@ trait BackupFlatFileTrait {
                     $fileName = pathinfo($file, PATHINFO_BASENAME);
                     // Move the file to the destination folder
                     Storage::move($file, $backupRoute.'/'.$fileName);
-
-                    //dd(storage_path($backupRoute.'/'.$fileName));
-                    chmod(storage_path($backupRoute), 0777);
+                    // Get the new file path
+                    $newFilePath = storage_path('app/'.$backupRoute.'/'.$fileName);
+                    // Change permissions of the file
+                    chmod($newFilePath, 0777);
                 }
             }
             
