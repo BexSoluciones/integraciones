@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Custom\bex_0008;
+namespace App\Custom\bex_0011;
 
 use App\Models\Tbl_Log;
 use App\Models\Ws_Config;
@@ -10,19 +10,21 @@ use App\Models\Connection_Bexsoluciones;
 use Illuminate\Support\Facades\DB;
 use App\Models\LogErrorImportacionModel;
 use App\Traits\ConnectionTrait;
+use App\Traits\ConsultOrderTrait;
+use App\Traits\WebServiceSiesaTrait;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class OrderCoreCustom
 {
-    use ConnectionTrait;
+    use ConnectionTrait, ConsultOrderTrait, WebServiceSiesaTrait;
 
     public function uploadOrder($order, $cia, $closing, $connection_id)
     {
         $id_connection = Connection_Bexsoluciones::where('id', $connection_id)->value('connection_id');
         $db = Connection::where('id', $id_connection)->value('name');
-       
+
         $configDB = $this->connectionDB($db, 'local'); 
         if($configDB != 0){
             DB::connection('mysql')->table('tbl_log')->insert([
@@ -36,7 +38,6 @@ class OrderCoreCustom
         }
         
         $config = Ws_Config::where('estado', 1)->first();
-        Log::info($order);
         try{
             if (count($order) > 0) {
                 // {PENDIENTE VENDEDORES Y CLIENTES}
@@ -192,12 +193,15 @@ class OrderCoreCustom
 
                 $lines = explode("\n", $chain);
 
+                $nummov = str_pad($order[0]->nummov, 10, "0", STR_PAD_LEFT);
+
+
                 $namefile = $closing.'_'.$order[0]->nummov. '.txt';
-                Storage::disk('public')->put('export/bex_0008/bexmovil/pedidos_txt/' . $namefile, $chain); dd('finalizar');// CAMBIAR EL NOMBRE DE LA COMPAÑIA
-                $xmlOrder = $this->crearXmlPedido($lines, $order[0]->nummov);
-                dd($xmlOrder);
-                if (!$this->existePedidoSiesa($cia['IdCia'], $order['TIPODOC'], str_pad($order['NUMMOV'], 15, "Y", STR_PAD_LEFT)) && $import === true) {
-                    // Log::info("ejecutando funcion ".__FUNCTION__." .Pedido = ".$order['NUMMOV']);
+                Storage::disk('public')->put('export/bex_0011/bexmovil/pedidos_txt/' . $namefile, $chain);// CAMBIAR EL NOMBRE DE LA COMPAÑIA
+                $xmlOrder = $this->createXmlOrder($lines, $nummov, $config);
+          
+                if (!$this->existePedidoSiesa($config, $order[0]->tipodoc, $nummov) && $import == true) {
+                    
                     $resp = $this->getWebServiceSiesa(28)->importarXml($xmlOrder);
                     if (!is_array($resp) && empty($resp)) {
                         $error = 'Ok';
@@ -242,9 +246,26 @@ class OrderCoreCustom
             
         } catch (\Exception $e) {
             Tbl_Log::create([
-                'descripcion' => 'Custom::bex_0008/OrderCoreCustom[uploadOrder()] => '.$e->getMessage()
+                'descripcion' => 'Custom::bex_0011/OrderCoreCustom[uploadOrder()] => '.$e->getMessage()
             ]);
             return print '▲ Error en uploadOrder';
         }
+    }
+
+    private function existePedidoSiesa($config, $tipodoc, $nummov){
+        $SQLnew = '
+            SET QUOTED_IDENTIFIER OFF;
+            SELECT 1
+            FROM t430_cm_pv_docto
+            WHERE f430_id_cia = "'.$config['IdCia'].'"
+            AND f430_id_tipo_docto = "'.$tipodoc.'"
+            AND f430_num_docto_referencia = "'.$nummov.'"; 
+            SET QUOTED_IDENTIFIER ON;
+            ';
+        
+        $consulta = $this->structureXML($config['NombreConexion'], $config['IdCia'], $config['IdProveedor'], $config['Usuario'], $config['Clave'], $SQLnew, $config['IdConsulta'], 1, 0);
+        dd($consulta);
+        $x = $this->SOAP($config['url'], $consulta, $config['IdConsulta']);
+        dd($x);
     }
 }
