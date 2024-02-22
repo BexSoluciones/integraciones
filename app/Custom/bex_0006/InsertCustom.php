@@ -265,7 +265,7 @@ class InsertCustom
                 ->join('s1e_clientes','tblmcliente.codcliente','=','s1e_clientes.codcliente')
                 ->whereColumn('tblmcliente.nitcliente','s1e_clientes.codigo')
                 ->update([
-                    'tblmcliente.RAZCLIENTE' => DB::raw('s1e_clientes.razsoc'),
+                    'tblmcliente.RAZCLIENTE' => DB::raw("IF(s1e_clientes.bloqueo=1, CONCAT(s1e_clientes.razsoc,' ', '*BLOQUEADO*'), s1e_clientes.razsoc)"),
                     'tblmcliente.NOMCLIENTE' => DB::raw('s1e_clientes.representante'),
                     'tblmcliente.DIRCLIENTE' => DB::raw('s1e_clientes.direccion'),
                     'tblmcliente.TELCLIENTE' => DB::raw('s1e_clientes.telefono'),
@@ -947,22 +947,22 @@ class InsertCustom
                 }
             }
 
-            DB::connection($conectionBex)
-                ->table('s1e_productos')
-                ->update([
-                    'codunidademp' => DB::raw("CASE 
-                        WHEN codunidademp = 'Kilogramo' THEN 'KIL'
-                        WHEN codunidademp = 'Millar' THEN 'MIL'
-                        WHEN codunidademp = 'Rollo' THEN 'ROL'
-                        WHEN codunidademp = 'Caja' THEN 'CAJ'
-                        WHEN codunidademp = 'Libra' THEN 'LIB'
-                        WHEN codunidademp = 'Gruesa' THEN 'GRU'
-                        WHEN codunidademp = 'Cubeta' THEN 'CUB'
-                        WHEN codunidademp = 'Unidad' THEN 'UND'
-                        ELSE ''
-                    END")
-                ]);
-            // Update estado_unidademp tabla s1e_productos
+            // DB::connection($conectionBex)
+            //     ->table('s1e_productos')
+            //     ->update([
+            //         'codunidademp' => DB::raw("CASE 
+            //             WHEN codunidademp = 'Kilogramo' THEN 'KIL'
+            //             WHEN codunidademp = 'Millar' THEN 'MIL'
+            //             WHEN codunidademp = 'Rollo' THEN 'ROL'
+            //             WHEN codunidademp = 'Caja' THEN 'CAJ'
+            //             WHEN codunidademp = 'Libra' THEN 'LIB'
+            //             WHEN codunidademp = 'Gruesa' THEN 'GRU'
+            //             WHEN codunidademp = 'Cubeta' THEN 'CUB'
+            //             WHEN codunidademp = 'Unidad' THEN 'UND'
+            //             ELSE ''
+            //         END")
+            //     ]);
+             // Update estado_unidademp tabla s1e_productos
             DB::connection($conectionBex)
                 ->table('s1e_productos')
                 ->join('tblmunidademp','s1e_productos.codunidademp','=','tblmunidademp.codunidademp')

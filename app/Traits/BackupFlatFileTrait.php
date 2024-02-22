@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 trait BackupFlatFileTrait {
     
-    public function backupFlatFile($db, $estado){
+    public function backupFlatFile($db, $estado, $id_importation = null, $type = null){
         try {
             if($estado == true){
                 $flatFilesRoute = 'imports/'.$db.'/planos';
@@ -22,7 +22,7 @@ trait BackupFlatFileTrait {
             
             //List flat file 
             $files = Storage::files($flatFilesRoute);
-
+        
             foreach ($files as $file) {
                 // Check if the file is a .txt file
                 if (pathinfo($file, PATHINFO_EXTENSION) === 'txt') {
@@ -30,9 +30,13 @@ trait BackupFlatFileTrait {
                     $fileName = pathinfo($file, PATHINFO_BASENAME);
                     // Move the file to the destination folder
                     Storage::move($file, $backupRoute.'/'.$fileName);
+                    // Get the new file path
+                    $newFilePath = storage_path('app/'.$backupRoute.'/'.$fileName);
+                    // Change permissions of the file
+                    chmod($newFilePath, 0777);
                 }
             }
-
+            
             if($estado == true){
                 $this->info('◘ Copia de seguridad archivos planos '.$db.' realizada con exito');
             }else{
