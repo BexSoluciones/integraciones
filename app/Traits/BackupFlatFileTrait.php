@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 trait BackupFlatFileTrait {
     
-    public function backupFlatFile($db, $estado, $id_importation, $type){
+    public function backupFlatFile($db, $estado, $id_importation = null, $type = null){
         try {
             if($estado == true){
                 $flatFilesRoute = 'imports/'.$db.'/planos';

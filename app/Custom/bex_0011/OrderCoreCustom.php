@@ -28,8 +28,8 @@ class OrderCoreCustom
         $configDB = $this->connectionDB($db, 'local'); 
         if($configDB != 0){
             DB::connection('mysql')->table('tbl_log')->insert([
-                'id_table'    => $id_importation,
-                'type'        => $type,
+                'id_table'    => null,
+                'type'        => null,
                 'descripcion' => 'Commands::OrderCoreCustom[uploadOrder()] => Conexion Local: Linea '.__LINE__.'; '.$configDB,
                 'created_at'  => now(),
                 'updated_at'  => now()
@@ -54,7 +54,7 @@ class OrderCoreCustom
                 $chain .= '1'; //Indicador de contactodd
                 $chain .= $order[0]->co; //Centro de operación del documento
                 $chain .= $order[0]->tipodoc; //Tipo de documento
-                $chain .= str_pad($order[0]->numvisita, 8, "0", STR_PAD_LEFT); //Numero documento
+                $chain .= str_pad($order[0]->nummov, 8, "0", STR_PAD_LEFT); //Numero documento
                 $chain .= substr($order[0]->fecmov, 0, 4).substr($order[0]->fecmov, 5, 2).substr($order[0]->fecmov, 8, 2); //Fecha del documento
                 $chain .= '502'; //Clase interna del documento
                 $chain .= '2'; //Estado del documento
@@ -66,7 +66,7 @@ class OrderCoreCustom
                 if($order[0]->origen == 'B2B'){
                     $chain.=str_pad("0003",4," ",STR_PAD_LEFT);
                 }else{
-                    $chain.=str_pad("0001",4," ",STR_PAD_LEFT);
+                    $chain.=str_pad("CL01",4," ",STR_PAD_LEFT);
                 }
                 $chain .= str_pad($order[0]->co,3,"0",STR_PAD_LEFT); //Centro de operacion de la factura
                 if($order[0]->fechorentregacli >= $order[0]->fecmov){
@@ -81,9 +81,9 @@ class OrderCoreCustom
                     $chain .= str_pad($order[0]->nummov, 15, "Y", STR_PAD_LEFT); //Orden de compra del Documento
                 }
                 $chain .= str_pad($order[0]->nummov, 10, "0", STR_PAD_LEFT); //Referencia del documento
-                $chain .= str_pad('GENERICO', 10, " ", STR_PAD_RIGHT); //Codigo de cargue del documento
+                $chain .= str_pad('', 10, " ", STR_PAD_RIGHT); //Codigo de cargue del documento
                 $chain .= 'COP'; //Codigo de moneda del documento
-                $chain .= 'COP'; //Moneda base de conversión {PENDIENTE CONVERSION}
+                $chain .= 'USD'; //Moneda base de conversión {PENDIENTE CONVERSION}
                 $chain .= '00000001.0000'; //Tasa de conversión
                 $chain .= 'COP'; //Moneda local
                 $chain .= '00000001.0000'; //Tasa local
@@ -120,26 +120,26 @@ class OrderCoreCustom
                         $chain="";
                         $chain.=str_pad($counter,7,"0",STR_PAD_LEFT);
                         $chain.="0431";
-                        $chain.="0003".$cia['ciasiesa'];
-                        $chain.=str_pad($order['CO'],3,"0",STR_PAD_LEFT);
-                        $chain.=str_pad($order['tipodoc'],3," ",STR_PAD_LEFT);
-                        $chain.=str_pad($order['numvisita'],8,"0",STR_PAD_LEFT);
+                        $chain.="0003".$config['IdCia'];
+                        $chain.=str_pad($order[0]->co,3,"0",STR_PAD_LEFT);
+                        $chain.=str_pad($order[0]->tipodoc,3," ",STR_PAD_LEFT);
+                        $chain.=str_pad($order[0]->numvisita,8,"0",STR_PAD_LEFT);
                         $chain.="0002432";
                         $chain.=str_pad("",50," ",STR_PAD_LEFT);
                         $chain.=str_pad("",20," ",STR_PAD_LEFT);
-                        $chain.=str_pad($order['codproducto'],7," ",STR_PAD_RIGHT);
+                        $chain.=str_pad($orderDetail->codproducto,7," ",STR_PAD_RIGHT);
                         $chain.=str_pad("",13," ",STR_PAD_LEFT);
-                        $chain.=str_pad(trim($order['codbodega']),5," ",STR_PAD_RIGHT);
+                        $chain.=str_pad(trim($orderDetail->codbodega),5," ",STR_PAD_RIGHT);
                         $chain.="501";
                         $chain.="01";
-                        $chain.=str_pad($order['CO'],3,"0",STR_PAD_LEFT);
+                        $chain.=str_pad($order[0]->co,3,"0",STR_PAD_LEFT);
                         $chain.=str_pad("99",20," ",STR_PAD_RIGHT); #Error siesa debe ser espacios
                         $chain.=str_pad("",15," ",STR_PAD_LEFT);
                         $chain.=str_pad("",15," ",STR_PAD_LEFT);
-                        $chain.=substr($order['fecmov'],0,4).substr($order['fecmov'],5,2).substr($order['fecmov'],8,2);
+                        $chain.=substr($order[0]->fecmov,0,4).substr($order[0]->fecmov,5,2).substr($order[0]->fecmov,8,2);
                         $chain.="000";
-                        $chain.=str_pad($order['codprecio'],3," ",STR_PAD_RIGHT);
-                        $chain.=str_pad(number_format($order['cantidadmov'],0,"",""),15,"0",STR_PAD_LEFT);
+                        $chain.=str_pad($order[0]->codprecio,3," ",STR_PAD_RIGHT);
+                        $chain.=str_pad(number_format($orderDetail->cantidadmov,0,"",""),15,"0",STR_PAD_LEFT);
                         $chain.=".0000";
                         $chain.=str_pad("",255," ",STR_PAD_LEFT);
                         $chain.=str_pad("",2000," ",STR_PAD_LEFT);
@@ -164,7 +164,7 @@ class OrderCoreCustom
                         $chain .= '01'; //Motivo
                         $chain .= '0'; //Indicador de obsequio
                         $chain .= $order[0]->co; //Centro de operacion movimiento
-                        $chain .= str_pad('01', 20, " ", STR_PAD_RIGHT); //Unidad de negocio movimiento
+                        $chain .= str_pad('003', 20, " ", STR_PAD_RIGHT); //Unidad de negocio movimiento
                         $chain .= str_pad('', 15, " ", STR_PAD_LEFT); //Centro de costo movimiento
                         $chain .= str_pad('', 15, " ", STR_PAD_LEFT); //Proyecto
                         if($order[0]->fechorentregacli >= $order[0]->fecmov){
@@ -199,19 +199,18 @@ class OrderCoreCustom
                 $namefile = $closing.'_'.$order[0]->nummov. '.txt';
                 Storage::disk('public')->put('export/bex_0011/bexmovil/pedidos_txt/' . $namefile, $chain);// CAMBIAR EL NOMBRE DE LA COMPAÑIA
                 $xmlOrder = $this->createXmlOrder($lines, $nummov, $config);
-          
+
                 if (!$this->existePedidoSiesa($config, $order[0]->tipodoc, $nummov) && $import == true) {
-                    
-                    $resp = $this->getWebServiceSiesa(28)->importarXml($xmlOrder);
+                    $resp = $this->importarXml($xmlOrder,$config['url']);
                     if (!is_array($resp) && empty($resp)) {
-                        $error = 'Ok';
+                        $envio = 'Ok';
                         $estado = "2";
-                        $this->logErrorImportarPedido($error, $estado, $order['CO'], $orderDetail['CODBODEGA'], $order['TIPODOC'], $order['NUMMOV']);
+                        $this->estadoRegistro($envio, $estado, $order[0]->codvendedor, $order[0]->nummov,$cia);
                     } else {
                         if (is_array($resp)) {
                             $error=$resp['error'];
-                            $estado = "4";
-                            $this->logErrorImportarPedido($error, $estado, $order['CO'], $orderDetail['CODBODEGA'], $order['TIPODOC'], $order['NUMMOV']);
+                            $estado = "3";
+                            $this->estadoRegistro($error, $estado, $order[0]->codvendedor, $order[0]->nummov,$cia);
                         } else {
                             $mensaje = "";
                             foreach ($resp->NewDataSet->Table as $key => $errores) {
@@ -224,24 +223,26 @@ class OrderCoreCustom
                             }
 
                             if (strrpos($error, "el tercero vendedor no existe o no esta configurado como vendedor")!==false) {
-                                $error.=" Nombre vendedor: ".$order['vendedor']." Cedula vendedor: ".$order['cedula_vendedor'];
+                                $error.=" Nombre vendedor: ".$order[0]->nomvendedor." Cedula vendedor: ".$order[0]->codvendedor;
                                 $estado = "3";
-                                $this->logErrorImportarPedido($error, $estado, $order['CO'], $orderDetail['CODBODEGA'], $order['TIPODOC'], $order['NUMMOV']);
+                                $this->estadoRegistro($error, $estado, $order[0]->codvendedor, $order[0]->nummov,$cia);
                             } else {
                                 $estado = "3";
-                                $this->logErrorImportarPedido($error, $estado, $order['CO'], $orderDetail['CODBODEGA'], $order['TIPODOC'], $order['NUMMOV']);
+                                $this->estadoRegistro($error, $estado, $order[0]->codvendedor, $order[0]->nummov,$cia);
                             }
                         }
                     }
-                } elseif ($this->existePedidoSiesa($cia['IdCia'], $order['TIPODOC'], str_pad($order['NUMMOV'], 15, "Y", STR_PAD_LEFT))) {
+                } elseif ($this->existePedidoSiesa($config, $order[0]->tipodoc, $nummov)) {
                     $error = "Este pedido ya fue registrado anteriormente, por favor verificar. Fecha de ejecucion: " . date('Y-m-d h:i:s');
                     $estado = "2";
-                    $this->logErrorImportarPedido($error, $estado, $order['CO'], $orderDetail['CODBODEGA'], $order['TIPODOC'], $order['NUMMOV']);
+
+                    $this->estadoRegistro($error, $estado, $order[0]->codvendedor, $order[0]->nummov,$cia);
+                    return 0;
                 }
             } else {
                 $error = 'El pedido no tiene productos asignados';
                 $estado = "3";
-                $this->logErrorImportarPedido($error, $estado, $order['CO'],  $order['TIPODOC'], $order['NUMMOV']);
+                $this->estadoRegistro($error, $estado, $order[0]->codvendedor, $order[0]->nummov,$cia);
             }
             
         } catch (\Exception $e) {
@@ -259,13 +260,33 @@ class OrderCoreCustom
             FROM t430_cm_pv_docto
             WHERE f430_id_cia = "'.$config['IdCia'].'"
             AND f430_id_tipo_docto = "'.$tipodoc.'"
-            AND f430_num_docto_referencia = "'.$nummov.'"; 
+            AND f430_referencia = "'.$nummov.'"; 
             SET QUOTED_IDENTIFIER ON;
             ';
         
         $consulta = $this->structureXML($config['NombreConexion'], $config['IdCia'], $config['IdProveedor'], $config['Usuario'], $config['Clave'], $SQLnew, $config['IdConsulta'], 1, 0);
-        dd($consulta);
-        $x = $this->SOAP($config['url'], $consulta, $config['IdConsulta']);
-        dd($x);
+        // dd($consulta);
+        $result = $this->SOAP($config['url'], $consulta, $config['IdConsulta']);
+        return $result;
+    }
+
+    private function estadoRegistro($envio, $estado, $vendedor, $nummov,$cia){
+        $platafor_pi288 = Connection_Bexsoluciones::where('name', $cia->bdlicencias)->first();
+                    $config = $this->connectionDB($platafor_pi288->id, 'externa', $platafor_pi288->area);
+                    if($config != 0){
+                        DB::connection('mysql')->table('tbl_log')->insert([
+                            'descripcion' => 'Trait::OrderCoreCustom[uploadOrder()] => Conexion Externa: '.$config,
+                            'created_at'  => now(),
+                            'updated_at'  => now()
+                        ]);
+                        return 1;
+                    }
+
+                    DB::connection($platafor_pi288->name)
+                        ->table('tbldmovenc')
+                        ->where('NUMMOV',  $nummov)
+                        ->where('CODTIPODOC', '4')
+                        ->where('codvendedor', $vendedor)
+                        ->update(['estadoenviows' => $estado, 'fechamovws' => now(), 'msmovws' => $envio]);
     }
 }
