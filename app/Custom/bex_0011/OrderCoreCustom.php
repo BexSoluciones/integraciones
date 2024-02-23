@@ -240,13 +240,12 @@ class OrderCoreCustom
                         $estado = "2";
 
                         $this->estadoRegistro($error, $estado, $order->codvendedor, $order->nummov,$cia);
-                        return 0;
                     }
                 } 
             }else {
                 $error = 'El pedido no tiene productos asignados';
                 $estado = "3";
-                $this->estadoRegistro($error, $estado, $order->codvendedor, $order->nummov,$cia);
+                $this->estadoRegistro($error, $estado, $orders[0]->codvendedor, $orders[0]->nummov,$cia);
             }
             
         } catch (\Exception $e) {
