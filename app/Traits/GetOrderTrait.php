@@ -61,7 +61,7 @@ trait GetOrderTrait {
                     ->orderBy('tbldmovenc.nummov','asc')
                     ->orderBy('tbldmovdet.codmovdet','asc')
                     ->get();
-                    
+               
                 $plataforSys = 2;
                 $config = $this->connectionDB($plataforSys, 'externa', $area);
                 if($config != 0){
