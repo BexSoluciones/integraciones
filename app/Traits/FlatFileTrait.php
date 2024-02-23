@@ -38,6 +38,10 @@ trait FlatFileTrait {
                     if ($sendToSFTP == 1) {
                         return 1;
                     }
+                }else{
+                    Storage::disk('local')->put('imports/'.$db.'/planos/'. $namefile, str_replace('"','',$content));
+                    $this->info('◘ Archivo '.$descripcion.'.txt guardado con éxito');
+                    return 1;
                 }
             }
         } catch (\Exception $e) {
