@@ -68,7 +68,7 @@ trait ApiTrait {
                 ]);
                 return 1;
             }
-
+        
             if($token){
                 if($area == 'bexmovil'){
                     $sentence = Ws_Consulta::getAll();
