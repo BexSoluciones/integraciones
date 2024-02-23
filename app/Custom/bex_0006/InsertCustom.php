@@ -1264,15 +1264,24 @@ class InsertCustom
                 print '◘ Datos insertados en la tabla tblmportafolio' . PHP_EOL;
             }
             
-            $inset = count($datosAInsertar);
+            $datosAInsert = json_decode(json_encode($datosAInsertar,true));
+            $inset = count($datosAInsert);
 
             if ($inset > 0) {
                 // Trunca la tabla
                 DB::connection($conectionBex)->table('s1e_vendedores')->truncate();
                 print "◘ Tabla s1e_vendedores truncada" . PHP_EOL;
 
+                foreach ($datosAInsert as &$dato) {
+                    foreach ($dato as $key => &$value) {
+                        $value = iconv("UTF-8", "ISO-8859-1//TRANSLIT", $value);
+                    }
+                }
+                unset($dato); // Desvincula la última referencia a $dato
+                unset($value); // Desvincula la última referencia a $value
+
                 $dataToInsert = [];
-                foreach ($datosAInsertar as $dato) {
+                foreach ($datosAInsert as $dato) {
                     $dataToInsert[] = [
                         'compania'      => $dato->compania,
                         'codvendedor'   => $dato->tercvendedor,
