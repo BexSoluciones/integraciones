@@ -59,7 +59,7 @@ class OrderCoreCustom
                     $chain .= str_pad($order->nummov, 8, "0", STR_PAD_LEFT); //Numero documento
                     $chain .= substr($order->fecmov, 0, 4).substr($order->fecmov, 5, 2).substr($order->fecmov, 8, 2); //Fecha del documento
                     $chain .= '502'; //Clase interna del documento
-                    $chain .= '2'; //Estado del documento
+                    $chain .= '0'; //Estado del documento
                     $chain .= '0'; //Indicador backorder del documento
                     $chain .= str_pad($order->nitcliente, 15, " ", STR_PAD_RIGHT); //Tercero cliente a facturar
                     $chain .= str_pad($order->succliente, 3, "0", STR_PAD_LEFT); //Sucursal cliente a facturar
