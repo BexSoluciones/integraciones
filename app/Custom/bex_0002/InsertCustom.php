@@ -328,6 +328,7 @@ class InsertCustom
         }
     }
 
+    
     public function insertEstadoPedidosCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
     {
         try {
@@ -337,7 +338,43 @@ class InsertCustom
                 // Borrar datos de la tabla s1e_estadopedidos
                 DB::connection($conectionBex)->table('s1e_estadopedidos')->truncate();
                 print '◘ Tabla s1e_estadopedidos truncada' . PHP_EOL;
+
+
+                //****************Codigo nuevo insercion datos s1e_estadopedidos****************//
+
+                $tamanoLote = 1000;
+                $datosArray = $datosAInsertar->toArray();
+
+                // Divide los datos en lotes
+                $datosDivididos = array_chunk($datosArray, $tamanoLote);
+
+                foreach ($datosDivididos as $datosLote) {
+                    foreach ($datosLote as &$dato) {
+                        // Estos datos no se insertan por eso los excluí
+                        unset($dato['bex_id']);
+                        unset($dato['estadoenc']);
+                        unset($dato['rowid']);
+
+                        // Adiccione este 
+                        $dato['codcliente'] = null;
+
+                        // Remover o reemplazar caracteres especiales en los valores de los datos
+                        foreach ($dato as $key => &$value) {
+                            if (is_string($value)) {
+                                // Remover caracteres especiales que no sean compatibles con latin1
+                                $value = preg_replace('/[^\x20-\x7E]/', '', $value);
+                                // Convertir la cadena de caracteres a la codificación de caracteres deseada
+                                $value = mb_convert_encoding($value, 'latin1', 'UTF-8');
+                            }
+                        }
+                    }
+
+                    // Insertar los datos del lote actual en la base de datos
+                    DB::connection($conectionBex)->table('s1e_estadopedidos')->insert($datosLote);
+                }
+                //finalizacion del codigo nuevo
                 
+                /* CODIGO ANTIGUO INSERCION s1e_estadopedidos
                 // Insertar datos en la tabla s1e_estadopedidos
                 $datosAInsertarJson = json_decode(json_encode($datosAInsertar,true));
 
@@ -349,7 +386,7 @@ class InsertCustom
                 unset($dato); // Desvincula la última referencia a $dato
                 unset($value); // Desvincula la última referencia a $value
 
-                foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
+                foreach (array_chunk($datosAInsertarJson, 500) as $dato) {
                     $dataToInsert = [];
                     $count = count($dato);
                     for($i=0;$i<$count;$i++) {
@@ -388,7 +425,10 @@ class InsertCustom
                     DB::connection($conectionBex)->table('s1e_estadopedidos')->insert($dataToInsert);
                 }
                 print '◘ Datos insertados en la tabla s1e_estadopedidos' . PHP_EOL;
-                
+                Finalizacion Codigo */
+
+
+
                 // Actualizar columna codcliente
                 $updateCodcliente = DB::connection($conectionBex)
                     ->table('s1e_estadopedidos')
@@ -400,6 +440,7 @@ class InsertCustom
                 }else{
                     print '◘ Sin datos por actualizar en la columna codcliente' . PHP_EOL;
                 }
+
 
                 DB::connection($conectionBex)->table('gm_MOB_CAB_PEDIDOS')->truncate();
                 print '◘ Tabla gm_MOB_CAB_PEDIDOS truncada' . PHP_EOL;
