@@ -350,16 +350,26 @@ class InsertCustom
 
                 foreach ($datosDivididos as $datosLote) {
                     foreach ($datosLote as &$dato) {
-                        // Estos datos no se insertan por eso los exclui
+                        // Estos datos no se insertan por eso los excluí
                         unset($dato['bex_id']);
                         unset($dato['estadoenc']);
                         unset($dato['rowid']);
-                        
+
                         // Adiccione este 
                         $dato['codcliente'] = null;
+
+                        // Remover o reemplazar caracteres especiales en los valores de los datos
+                        foreach ($dato as $key => &$value) {
+                            if (is_string($value)) {
+                                // Remover caracteres especiales que no sean compatibles con latin1
+                                $value = preg_replace('/[^\x20-\x7E]/', '', $value);
+                                // Convertir la cadena de caracteres a la codificación de caracteres deseada
+                                $value = mb_convert_encoding($value, 'latin1', 'UTF-8');
+                            }
+                        }
                     }
 
-                    // Inserta los datos del lote actual en la base de datos
+                    // Insertar los datos del lote actual en la base de datos
                     DB::connection($conectionBex)->table('s1e_estadopedidos')->insert($datosLote);
                 }
                 //finalizacion del codigo nuevo
