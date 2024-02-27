@@ -67,6 +67,7 @@ trait FlatFileTrait {
                 // Iniciar sesión FTP
                 $login = ftp_login($connId, $ftpUser, $ftpPass);
                 if ($login) {
+                    ftp_pasv($connId, true);
                     $remoteDirectory = '/';
                     if (ftp_chdir($connId, $remoteDirectory)) {
                         // Subir el archivo al servidor FTP
