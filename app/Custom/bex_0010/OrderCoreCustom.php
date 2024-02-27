@@ -85,7 +85,7 @@ class OrderCoreCustom
                     $chain .= str_pad($order->nummov, 10, "0", STR_PAD_LEFT); //Referencia del documento
                     $chain .= str_pad('', 10, " ", STR_PAD_RIGHT); //Codigo de cargue del documento
                     $chain .= 'COP'; //Codigo de moneda del documento
-                    $chain .= 'USD'; //Moneda base de conversión {PENDIENTE CONVERSION}
+                    $chain .= 'COP'; //Moneda base de conversión {PENDIENTE CONVERSION}
                     $chain .= '00000001.0000'; //Tasa de conversión
                     $chain .= 'COP'; //Moneda local
                     $chain .= '00000001.0000'; //Tasa local
@@ -192,7 +192,7 @@ class OrderCoreCustom
                             }
                     }
 
-                    $chain .= str_pad($counter, 7, "0", STR_PAD_LEFT) . "99990001002";
+                    $chain .= str_pad($counter, 7, "0", STR_PAD_LEFT) . "99990001001";
 
                     $lines = explode("\n", $chain);
 

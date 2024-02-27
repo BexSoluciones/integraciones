@@ -192,7 +192,7 @@ class OrderCoreCustom
                             }
                     }
 
-                    $chain .= str_pad($counter, 7, "0", STR_PAD_LEFT) . "99990001002";
+                    $chain .= str_pad($counter, 7, "0", STR_PAD_LEFT) . "99990001001";
 
                     $lines = explode("\n", $chain);
 
