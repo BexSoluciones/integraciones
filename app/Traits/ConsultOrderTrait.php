@@ -36,7 +36,7 @@ trait ConsultOrderTrait {
             }
             $xmlPedido .= "        </Datos>
             </Importar>";
-        
+            echo $xmlPedido;
             return $xmlPedido;
             
         }catch (\Exception $e) {
