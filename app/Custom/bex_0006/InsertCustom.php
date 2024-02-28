@@ -44,6 +44,7 @@ class InsertCustom
                             'documento'     => $dato[$i]->documento,
                             'fecmov'        => $dato[$i]->fecmov,
                             'fechavenci'    => $dato[$i]->fechavenci,
+                            'vrpostf'       => $dato[$i]->vrpostf,
                             'valor'         => $dato[$i]->valor,
                             'codvendedor'   => $dato[$i]->codvendedor,
                             'x'             => null,
@@ -87,9 +88,9 @@ class InsertCustom
             DB::connection($conectionBex)
                 ->table('tbldcartera')
                 ->insertUsing(
-                    ['CODVENDEDOR', 'CODCLIENTE','CODTIPODOC','NUMMOV','FECMOV','FECVEN','PRECIOMOV'],
+                    ['CODVENDEDOR', 'CODCLIENTE','CODTIPODOC','NUMMOV','FECMOV','FECVEN','PRECIOMOV','VALTOTCREDITO'],
                     function ($query) {
-                        $query->select('s1e_cartera.codvendedor','s1e_cartera.codcliente','s1e_cartera.codtipodoc','documento','s1e_cartera.fecmov','fechavenci','valor')
+                        $query->select('s1e_cartera.codvendedor','s1e_cartera.codcliente','s1e_cartera.codtipodoc','documento','s1e_cartera.fecmov','fechavenci','valor','vrpostf')
                         ->from('s1e_cartera')
                         ->join('tblmcliente','s1e_cartera.codcliente','=','tblmcliente.CODCLIENTE')
                         ->join('tblmvendedor','s1e_cartera.codvendedor','=','tblmvendedor.CODVENDEDOR');
