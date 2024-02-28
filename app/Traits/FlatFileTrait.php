@@ -64,16 +64,13 @@ trait FlatFileTrait {
             // Establecer conexión FTP
             $connId = ftp_connect($ftpHost);
             if ($connId) {
-                // Intentar establecer conexión pasiva
-                ftp_set_option($connId, FTP_USEPASVADDRESS, false);
                 // Iniciar sesión FTP
                 $login = ftp_login($connId, $ftpUser, $ftpPass);
                 if ($login) {
-                    //ftp_pasv($connId, true);
                     $remoteDirectory = '/';
                     if (ftp_chdir($connId, $remoteDirectory)) {
                         // Subir el archivo al servidor FTP
-                        $upload = ftp_put($connId, $filename, $localFilePath, FTP_ASCII);
+                        $upload = ftp_put($connId, $filename, $localFilePath, FTP_BINARY);
                         if ($upload) {
                             $this->info("Archivo $filename cargado con éxito");
                         } else {
