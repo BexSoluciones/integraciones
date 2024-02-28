@@ -1103,9 +1103,14 @@ class InsertCustom
         }
     }
 
-    public function insertRuteroCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
+    public function insertRuteroCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance)
     {
         try {
+
+            $modelInstance::whereRaw('cliente = sucursal')
+                            ->whereRaw('sucursal <> 0')
+                            ->update(['sucursal' => '0']);
+             print '◘ Rutero actualizado en la columna de sucursal' . PHP_EOL;
             $inset=(count($datosAInsertar));
  
             if($inset > 0){
@@ -1119,6 +1124,9 @@ class InsertCustom
                         $Insert = [];
                         $count = count($dato);
                         for($i=0;$i<$count;$i++) {
+                            if($dato[$i]->sucursal == $dato[$i]->cliente){
+                                $dato[$i]->sucursal = '0';
+                            }
                             $Insert[] = [
                                 'codvendedor'    => $dato[$i]->tercvendedor,
                                 'dia'            => $dato[$i]->dia,
