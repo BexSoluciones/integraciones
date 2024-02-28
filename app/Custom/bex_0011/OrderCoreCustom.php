@@ -197,51 +197,50 @@ class OrderCoreCustom
                     $lines = explode("\n", $chain);
 
                     $nummov = str_pad($order->nummov, 10, "0", STR_PAD_LEFT);
+                }
+                
+                $namefile = $closing.'_'.$orders[0]->nummov. '.txt';
+                Storage::disk('public')->put('export/bex_0011/bexmovil/pedidos_txt/' . $namefile, $chain);// CAMBIAR EL NOMBRE DE LA COMPAÑIA
+                $xmlOrder = $this->createXmlOrder($lines, $nummov, $config);
 
-
-                    $namefile = $closing.'_'.$order->nummov. '.txt';
-                    Storage::disk('public')->put('export/bex_0011/bexmovil/pedidos_txt/' . $namefile, $chain);// CAMBIAR EL NOMBRE DE LA COMPAÑIA
-                    $xmlOrder = $this->createXmlOrder($lines, $nummov, $config);
-
-                    if (!$this->existePedidoSiesa($config, $order->tipodoc, $nummov) && $import == true) {
-                        $resp = $this->importarXml($xmlOrder,$config['url']);
-                        if (!is_array($resp) && empty($resp)) {
-                            $envio = 'Ok';
-                            $estado = "2";
-                            $this->estadoRegistro($envio, $estado, $order->codvendedor, $order->nummov,$cia);
+                if (!$this->existePedidoSiesa($config, $orders[0]->tipodoc, $nummov) && $import == true) {
+                    $resp = $this->importarXml($xmlOrder,$config['url']);
+                    if (!is_array($resp) && empty($resp)) {
+                        $envio = 'Ok';
+                        $estado = "2";
+                        $this->estadoRegistro($envio, $estado, $orders[0]->codvendedor, $orders[0]->nummov,$cia);
+                    } else {
+                        if (is_array($resp)) {
+                            $error=$resp['error'];
+                            $estado = "3";
+                            $this->estadoRegistro($error, $estado, $orders[0]->codvendedor, $orders[0]->nummov,$cia);
                         } else {
-                            if (is_array($resp)) {
-                                $error=$resp['error'];
-                                $estado = "3";
-                                $this->estadoRegistro($error, $estado, $order->codvendedor, $order->nummov,$cia);
-                            } else {
-                                $mensaje = "";
-                                foreach ($resp->NewDataSet->Table as $key => $errores) {
-                                    $error = "";
-                                    foreach ($errores as $key => $detalleError) {
-                                        if ($key == 'f_detalle') {
-                                            $error = $detalleError;
-                                        }
+                            $mensaje = "";
+                            foreach ($resp->NewDataSet->Table as $key => $errores) {
+                                $error = "";
+                                foreach ($errores as $key => $detalleError) {
+                                    if ($key == 'f_detalle') {
+                                        $error = $detalleError;
                                     }
                                 }
+                            }
 
-                                if (strrpos($error, "el tercero vendedor no existe o no esta configurado como vendedor")!==false) {
-                                    $error.=" Nombre vendedor: ".$order->nomvendedor." Cedula vendedor: ".$order->codvendedor;
-                                    $estado = "3";
-                                    $this->estadoRegistro($error, $estado, $order->codvendedor, $order->nummov,$cia);
-                                } else {
-                                    $estado = "3";
-                                    $this->estadoRegistro($error, $estado, $order->codvendedor, $order->nummov,$cia);
-                                }
+                            if (strrpos($error, "el tercero vendedor no existe o no esta configurado como vendedor")!==false) {
+                                $error.=" Nombre vendedor: ".$orders[0]->nomvendedor." Cedula vendedor: ".$orders[0]->codvendedor;
+                                $estado = "3";
+                                $this->estadoRegistro($error, $estado, $orders[0]->codvendedor, $orders[0]->nummov,$cia);
+                            } else {
+                                $estado = "3";
+                                $this->estadoRegistro($error, $estado, $orders[0]->codvendedor, $orders[0]->nummov,$cia);
                             }
                         }
-                    } elseif ($this->existePedidoSiesa($config, $order->tipodoc, $nummov)) {
-                        $error = "Este pedido ya fue registrado anteriormente, por favor verificar. Fecha de ejecucion: " . date('Y-m-d h:i:s');
-                        $estado = "2";
-
-                        $this->estadoRegistro($error, $estado, $order->codvendedor, $order->nummov,$cia);
                     }
-                } 
+                } elseif ($this->existePedidoSiesa($config, $orders[0]->tipodoc, $nummov)) {
+                    $error = "Este pedido ya fue registrado anteriormente, por favor verificar. Fecha de ejecucion: " . date('Y-m-d h:i:s');
+                    $estado = "2";
+
+                    $this->estadoRegistro($error, $estado, $orders[0]->codvendedor, $orders[0]->nummov,$cia);
+                }
             }else {
                 $error = 'El pedido no tiene productos asignados';
                 $estado = "3";
