@@ -1100,10 +1100,17 @@ class InsertCustom
                 }
 
 
-                DB::connection($conectionBex)->table('tblmrutero')->truncate();
-                print '◘ Datos eliminados con exito en la tabla tblmrutero' . PHP_EOL;
+                $tblslicencias = DB::connection($conectionSys)
+                    ->table('tblslicencias')
+                    ->select('borrarruteroimportando')
+                    ->where('bdlicencias', 'platafor_pi055')
+                    ->first();
+               
+                if($tblslicencias->borrarruteroimportando == "S"){
+                    DB::connection($conectionBex)->table('tblmrutero')->truncate();
+                    print '◘ Datos eliminados con exito en la tabla tblmrutero' . PHP_EOL;
 
-                DB::connection($conectionBex)
+                    DB::connection($conectionBex)
                     ->table('tblmrutero')
                     ->insertUsing([
                             'CODVENDEDOR', 'DIARUTERO','SECUENCIARUTERO','CODCLIENTE','CUPO','CODPRECIO','CODGRUPODCTO'
@@ -1123,9 +1130,9 @@ class InsertCustom
                             }
                             );
 
-                print "◘ Datos insertados en la tabla tblmrutero." . PHP_EOL;
-             
-                DB::connection($conectionBex)
+                    print "◘ Datos insertados en la tabla tblmrutero." . PHP_EOL;
+                }else{
+                    DB::connection($conectionBex)
                     ->table('s1e_ruteros')
                     ->join('s1e_clientes','s1e_ruteros.cliente','=','s1e_clientes.codigo')
                     ->join('tblmvendedor','s1e_ruteros.codvendedor','=','tblmvendedor.CODVENDEDOR')
@@ -1137,7 +1144,8 @@ class InsertCustom
                             's1e_clientes.codgrupodcto')
                     ->distinct()
                     ->get();
-              
+                }
+
                 DB::connection($conectionBex)
                     ->table('tblmrutero')
                     ->join('s1e_clientes','tblmrutero.CODCLIENTE','=','s1e_clientes.codcliente')
