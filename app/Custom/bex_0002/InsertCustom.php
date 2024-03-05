@@ -1098,7 +1098,33 @@ class InsertCustom
                     DB::connection($conectionBex)->table('tblmdiarutero')->insert($insertData);
                     print '◘ Datos insertados en la tabla tblmdiarutero' . PHP_EOL;
                 }
-                            
+
+
+                DB::connection($conectionBex)->table('tblmrutero')->truncate();
+                print '◘ Datos eliminados con exito en la tabla tblmrutero' . PHP_EOL;
+
+                DB::connection($conectionBex)
+                    ->table('tblmrutero')
+                    ->insertUsing([
+                            'CODVENDEDOR', 'DIARUTERO','SECUENCIARUTERO','CODCLIENTE','CUPO','CODPRECIO','CODGRUPODCTO'
+                        ], function ($query) {
+                                $query->selectRaw('tblmvendedor.codvendedor,dia, secuencia,
+                                codcliente, cupo, "0" as precio,"0" as codgrupodcto')
+                                ->distinct()
+                                ->from('s1e_ruteros')
+                                ->join('tblmcliente', function ($join) {
+                                    $join->on('s1e_ruteros.cliente', '=', 'tblmcliente.nitcliente')
+                                        ->on('s1e_ruteros.sucursal', '=', 'tblmcliente.succliente');
+                                })
+                                ->join('tblmvendedor', 's1e_ruteros.codvendedor', '=', 'tblmvendedor.CODVENDEDOR')
+                                ->join('tblmdiarutero', 's1e_ruteros.dia', '=', 'tblmdiarutero.diarutero')
+                                ->where('s1e_ruteros.cliente', '<>', '')
+                                ->get();
+                            }
+                            );
+
+                print "◘ Datos insertados en la tabla tblmrutero." . PHP_EOL;
+             
                 DB::connection($conectionBex)
                     ->table('s1e_ruteros')
                     ->join('s1e_clientes','s1e_ruteros.cliente','=','s1e_clientes.codigo')
@@ -1111,7 +1137,7 @@ class InsertCustom
                             's1e_clientes.codgrupodcto')
                     ->distinct()
                     ->get();
-
+              
                 DB::connection($conectionBex)
                     ->table('tblmrutero')
                     ->join('s1e_clientes','tblmrutero.CODCLIENTE','=','s1e_clientes.codcliente')
