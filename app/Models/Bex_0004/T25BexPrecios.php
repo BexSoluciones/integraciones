@@ -12,7 +12,7 @@ class T25BexPrecios extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't25_bex_precios';
-protected $fillable = ['lista', 'producto', 'precio', 'estadoprecio'];
+protected $fillable = ['lista', 'producto', 'precio', 'preciomax', 'estadoprecio'];
 public $timestamps = false;
 
 public function scopeInsertDataTblmprecio($query){

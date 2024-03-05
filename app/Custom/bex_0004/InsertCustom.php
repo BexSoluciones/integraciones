@@ -850,6 +850,8 @@ class InsertCustom
                             'lista'        => $dato->lista,
                             'producto'     => $dato->producto,
                             'precio'       => $dato->precio,
+                            'preciomin'    => $dato->precio,
+                            'preciomax'    => $dato->preciomax,
                             'estadoprecio' => $dato->estadoprecio
                         ];
                     }
@@ -891,9 +893,9 @@ class InsertCustom
                 DB::connection($conectionBex)
                     ->table('tbldproductoprecio')
                     ->insertUsing([
-                        'CODPRODUCTO', 'codprecio','precioproductoprecio'
+                        'CODPRODUCTO', 'codprecio','precioproductoprecio', 'PRECIOMIN', 'PRECIOMAX'
                     ],function ($query) {
-                        $query->selectRaw('producto,lista,precio')
+                        $query->selectRaw('producto, lista, precio, preciomin, preciomax')
                         ->from('s1e_precios')
                         ->join('tblmproducto','s1e_precios.producto','=','tblmproducto.CODPRODUCTO')
                         ->distinct()

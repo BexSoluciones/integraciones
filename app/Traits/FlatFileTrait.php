@@ -70,7 +70,7 @@ trait FlatFileTrait {
                     $remoteDirectory = '/';
                     if (ftp_chdir($connId, $remoteDirectory)) {
                         // Subir el archivo al servidor FTP
-                        $upload = ftp_put($connId, $filename, $localFilePath, FTP_BINARY);
+                        $upload = ftp_put($connId, $filename, $localFilePath, FTP_ASCII);
                         if ($upload) {
                             $this->info("Archivo $filename cargado con éxito");
                         } else {
