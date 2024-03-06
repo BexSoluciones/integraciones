@@ -1131,19 +1131,6 @@ class InsertCustom
                             );
 
                     print "◘ Datos insertados en la tabla tblmrutero." . PHP_EOL;
-                }else{
-                    DB::connection($conectionBex)
-                    ->table('s1e_ruteros')
-                    ->join('s1e_clientes','s1e_ruteros.cliente','=','s1e_clientes.codigo')
-                    ->join('tblmvendedor','s1e_ruteros.codvendedor','=','tblmvendedor.CODVENDEDOR')
-                    ->join('tblmdiarutero','s1e_ruteros.dia','=','tblmdiarutero.diarutero')
-                    ->whereColumn('s1e_ruteros.sucursal','s1e_clientes.sucursal')
-                    ->where('s1e_ruteros.cliente','<>','')
-                    ->select('tblmvendedor.codvendedor','s1e_ruteros.dia','s1e_ruteros.secuencia',
-                            's1e_clientes.codcliente','s1e_clientes.cupo','s1e_clientes.precio',
-                            's1e_clientes.codgrupodcto')
-                    ->distinct()
-                    ->get();
                 }
 
                 DB::connection($conectionBex)
