@@ -37,7 +37,7 @@ trait GetOrderTrait {
             }
             
             $db = Connection_Bexsoluciones::getAll()->where('id', $db)->value('name');
-        
+       
             if($db){
                 $order = DB::connection($db)
                     ->table('tbldmovenc')
@@ -61,7 +61,7 @@ trait GetOrderTrait {
                     ->orderBy('tbldmovenc.nummov','asc')
                     ->orderBy('tbldmovdet.codmovdet','asc')
                     ->get();
-               
+          
                 $plataforSys = 2;
                 $config = $this->connectionDB($plataforSys, 'externa', $area);
                 if($config != 0){
@@ -72,7 +72,7 @@ trait GetOrderTrait {
                     ]);
                     return 1;
                 }
-              
+         
                 $plataforSys = Connection_Bexsoluciones::getAll()->where('id', $plataforSys)->value('name');
                 $cia = DB::connection($plataforSys)
                         ->table('tblslicencias')
