@@ -51,14 +51,6 @@ class ExportInformation extends Command
             $baseNamespace  = 'App\\Models\\' . ucfirst($tenantDB) . '\\';
             $availableModels = $this->getAvailableModels($baseNamespace, $tenantDB);
 
-            $modelToExecuteFirst = "App\Models\Bex_0012\T25BexPrecios";
-            $tableNameToExecuteFirst = $availableModels[$modelToExecuteFirst];
-
-            // Eliminar el elemento del array para volver a insertarlo al principio
-            unset($availableModels[$modelToExecuteFirst]);
-            $availableModels = [$modelToExecuteFirst => $tableNameToExecuteFirst] + $availableModels;
-
-
             $configDB = $this->setupDatabaseConnection($tenantDB, 'local');
             if ($configDB !== 0) {
                 $this->insertLog($id_importation, $type, "Commands::ExportInformation[handle()] => Conexion Local: Linea " . __LINE__ . "; $configDB");
@@ -78,11 +70,11 @@ class ExportInformation extends Command
 
             $conectionBex = Connection_Bexsoluciones::showConnectionBS($conectionBex, $area)->value('name');
             $conectionSys = null;
-        
+
             foreach ($availableModels as $modelClass => $tableName) {
                 $modelInstance = new $modelClass;
                 $datosAInsertar = $modelInstance::get();
-            
+
                 if ($tableName == 't16_bex_inventarios' && $area == 'bexmovil') {
                     $conectionSys = 2;
                     $configDB = $this->setupDatabaseConnection($conectionSys, 'externa', $area);
@@ -91,35 +83,14 @@ class ExportInformation extends Command
                     }
                     $conectionSys = Connection_Bexsoluciones::showConnectionBS($conectionSys, $area)->value('name');
                 }
-            
+
                 foreach ($customMethods as $method) {
                     $methodName = $method->method;
                     if ($tableName == $method->name_table) {
-                        if ($tableName === 't25_bex_precios') {
-                            $this->performCustomInsert($custom, $methodName, $conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance, $tableName);
-                            $this->info("◘ Proceso $methodName Finalizado");
-                        } else {
-                            // Guardar los métodos relacionados con "t25_bex_precios" para ejecutarlos después
-                            $pendingMethods[] = [
-                                'custom' => $custom,
-                                'methodName' => $methodName,
-                                'conectionBex' => $conectionBex,
-                                'conectionSys' => $conectionSys,
-                                'datosAInsertar' => $datosAInsertar,
-                                'id_importation' => $id_importation,
-                                'type' => $type,
-                                'modelInstance' => $modelInstance,
-                                'tableName' => $tableName
-                            ];
-                        }
+                        $this->performCustomInsert($custom, $methodName, $conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance, $tableName);
+                        $this->info("◘ Proceso $methodName Finalizado");
                     }
                 }
-            }
-            
-            // Ejecutar los métodos relacionados con "t25_bex_precios" después de los demás
-            foreach ($pendingMethods as $method) {
-                $this->performCustomInsert($method['custom'], $method['methodName'], $method['conectionBex'], $method['conectionSys'], $method['datosAInsertar'], $method['id_importation'], $method['type'], $method['modelInstance'], $method['tableName']);
-                $this->info("◘ Proceso {$method['methodName']} Finalizado");
             }
 
             $this->info("◘ Información Base de Datos $tenantDB Exportada.");
