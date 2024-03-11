@@ -4,6 +4,7 @@ namespace App\Traits;
 use Exception;
 use SoapClient;
 use App\Models\Tbl_Log;
+use Illuminate\Support\Facades\Log;
 
 trait WebServiceSiesaTrait {
 
@@ -109,4 +110,33 @@ trait WebServiceSiesaTrait {
                 return true; 
             }
     }
+
+    public function importarXml($xml,$url)
+    {
+
+        try
+        {
+            $parm = array(); //parm de la llamada
+            $parm['pvstrDatos'] = $xml;
+            $parm['printTipoError'] = '1';
+            $parm['cache_wsdl'] = 0; //new
+            $client = new SoapClient($url, $parm);
+            $result = $client->ImportarXML($parm); //llamamos al métdo que nos interesa con los parámetros
+            
+            $schema = simplexml_load_string($result->ImportarXMLResult->schema);
+            return $any = simplexml_load_string($result->ImportarXMLResult->any);
+
+        } catch (\Exception $fault) {
+
+            $error = $fault->getMessage();   
+            Log::info('======este es mensaje de error de conexion ======'); 
+            Log::error($error); 
+            return [
+                'conexion_exitosa'=>false,
+                'error'=>$error
+            ];        
+        }
+
+    }
+
 }

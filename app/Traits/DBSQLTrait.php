@@ -45,12 +45,12 @@ trait DBSQLTrait {
             $sentences = Ws_Consulta::getAll();
     
             //backup txt files
-            $backupFlatFile = $this->backupFlatFile($db, true);
+            $backupFlatFile = $this->backupFlatFile($db, true, $id_importation, $type);
             if($backupFlatFile != 0){
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
                     'type'        => $type,
-                    'descripcion' => 'Traits::DBSQLTrait[sentencesDBSQL()] => '.$e->getMessage()
+                    'descripcion' => 'Traits::DBSQLTrait[sentencesDBSQL()] => No se pudo realizar backup archivos planos'
                 ]);
                 return 1;
             }

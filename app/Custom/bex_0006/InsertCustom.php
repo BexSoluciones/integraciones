@@ -14,9 +14,14 @@ class InsertCustom
 {
     use ConnectionTrait;
 
-    public function insertCarteraCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
+    public function insertCarteraCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance)
     {
         try {
+            $modelInstance::whereRaw('nitcliente = succliente')
+                            ->whereRaw('succliente <> 0')
+                            ->update(['succliente' => '0']);
+            print '◘ Sucursal actualizada en la tabla de cartera' . PHP_EOL;
+
             //Tunca tabla s1e_cartera
             DB::connection($conectionBex)->table('s1e_cartera')->truncate();
             print '◘ Tabla s1e_cartera truncada' . PHP_EOL;
@@ -28,6 +33,9 @@ class InsertCustom
                     $Insert = [];
                     $count = count($dato);
                     for($i=0;$i<$count;$i++) {
+                        if ($dato[$i]->succliente == $dato[$i]->nitcliente) {
+                            $dato[$i]->succliente = '0';
+                        }
                         $Insert[] = [
                             'nitcliente'    => $dato[$i]->nitcliente,
                             'dv'            => $dato[$i]->dv,
@@ -36,6 +44,7 @@ class InsertCustom
                             'documento'     => $dato[$i]->documento,
                             'fecmov'        => $dato[$i]->fecmov,
                             'fechavenci'    => $dato[$i]->fechavenci,
+                            'vrpostf'       => $dato[$i]->vrpostf,
                             'valor'         => $dato[$i]->valor,
                             'codvendedor'   => $dato[$i]->codvendedor,
                             'x'             => null,
@@ -79,9 +88,9 @@ class InsertCustom
             DB::connection($conectionBex)
                 ->table('tbldcartera')
                 ->insertUsing(
-                    ['CODVENDEDOR', 'CODCLIENTE','CODTIPODOC','NUMMOV','FECMOV','FECVEN','PRECIOMOV'],
+                    ['CODVENDEDOR', 'CODCLIENTE','CODTIPODOC','NUMMOV','FECMOV','FECVEN','PRECIOMOV','VALTOTCREDITO'],
                     function ($query) {
-                        $query->select('s1e_cartera.codvendedor','s1e_cartera.codcliente','s1e_cartera.codtipodoc','documento','s1e_cartera.fecmov','fechavenci','valor')
+                        $query->select('s1e_cartera.codvendedor','s1e_cartera.codcliente','s1e_cartera.codtipodoc','documento','s1e_cartera.fecmov','fechavenci','valor','vrpostf')
                         ->from('s1e_cartera')
                         ->join('tblmcliente','s1e_cartera.codcliente','=','tblmcliente.CODCLIENTE')
                         ->join('tblmvendedor','s1e_cartera.codvendedor','=','tblmvendedor.CODVENDEDOR');
@@ -145,6 +154,11 @@ class InsertCustom
                 print '◘ Datos insertados en la tabla tblmdescuento' . PHP_EOL;
             }
 
+            $modelInstance::whereRaw('codigo = sucursal')
+                            ->whereRaw('sucursal <> 0')
+                            ->update(['sucursal' => '0']);
+            print '◘ Sucursal actualizada en la tabla de clientes' . PHP_EOL;
+
             $codpago = $modelInstance::codPago()->get();
             if ($codpago->isNotEmpty()) {
                 $dataToInsert = $codpago->map(function ($dato) {
@@ -178,6 +192,9 @@ class InsertCustom
                     $Insert = [];
                     $count = count($dato);
                     for($i=0;$i<$count;$i++) {
+                        if ($dato[$i]->sucursal == $dato[$i]->codigo) {
+                            $dato[$i]->sucursal = '0';
+                        }
                         $Insert[] = [
                             'codigo'        => $dato[$i]->codigo,
                             'dv'            => $dato[$i]->dv,
@@ -265,7 +282,7 @@ class InsertCustom
                 ->join('s1e_clientes','tblmcliente.codcliente','=','s1e_clientes.codcliente')
                 ->whereColumn('tblmcliente.nitcliente','s1e_clientes.codigo')
                 ->update([
-                    'tblmcliente.RAZCLIENTE' => DB::raw('s1e_clientes.razsoc'),
+                    'tblmcliente.RAZCLIENTE' => DB::raw("IF(s1e_clientes.bloqueo=1, CONCAT(s1e_clientes.razsoc,' ', '*BLOQUEADO*'), s1e_clientes.razsoc)"),
                     'tblmcliente.NOMCLIENTE' => DB::raw('s1e_clientes.representante'),
                     'tblmcliente.DIRCLIENTE' => DB::raw('s1e_clientes.direccion'),
                     'tblmcliente.TELCLIENTE' => DB::raw('s1e_clientes.telefono'),
@@ -947,22 +964,22 @@ class InsertCustom
                 }
             }
 
-            DB::connection($conectionBex)
-                ->table('s1e_productos')
-                ->update([
-                    'codunidademp' => DB::raw("CASE 
-                        WHEN codunidademp = 'Kilogramo' THEN 'KIL'
-                        WHEN codunidademp = 'Millar' THEN 'MIL'
-                        WHEN codunidademp = 'Rollo' THEN 'ROL'
-                        WHEN codunidademp = 'Caja' THEN 'CAJ'
-                        WHEN codunidademp = 'Libra' THEN 'LIB'
-                        WHEN codunidademp = 'Gruesa' THEN 'GRU'
-                        WHEN codunidademp = 'Cubeta' THEN 'CUB'
-                        WHEN codunidademp = 'Unidad' THEN 'UND'
-                        ELSE ''
-                    END")
-                ]);
-            // Update estado_unidademp tabla s1e_productos
+            // DB::connection($conectionBex)
+            //     ->table('s1e_productos')
+            //     ->update([
+            //         'codunidademp' => DB::raw("CASE 
+            //             WHEN codunidademp = 'Kilogramo' THEN 'KIL'
+            //             WHEN codunidademp = 'Millar' THEN 'MIL'
+            //             WHEN codunidademp = 'Rollo' THEN 'ROL'
+            //             WHEN codunidademp = 'Caja' THEN 'CAJ'
+            //             WHEN codunidademp = 'Libra' THEN 'LIB'
+            //             WHEN codunidademp = 'Gruesa' THEN 'GRU'
+            //             WHEN codunidademp = 'Cubeta' THEN 'CUB'
+            //             WHEN codunidademp = 'Unidad' THEN 'UND'
+            //             ELSE ''
+            //         END")
+            //     ]);
+             // Update estado_unidademp tabla s1e_productos
             DB::connection($conectionBex)
                 ->table('s1e_productos')
                 ->join('tblmunidademp','s1e_productos.codunidademp','=','tblmunidademp.codunidademp')
@@ -1086,9 +1103,14 @@ class InsertCustom
         }
     }
 
-    public function insertRuteroCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
+    public function insertRuteroCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance)
     {
         try {
+
+            $modelInstance::whereRaw('cliente = sucursal')
+                            ->whereRaw('sucursal <> 0')
+                            ->update(['sucursal' => '0']);
+             print '◘ Rutero actualizado en la columna de sucursal' . PHP_EOL;
             $inset=(count($datosAInsertar));
  
             if($inset > 0){
@@ -1102,6 +1124,9 @@ class InsertCustom
                         $Insert = [];
                         $count = count($dato);
                         for($i=0;$i<$count;$i++) {
+                            if($dato[$i]->sucursal == $dato[$i]->cliente){
+                                $dato[$i]->sucursal = '0';
+                            }
                             $Insert[] = [
                                 'codvendedor'    => $dato[$i]->tercvendedor,
                                 'dia'            => $dato[$i]->dia,
@@ -1264,15 +1289,24 @@ class InsertCustom
                 print '◘ Datos insertados en la tabla tblmportafolio' . PHP_EOL;
             }
             
-            $inset = count($datosAInsertar);
+            $datosAInsert = json_decode(json_encode($datosAInsertar,true));
+            $inset = count($datosAInsert);
 
             if ($inset > 0) {
                 // Trunca la tabla
                 DB::connection($conectionBex)->table('s1e_vendedores')->truncate();
                 print "◘ Tabla s1e_vendedores truncada" . PHP_EOL;
 
+                foreach ($datosAInsert as &$dato) {
+                    foreach ($dato as $key => &$value) {
+                        $value = iconv("UTF-8", "ISO-8859-1//TRANSLIT", $value);
+                    }
+                }
+                unset($dato); // Desvincula la última referencia a $dato
+                unset($value); // Desvincula la última referencia a $value
+
                 $dataToInsert = [];
-                foreach ($datosAInsertar as $dato) {
+                foreach ($datosAInsert as $dato) {
                     $dataToInsert[] = [
                         'compania'      => $dato->compania,
                         'codvendedor'   => $dato->tercvendedor,

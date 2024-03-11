@@ -29,15 +29,19 @@ trait FlatFileTrait {
                 }
                 $content = rtrim($content, "\n");
                 $namefile = strtolower($descripcion) . '.txt';
-                
-                Storage::disk('local')->put('imports/'.$db.'/planos/'. $namefile, str_replace('"','',$content));
-                $this->info('◘ Archivo '.$descripcion.'.txt guardado con éxito');
 
                 if ($db == 'bex_0007') {
+                    Storage::disk('local')->put('imports/'.$db.'/planos/'. $namefile, str_replace('"','',$content));
+                    $this->info('◘ Archivo '.$descripcion.'.txt guardado con éxito');
+                     
                     $sendToSFTP = $this->sendToSFTP($namefile, $id_importation, $type, $db);
                     if ($sendToSFTP == 1) {
                         return 1;
                     }
+                }else{
+                    Storage::disk('local')->append('imports/'.$db.'/planos/'. $namefile, str_replace('"','',$content));
+                    $this->info('◘ Archivo '.$descripcion.'.txt guardado con exito');
+                    $this->info('-------------------------------------------------------------------');
                 }
             }
         } catch (\Exception $e) {

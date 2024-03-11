@@ -850,6 +850,8 @@ class InsertCustom
                             'lista'        => $dato->lista,
                             'producto'     => $dato->producto,
                             'precio'       => $dato->precio,
+                            'preciomin'    => $dato->precio,
+                            'preciomax'    => $dato->preciomax,
                             'estadoprecio' => $dato->estadoprecio
                         ];
                     }
@@ -891,9 +893,9 @@ class InsertCustom
                 DB::connection($conectionBex)
                     ->table('tbldproductoprecio')
                     ->insertUsing([
-                        'CODPRODUCTO', 'codprecio','precioproductoprecio'
+                        'CODPRODUCTO', 'codprecio','precioproductoprecio', 'PRECIOMIN', 'PRECIOMAX'
                     ],function ($query) {
-                        $query->selectRaw('producto,lista,precio')
+                        $query->selectRaw('producto, lista, precio, preciomin, preciomax')
                         ->from('s1e_precios')
                         ->join('tblmproducto','s1e_precios.producto','=','tblmproducto.CODPRODUCTO')
                         ->distinct()
@@ -1114,7 +1116,7 @@ class InsertCustom
 
                 DB::connection($conectionBex)
                     ->table('s1e_ruteros')
-                    ->join('tblmdiarutero','s1e_ruteros.dia','=','tblmdiarutero.diarutero')
+                    ->join('tblmdiarutero', 'tblmdiarutero.diarutero', '=', 's1e_ruteros.dia')
                     ->update(['s1e_ruteros.estadodiarutero' => 'C']);
                                     
                 $ruteroDias = DB::connection($conectionBex)
@@ -1124,16 +1126,22 @@ class InsertCustom
                                 ->where('estadodiarutero', 'A')
                                 ->where('cliente','<>','')
                                 ->get();
-
+               
                 if (count($ruteroDias) > 0) {
-                    $insertData = array_map(function ($ruteroDia) {
-                        return [
-                            'DIARUTERO' => $ruteroDia->dia,
-                            'NOMDIARUTERO' => $ruteroDia->dia_descrip
+                    $dataRuteroDia = [];
+                    foreach ($ruteroDias as $dato) {
+                        $dataRuteroDia[] = [
+                            'DIARUTERO'      => $dato->dia,
+                            'NOMDIARUTERO'   => $dato->dia_descrip
                         ];
-                    }, $ruteroDias->toArray());
-                
-                    DB::connection($conectionBex)->table('tblmdiarutero')->insert($insertData);
+                    }
+                    
+                    // Insertar o actualizar el Diarutero en la tabla tblmdiarutero
+                    foreach ($dataRuteroDia as $datoRutero) {
+                        DB::connection($conectionBex)
+                            ->table('tblmdiarutero')
+                            ->updateOrInsert(['DIARUTERO' => $datoRutero['DIARUTERO']], $datoRutero);
+                    }
                     print '◘ Datos insertados en la tabla tblmdiarutero' . PHP_EOL;
                 }
                             

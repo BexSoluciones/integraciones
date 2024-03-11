@@ -10,6 +10,9 @@ use App\Custom\bex_0005\OrderCoreCustom as OrderCoreCustom5;
 use App\Custom\bex_0006\OrderCoreCustom as OrderCoreCustom6;
 use App\Custom\bex_0008\OrderCoreCustom as OrderCoreCustom8;
 use App\Custom\bex_0009\OrderCoreCustom as OrderCoreCustom9;
+use App\Custom\bex_0010\OrderCoreCustom as OrderCoreCustom10;
+use App\Custom\bex_0011\OrderCoreCustom as OrderCoreCustom11;
+use App\Custom\bex_0012\OrderCoreCustom as OrderCoreCustom12;
 use App\Models\Tbl_Log;
 
 use Illuminate\Bus\Queueable;
@@ -43,7 +46,8 @@ class ProcessOrderUploadERP implements ShouldQueue
 
     public function handle(): void
     {  
-        try{/*
+        try{
+            /*
             if($this->cia == 123){
                 $objOrederCore = new OrderCoreCustom8();
                 $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing, $this->connection_id); 
@@ -70,6 +74,15 @@ class ProcessOrderUploadERP implements ShouldQueue
                 $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing, $this->connection_id); 
             }elseif($this->cia->bdlicencias == 'platafor_pi061'){
                 $objOrederCore = new OrderCoreCustom9();
+                $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing, $this->connection_id); 
+            }elseif($this->cia->bdlicencias == 'platafor_pi289'){
+                $objOrederCore = new OrderCoreCustom10();
+                $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing, $this->connection_id); 
+            }elseif($this->cia->bdlicencias == 'platafor_pi288'){
+                $objOrederCore = new OrderCoreCustom11();
+                $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing, $this->connection_id); 
+            }elseif($this->cia->bdlicencias == 'platafor_pi291'){
+                $objOrederCore = new OrderCoreCustom11();
                 $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing, $this->connection_id); 
             }else{
                 $objOrederCore = new OrderCoreCustomGeneral();

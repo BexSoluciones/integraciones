@@ -71,7 +71,7 @@ class ImportationJob implements ShouldQueue
                 }
 
                 if($updateInformation == 1) {
-                    // [Estado:4] => Significa que la importación finalizo
+                    // [Estado:4] => Significa que la importación finalizo con error 
                     Importation_Demand::updateOrInsert(
                         ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
                     );
@@ -92,7 +92,7 @@ class ImportationJob implements ShouldQueue
                         ['consecutive' => $this->consecutive], ['state' => 3, 'updated_at' => $currentTime]
                     );  
                 } else {
-                    // [Estado:4] => Significa que la importación finalizo
+                    // [Estado:4] => Significa que la importación finalizo con error
                     Importation_Demand::updateOrInsert(
                         ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
                     );
@@ -129,7 +129,7 @@ class ImportationJob implements ShouldQueue
                 }
 
                 if($updateInformation == 1) {
-                    // [Estado:4] => Significa que la importación finalizo
+                    // [Estado:4] => Significa que la importación finalizo con error 
                     Importation_Demand::updateOrInsert(
                         ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
                     );
@@ -148,7 +148,7 @@ class ImportationJob implements ShouldQueue
                 ]);
                 
                 if($exportInformation == 0) {
-                    // [Estado:4] => Significa que la importación finalizo
+                    // [Estado:4] => Significa que la importación finalizo con error 
                     Importation_Demand::updateOrInsert(
                         ['consecutive' => $this->consecutive], ['state' => 4, 'updated_at' => $currentTime]
                     );

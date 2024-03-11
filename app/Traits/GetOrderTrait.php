@@ -37,7 +37,7 @@ trait GetOrderTrait {
             }
             
             $db = Connection_Bexsoluciones::getAll()->where('id', $db)->value('name');
-        
+       
             if($db){
                 $order = DB::connection($db)
                     ->table('tbldmovenc')
@@ -56,11 +56,12 @@ trait GetOrderTrait {
                                 tbldmovdet.codbodega,cantidadmov,tbldmovenc.codprecio,preciomov,dcto1mov,dcto2mov,dcto3mov,
                                 dcto4mov,pluproducto,nomunidademp,tblmproducto.codunidademp,mensajemov,dctopiefacaut,dctonc,
                                 numvisita,fechorfinvisita,fechorentregacli,origen,ordendecompra,tblmvendedor.cedula,
-                                tbldmovdet.prepack,ivamov,nomproducto'.$iva)
+                                tbldmovdet.prepack,ivamov,nomproducto,dctovalor,tblmvendedor.tercvendedor,tbldmovdet.bonificado,tblmproducto.codproveedor,
+                                tbldmovdet.ocultoporcval,tbldmovenc.codtipodoc,tbldmovenc.prefmov,tbldmovenc.numcierre,estadoenviows,tblmproducto.ccostos,tblmvendedor.nomvendedor'.$iva)
                     ->orderBy('tbldmovenc.nummov','asc')
                     ->orderBy('tbldmovdet.codmovdet','asc')
                     ->get();
-                    
+          
                 $plataforSys = 2;
                 $config = $this->connectionDB($plataforSys, 'externa', $area);
                 if($config != 0){
@@ -71,7 +72,7 @@ trait GetOrderTrait {
                     ]);
                     return 1;
                 }
-              
+         
                 $plataforSys = Connection_Bexsoluciones::getAll()->where('id', $plataforSys)->value('name');
                 $cia = DB::connection($plataforSys)
                         ->table('tblslicencias')
