@@ -24,32 +24,22 @@ class CommandController extends Controller
 
             $data = $request->timeValidator();
 
-            $importation = DB::connection('mysql')->table('importation_demand')->insert([
+            $importation = Importation_Demand::create([
                 'command' => 'command:update-information',
                 'name_db' => $request->name_db,
                 'area'    => $request->area,
                 'hour'    => $data['hourUser'],
                 'date'    => $data['dateUser']
             ]);
-
-            return $importation;
-
-            // $importation = Importation_Demand::create([
-            //     'command' => 'command:update-information',
-            //     'name_db' => $request->name_db,
-            //     'area'    => $request->area,
-            //     'hour'    => $data['hourUser'],
-            //     'date'    => $data['dateUser']
-            // ]);
         
             // Se registra en la cola de procesos (jobs)
             $currentTimeDate = Carbon::now();
             $delayInSeconds = $currentTimeDate
                 ->diffInSeconds($data['dateUser'].' '.$data['hourUser'], 'UTC');
 
-            // ImportationJob::dispatch($importation->consecutive)
-            //     ->onQueue($importation->area)
-            //     ->delay($delayInSeconds);
+            ImportationJob::dispatch($importation->consecutive)
+                ->onQueue($importation->area)
+                ->delay($delayInSeconds);
 
             return response()->json([
                 'status'   => 200, 
