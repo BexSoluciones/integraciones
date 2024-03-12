@@ -32,6 +32,8 @@ class CommandController extends Controller
                 'date'    => $data['dateUser']
             ]);
 
+            return $importation;
+
             // $importation = Importation_Demand::create([
             //     'command' => 'command:update-information',
             //     'name_db' => $request->name_db,
