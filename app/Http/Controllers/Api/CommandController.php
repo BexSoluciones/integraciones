@@ -24,7 +24,6 @@ class CommandController extends Controller
 
             $data = $request->timeValidator();
 
-            
             $importation = Importation_Demand::create([
                 'command' => 'command:update-information',
                 'name_db' => $request->name_db,
