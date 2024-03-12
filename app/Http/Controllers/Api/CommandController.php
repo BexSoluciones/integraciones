@@ -24,6 +24,7 @@ class CommandController extends Controller
 
             $data = $request->timeValidator();
 
+            
             $importation = Importation_Demand::create([
                 'command' => 'command:update-information',
                 'name_db' => $request->name_db,
@@ -31,23 +32,21 @@ class CommandController extends Controller
                 'hour'    => $data['hourUser'],
                 'date'    => $data['dateUser']
             ]);
-
-            return $importation;
         
-            // // Se registra en la cola de procesos (jobs)
-            // $currentTimeDate = Carbon::now();
-            // $delayInSeconds = $currentTimeDate
-            //     ->diffInSeconds($data['dateUser'].' '.$data['hourUser'], 'UTC');
+            // Se registra en la cola de procesos (jobs)
+            $currentTimeDate = Carbon::now();
+            $delayInSeconds = $currentTimeDate
+                ->diffInSeconds($data['dateUser'].' '.$data['hourUser'], 'UTC');
 
-            // ImportationJob::dispatch($importation->consecutive)
-            //     ->onQueue($importation->area)
-            //     ->delay($delayInSeconds);
+            ImportationJob::dispatch($importation->consecutive)
+                ->onQueue($importation->area)
+                ->delay($delayInSeconds);
 
-            // return response()->json([
-            //     'status'   => 200, 
-            //     'code'     => $importation->consecutive,
-            //     'response' => 'Importación numero: '.$importation->consecutive.' la cual se ejecutara en la fecha: '.$importation->date.' a las '.$importation->hour
-            // ]);
+            return response()->json([
+                'status'   => 200, 
+                'code'     => $importation->consecutive,
+                'response' => 'Importación numero: '.$importation->consecutive.' la cual se ejecutara en la fecha: '.$importation->date.' a las '.$importation->hour
+            ]);
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'descripcion' => 'Controller::CommandController[updateInformation()] => '.$e->getMessage()
