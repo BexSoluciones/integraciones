@@ -22,7 +22,6 @@ class CommandController extends Controller
     public function updateInformation(UpdateInformation $request){
         try {
 
-            return 1;
             $data = $request->timeValidator();
 
             $importation = Importation_Demand::create([
@@ -32,6 +31,8 @@ class CommandController extends Controller
                 'hour'    => $data['hourUser'],
                 'date'    => $data['dateUser']
             ]);
+
+            return 2;
         
             // Se registra en la cola de procesos (jobs)
             $currentTimeDate = Carbon::now();
