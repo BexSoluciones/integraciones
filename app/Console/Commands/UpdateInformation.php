@@ -45,6 +45,8 @@ class UpdateInformation extends Command {
                 ]);
                 return 1;
             }
+
+            dd($configDB);
  
             // Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
             if($status == 'new'){
@@ -55,9 +57,7 @@ class UpdateInformation extends Command {
             
             // Function to extract data through WS (DataImportTrait).
             $config = Ws_Config::where('estado', 1)->first();
-            
-            dd($config);
-            
+
             if(!$config){
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
