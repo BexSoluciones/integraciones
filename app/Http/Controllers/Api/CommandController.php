@@ -35,8 +35,7 @@ class CommandController extends Controller
             $importation->date = $data['dateUser'];
 
 
-            return $importation;
-            // $importation->save();
+            $importation->save();
 
             // $importation = Importation_Demand::create([
             //     'command' => 'command:update-information',
@@ -47,13 +46,13 @@ class CommandController extends Controller
             // ]);
         
             // Se registra en la cola de procesos (jobs)
-            $currentTimeDate = Carbon::now();
-            $delayInSeconds = $currentTimeDate
-                ->diffInSeconds($data['dateUser'].' '.$data['hourUser'], 'UTC');
+            // $currentTimeDate = Carbon::now();
+            // $delayInSeconds = $currentTimeDate
+            //     ->diffInSeconds($data['dateUser'].' '.$data['hourUser'], 'UTC');
 
-            ImportationJob::dispatch($importation->consecutive)
-                ->onQueue($importation->area)
-                ->delay($delayInSeconds);
+            // ImportationJob::dispatch($importation->consecutive)
+            //     ->onQueue($importation->area)
+            //     ->delay($delayInSeconds);
 
             return response()->json([
                 'status'   => 200, 
