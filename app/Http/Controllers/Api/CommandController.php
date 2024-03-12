@@ -36,9 +36,9 @@ class CommandController extends Controller
             $delayInSeconds = $currentTimeDate
                 ->diffInSeconds($data['dateUser'].' '.$data['hourUser'], 'UTC');
 
-            ImportationJob::dispatch($importation->consecutive)
-                ->onQueue($importation->area)
-                ->delay($delayInSeconds);
+            // ImportationJob::dispatch($importation->consecutive)
+            //     ->onQueue($importation->area)
+            //     ->delay($delayInSeconds);
 
             return response()->json([
                 'status'   => 200, 
