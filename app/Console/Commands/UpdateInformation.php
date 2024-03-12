@@ -46,7 +46,7 @@ class UpdateInformation extends Command {
                 return 1;
             }
 
-            dd($configDB);
+            dd($status);
  
             // Si la migracion se va a ejecutar por primer vez, se toma en cuenta primero esta condicion
             if($status == 'new'){
