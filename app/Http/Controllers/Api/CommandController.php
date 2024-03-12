@@ -24,6 +24,14 @@ class CommandController extends Controller
 
             $data = $request->timeValidator();
 
+            $importation = DB::connection('mysql')->table('importation_demand')->insert([
+                'command' => 'command:update-information',
+                'name_db' => $request->name_db,
+                'area'    => $request->area,
+                'hour'    => $data['hourUser'],
+                'date'    => $data['dateUser']
+            ]);
+
             // $importation = Importation_Demand::create([
             //     'command' => 'command:update-information',
             //     'name_db' => $request->name_db,
@@ -36,8 +44,6 @@ class CommandController extends Controller
             $currentTimeDate = Carbon::now();
             $delayInSeconds = $currentTimeDate
                 ->diffInSeconds($data['dateUser'].' '.$data['hourUser'], 'UTC');
-
-            return $delayInSeconds;
 
             // ImportationJob::dispatch($importation->consecutive)
             //     ->onQueue($importation->area)
