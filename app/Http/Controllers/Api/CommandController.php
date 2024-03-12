@@ -33,7 +33,10 @@ class CommandController extends Controller
             $importation->area = $request->area;
             $importation->hour = $data['hourUser'];
             $importation->date = $data['dateUser'];
-            $importation->save();
+
+
+            return $importation;
+            // $importation->save();
 
             // $importation = Importation_Demand::create([
             //     'command' => 'command:update-information',
