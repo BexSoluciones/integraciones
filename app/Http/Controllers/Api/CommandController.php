@@ -27,7 +27,6 @@ class CommandController extends Controller
 
             $importation = new Importation_Demand();
 
-            $importation->setConnection('mysql');
             $importation->command = 'command:update-information';
             $importation->name_db = $request->name_db;
             $importation->area = $request->area;
