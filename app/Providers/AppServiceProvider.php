@@ -21,11 +21,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        try {
-            DB::connection()->getPDO();
-            dd(DB::connection()->getDatabaseName());
-         } catch (\Exception $e) {
-            print('Error uploadOrder: ' . $e->getMessage());
-         }
+
     }
 }
