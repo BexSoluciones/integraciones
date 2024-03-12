@@ -21,6 +21,8 @@ class CommandController extends Controller
 {
     public function updateInformation(UpdateInformation $request){
         try {
+
+            return 1;
             $data = $request->timeValidator();
 
             $importation = Importation_Demand::create([
