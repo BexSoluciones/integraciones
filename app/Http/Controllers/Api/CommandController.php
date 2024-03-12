@@ -24,7 +24,7 @@ class CommandController extends Controller
 
             $data = $request->timeValidator();
 
-            $importation = Importation_Demand::create([
+            $importation = Importation_Demand::setConnection('mysql')->create([
                 'command' => 'command:update-information',
                 'name_db' => $request->name_db,
                 'area'    => $request->area,
