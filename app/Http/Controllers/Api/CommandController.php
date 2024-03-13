@@ -24,15 +24,15 @@ class CommandController extends Controller
 
             $data = $request->timeValidator();
 
-            return 1;
+            $importation = Importation_Demand::create([
+                'command' => 'command:update-information',
+                'name_db' => $request->name_db,
+                'area'    => $request->area,
+                'hour'    => $data['hourUser'],
+                'date'    => $data['dateUser']
+            ]);
 
-            // $importation = Importation_Demand::create([
-            //     'command' => 'command:update-information',
-            //     'name_db' => $request->name_db,
-            //     'area'    => $request->area,
-            //     'hour'    => $data['hourUser'],
-            //     'date'    => $data['dateUser']
-            // ]);
+            return 1;
         
             // // Se registra en la cola de procesos (jobs)
             // $currentTimeDate = Carbon::now();
