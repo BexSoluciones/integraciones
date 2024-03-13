@@ -43,13 +43,13 @@ class CommandController extends Controller
 
         
             // // Se registra en la cola de procesos (jobs)
-            $currentTimeDate = Carbon::now();
-            $delayInSeconds = $currentTimeDate
-                ->diffInSeconds($data['dateUser'].' '.$data['hourUser'], 'UTC');
+            // $currentTimeDate = Carbon::now();
+            // $delayInSeconds = $currentTimeDate
+            //     ->diffInSeconds($data['dateUser'].' '.$data['hourUser'], 'UTC');
 
-            ImportationJob::dispatch(1)
-                ->onQueue('bexmovil')
-                ->delay($delayInSeconds);
+            // ImportationJob::dispatch(1)
+            //     ->onQueue('bexmovil')
+            //     ->delay($delayInSeconds);
 
             return response()->json([
                 'status'   => 200, 
