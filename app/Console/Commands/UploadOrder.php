@@ -63,8 +63,10 @@ class UploadOrder extends Command
                     return 1;
                 }
             }
-
-            print_r($db);
+            
+    
+            print_r($db );
+            echo "holiwis";
 
             exit;
            
