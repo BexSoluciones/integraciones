@@ -39,10 +39,6 @@ class UploadOrder extends Command
                     'created_at'  => now(),
                     'updated_at'  => now()
                 ]);
-
-                echo "holiwis";
-    
-                exit;
                 return 1;
             }
         
@@ -73,20 +69,11 @@ class UploadOrder extends Command
                 }
             }
             
-
-           
             if($closing == null || $closing == 'null'){
                 $orders = $this->getOrderHeder($db->id, $area, $closing);
             }else{
                 $orders = $this->getOrderHeder($db, $area, $closing);
             }
-
-                
-            print_r($orders);
-            echo "holiwis";
-
-            exit;
-
 
             if($orders == 0){
                 return 0;
@@ -96,13 +83,15 @@ class UploadOrder extends Command
                 $orderDetails = $this->getOrderDetail($orders);
                 return 0;
             }   
+
             return 1;
         }catch (\Exception $e) {
-            DB::connection('mysql')->table('tbl_log')->insert([
-                'descripcion' => 'Commands::UploadOrder[handle()] => '.$e->getMessage(),
-                'created_at'  => now(),
-                'updated_at'  => now()
-            ]);
+            echo $e;
+            // DB::connection('mysql')->table('tbl_log')->insert([
+            //     'descripcion' => 'Commands::UploadOrder[handle()] => '.$e->getMessage(),
+            //     'created_at'  => now(),
+            //     'updated_at'  => now()
+            // ]);
             return 1;
         }
     }
