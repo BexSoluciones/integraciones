@@ -64,17 +64,19 @@ class UploadOrder extends Command
                 }
             }
             
-    
-            print_r($db );
-            echo "holiwis";
 
-            exit;
            
             if($closing == null || $closing == 'null'){
                 $orders = $this->getOrderHeder($db->id, $area, $closing);
             }else{
                 $orders = $this->getOrderHeder($db, $area, $closing);
             }
+
+                
+            print_r($orders);
+            echo "holiwis";
+
+            exit;
 
 
             if($orders == 0){
