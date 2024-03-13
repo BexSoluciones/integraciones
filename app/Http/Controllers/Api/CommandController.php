@@ -53,8 +53,6 @@ class CommandController extends Controller
             //     ->onQueue('bexmovil')
             //     ->delay($delayInSeconds);
 
-            return "holaaaa";
-
             return response()->json([
                 'status'   => 200, 
                 'code'     =>  1,
