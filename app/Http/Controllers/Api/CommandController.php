@@ -24,6 +24,8 @@ class CommandController extends Controller
 
             $data = $request->timeValidator();
 
+            return "holaaaa";
+
 
             // DB::connection('mysql')->table('importation_demand')->insert([
             //     'command' => 'command:update-information',
