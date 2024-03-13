@@ -30,6 +30,8 @@ class UploadOrder extends Command
             $type           = $this->argument('type', null);
         
             $configDB = $this->connectionDB($db, 'externa', $area); 
+
+            print_r($configDB);
        
             if($configDB != 0){
                 DB::connection('mysql')->table('tbl_log')->insert([
