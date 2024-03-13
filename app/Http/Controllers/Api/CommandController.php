@@ -24,24 +24,13 @@ class CommandController extends Controller
 
             $data = $request->timeValidator();
 
-
-
-
-            // DB::connection('mysql')->table('importation_demand')->insert([
-            //     'command' => 'command:update-information',
-            //     'name_db' => $request->name_db,
-            //     'area'    => $request->area,
-            //     'hour'    => '19:17:23',
-            //     'date'    => '2024-03-12'
-            // ]);
-
-            // $importation = Importation_Demand::create([
-            //     'command' => 'command:update-information',
-            //     'name_db' => $request->name_db,
-            //     'area'    => $request->area,
-            //     'hour'    => '19:17:23',
-            //     'date'    => '2024-03-12'
-            // ]);
+            $importation = Importation_Demand::create([
+                'command' => 'command:update-information',
+                'name_db' => $request->name_db,
+                'area'    => $request->area,
+                'hour'    => '19:17:23',
+                'date'    => '2024-03-12'
+            ]);
 
         
             // // Se registra en la cola de procesos (jobs)
@@ -52,25 +41,21 @@ class CommandController extends Controller
             // ImportationJob::dispatch(1)
             //     ->onQueue('bexmovil')
             //     ->delay($delayInSeconds);
-            
-            print_r($data);
-            print_r($request->all());
-
-            exit;
-
-            return response()->json([
-                'status'   => 200, 
-                'code'     =>  1,
-                'response' => 'Importación numero: 1 la cual se ejecutara en la fecha: '.$data['dateUser'].' a las '. $data['dateHour']
-            ]);
+            echo "reponse";
+            // response()->json([
+            //     'status'   => 200, 
+            //     'code'     =>  1,
+            //     'response' => 'Importación numero: 1 la cual se ejecutara en la fecha: '.$data['dateUser'].' a las '. $data['dateHour']
+            // ]);
         } catch (\Exception $e) {
-            Tbl_Log::create([
-                'descripcion' => 'Controller::CommandController[updateInformation()] => '.$e->getMessage()
-            ]);
-            return response()->json([
-                'status'   => 500, 
-                'response' => $e->getMessage()
-            ]);
+            echo $e;
+            // Tbl_Log::create([
+            //     'descripcion' => 'Controller::CommandController[updateInformation()] => '.$e->getMessage()
+            // ]);
+            // return response()->json([
+            //     'status'   => 500, 
+            //     'response' => $e->getMessage()
+            // ]);
         }
     }
 
