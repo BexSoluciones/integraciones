@@ -24,14 +24,12 @@ class CommandController extends Controller
 
             $data = $request->timeValidator();
 
-            return $data;
-
             $importation = Importation_Demand::create([
                 'command' => 'command:update-information',
                 'name_db' => $request->name_db,
                 'area'    => $request->area,
-                'hour'    => $data['hourUser'],
-                'date'    => $data['dateUser']
+                'hour'    => '19:17:23',
+                'date'    => '2024-03-12'
             ]);
 
             return 1;
