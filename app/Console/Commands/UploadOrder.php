@@ -32,11 +32,6 @@ class UploadOrder extends Command
             $configDB = $this->connectionDB($db, 'externa', $area); 
        
             if($configDB != 0){
-
-                print_r($db);
-
-                exit;
-
                 DB::connection('mysql')->table('tbl_log')->insert([
                     'id_table'    => $id_importation,
                     'type'        => $type,
@@ -44,13 +39,14 @@ class UploadOrder extends Command
                     'created_at'  => now(),
                     'updated_at'  => now()
                 ]);
-
                 return 1;
             }
 
             
         
             if($closing == null || $closing == 'null'){
+
+                
                 $db = Connection_Bexsoluciones::getAll()->where('id', $db)->first();
                
 
@@ -72,6 +68,10 @@ class UploadOrder extends Command
                     return 1;
                 }
             }
+
+            
+            print_r($db);
+            exit;
            
             if($closing == null || $closing == 'null'){
                 $orders = $this->getOrderHeder($db->id, $area, $closing);
