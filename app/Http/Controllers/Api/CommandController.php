@@ -54,6 +54,7 @@ class CommandController extends Controller
             //     ->delay($delayInSeconds);
             
             print_r($data);
+            print_r($request->all());
 
             exit;
 
