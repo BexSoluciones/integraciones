@@ -30,10 +30,6 @@ class UploadOrder extends Command
             $type           = $this->argument('type', null);
         
             $configDB = $this->connectionDB($db, 'externa', $area); 
-
-            print_r($configDB);
-
-            exit;
        
             if($configDB != 0){
                 DB::connection('mysql')->table('tbl_log')->insert([
@@ -45,6 +41,10 @@ class UploadOrder extends Command
                 ]);
                 return 1;
             }
+
+            print_r($closing);
+
+            exit;
         
             if($closing == null || $closing == 'null'){
                 $db = Connection_Bexsoluciones::getAll()->where('id', $db)->first();
