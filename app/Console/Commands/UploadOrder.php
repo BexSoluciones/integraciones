@@ -51,6 +51,11 @@ class UploadOrder extends Command
                     ->where('estadoenviows', '0')
                     ->whereNotNull('numcierre')
                     ->min('numcierre');
+
+                print_r($closing);
+                echo "holiwis";
+    
+                exit;
                
                 if($closing == null){
                     DB::connection('mysql')->table('tbl_log')->insert([
