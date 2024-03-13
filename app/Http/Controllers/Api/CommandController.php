@@ -47,9 +47,6 @@ class CommandController extends Controller
                 'response' => 'Importación numero: '.$importation->consecutive.' la cual se ejecutara en la fecha: '.$importation->date.' a las '.$importation->hour
             ]);
         } catch (\Exception $e) {
-
-            
-
             Tbl_Log::create([
                 'descripcion' => 'Controller::CommandController[updateInformation()] => '.$e->getMessage()
             ]);
