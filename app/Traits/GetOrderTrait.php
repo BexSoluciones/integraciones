@@ -95,9 +95,10 @@ trait GetOrderTrait {
             }
             
         }catch (\Exception $e) {
-            Tbl_Log::create([
-                'descripcion' => 'Trait::GetOrderTrait[getOrderHeder()] => '.$e->getMessage()
-            ]);
+            echo $e;
+            // Tbl_Log::create([
+            //     'descripcion' => 'Trait::GetOrderTrait[getOrderHeder()] => '.$e->getMessage()
+            // ]);
         }
     }
 

@@ -45,10 +45,7 @@ class UploadOrder extends Command
             
         
             if($closing == null || $closing == 'null'){
-
-                
                 $db = Connection_Bexsoluciones::getAll()->where('id', $db)->first();
-               
 
                 $closing = DB::connection($db->name)
                     ->table('tbldmovenc')
@@ -68,10 +65,6 @@ class UploadOrder extends Command
                     return 1;
                 }
             }
-
-            
-            print_r($db);
-            exit;
            
             if($closing == null || $closing == 'null'){
                 $orders = $this->getOrderHeder($db->id, $area, $closing);
