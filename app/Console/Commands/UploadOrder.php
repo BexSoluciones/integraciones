@@ -29,12 +29,7 @@ class UploadOrder extends Command
             $id_importation = $this->argument('id_importation', null);
             $type           = $this->argument('type', null);
         
-            $configDB = $this->connectionDB($db, 'externa', $area); 
-
-            print_r($configDB);
-                echo "holiwis";
-    
-                exit;
+            $configDB = $this->connectionDB($db, 'externa', $area);
        
             if($configDB != 0){
                 DB::connection('mysql')->table('tbl_log')->insert([
@@ -44,6 +39,10 @@ class UploadOrder extends Command
                     'created_at'  => now(),
                     'updated_at'  => now()
                 ]);
+
+                echo "holiwis";
+    
+                exit;
                 return 1;
             }
         
