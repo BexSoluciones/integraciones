@@ -63,6 +63,10 @@ class UploadOrder extends Command
                     return 1;
                 }
             }
+
+            print_r($db);
+
+            exit;
            
             if($closing == null || $closing == 'null'){
                 $orders = $this->getOrderHeder($db->id, $area, $closing);
