@@ -24,7 +24,7 @@ class CommandController extends Controller
 
             $data = $request->timeValidator();
 
-            return "holaaaa";
+
 
 
             // DB::connection('mysql')->table('importation_demand')->insert([
@@ -52,6 +52,8 @@ class CommandController extends Controller
             // ImportationJob::dispatch(1)
             //     ->onQueue('bexmovil')
             //     ->delay($delayInSeconds);
+
+            return "holaaaa";
 
             return response()->json([
                 'status'   => 200, 
