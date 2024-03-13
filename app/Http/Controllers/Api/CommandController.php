@@ -97,6 +97,11 @@ class CommandController extends Controller
                 'area' => $request->area,
                 'closing' => $request->closing,
             ]);
+
+            print_r($output);
+            echo "holiwis";
+
+            exit;
             
             if($output == 0){
                 $rutaArchivo = 'export/'.$request->name_db.'/'.$request->area.'/pedidos_txt/'.str_pad($request->closing,8,"0",STR_PAD_LEFT).'.PE0';
