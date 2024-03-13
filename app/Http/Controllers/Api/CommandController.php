@@ -48,14 +48,14 @@ class CommandController extends Controller
             ]);
         } catch (\Exception $e) {
 
-            dd($e);
             
+
             Tbl_Log::create([
                 'descripcion' => 'Controller::CommandController[updateInformation()] => '.$e->getMessage()
             ]);
             return response()->json([
                 'status'   => 500, 
-                'response' => 'Ocurrio un error con la petición.'
+                'response' => $e->getMessage()
             ]);
         }
     }
