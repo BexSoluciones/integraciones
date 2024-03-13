@@ -44,14 +44,14 @@ class UpdateInformation extends FormRequest
 
     protected function withValidator(Validator $validator)
     {
-        // $validator->after(function ($validator) {
-        //     $this->keyValidation($validator);
-        //     $this->areaValidation();
-        //     $this->dbValidation();
-        //     $this->limitValidation();
-        //     $this->executingImportValidation();
-        //     $this->timeValidator();
-        // });
+        $validator->after(function ($validator) {
+            $this->keyValidation($validator);
+            $this->areaValidation();
+            $this->dbValidation();
+            $this->limitValidation();
+            $this->executingImportValidation();
+            $this->timeValidator();
+        });
     }
 
     // Valida que los atributos o keys sean completos
