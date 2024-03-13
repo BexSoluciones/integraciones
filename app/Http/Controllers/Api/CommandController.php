@@ -52,6 +52,10 @@ class CommandController extends Controller
             // ImportationJob::dispatch(1)
             //     ->onQueue('bexmovil')
             //     ->delay($delayInSeconds);
+            
+            print_r($data);
+
+            exit;
 
             return response()->json([
                 'status'   => 200, 
