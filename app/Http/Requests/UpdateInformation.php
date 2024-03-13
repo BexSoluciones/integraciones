@@ -44,14 +44,14 @@ class UpdateInformation extends FormRequest
 
     protected function withValidator(Validator $validator)
     {
-        $validator->after(function ($validator) {
-            $this->keyValidation($validator);
-            $this->areaValidation();
-            $this->dbValidation();
-            $this->limitValidation();
-            $this->executingImportValidation();
-            $this->timeValidator();
-        });
+        // $validator->after(function ($validator) {
+        //     $this->keyValidation($validator);
+        //     $this->areaValidation();
+        //     $this->dbValidation();
+        //     $this->limitValidation();
+        //     $this->executingImportValidation();
+        //     $this->timeValidator();
+        // });
     }
 
     // Valida que los atributos o keys sean completos
@@ -123,7 +123,6 @@ class UpdateInformation extends FormRequest
 
     // Valida que una importacion no se este ejecutando
     protected function executingImportValidation(){
-        return 'hola';
         $importation = Connection::forNameDB($this->name_db,$this->area)->where('area', $this->area)->first();
         if(empty($importation)){
             throw new HttpResponseException(response()->json([
