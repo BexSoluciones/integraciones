@@ -25,13 +25,13 @@ class CommandController extends Controller
             $data = $request->timeValidator();
 
 
-            DB::connection('mysql')->table('importation_demand')->insert([
-                'command' => 'command:update-information',
-                'name_db' => $request->name_db,
-                'area'    => $request->area,
-                'hour'    => '19:17:23',
-                'date'    => '2024-03-12'
-            ]);
+            // DB::connection('mysql')->table('importation_demand')->insert([
+            //     'command' => 'command:update-information',
+            //     'name_db' => $request->name_db,
+            //     'area'    => $request->area,
+            //     'hour'    => '19:17:23',
+            //     'date'    => '2024-03-12'
+            // ]);
 
             // $importation = Importation_Demand::create([
             //     'command' => 'command:update-information',
@@ -41,22 +41,21 @@ class CommandController extends Controller
             //     'date'    => '2024-03-12'
             // ]);
 
-            return 1;
         
             // // Se registra en la cola de procesos (jobs)
-            // $currentTimeDate = Carbon::now();
-            // $delayInSeconds = $currentTimeDate
-            //     ->diffInSeconds($data['dateUser'].' '.$data['hourUser'], 'UTC');
+            $currentTimeDate = Carbon::now();
+            $delayInSeconds = $currentTimeDate
+                ->diffInSeconds($data['dateUser'].' '.$data['hourUser'], 'UTC');
 
-            // ImportationJob::dispatch($importation->consecutive)
-            //     ->onQueue($importation->area)
-            //     ->delay($delayInSeconds);
+            ImportationJob::dispatch(1)
+                ->onQueue('bexmovil')
+                ->delay($delayInSeconds);
 
-            // return response()->json([
-            //     'status'   => 200, 
-            //     'code'     => $importation->consecutive,
-            //     'response' => 'Importación numero: '.$importation->consecutive.' la cual se ejecutara en la fecha: '.$importation->date.' a las '.$importation->hour
-            // ]);
+            return response()->json([
+                'status'   => 200, 
+                'code'     =>  1,
+                'response' => 'Importación numero: 1 la cual se ejecutara en la fecha: '.$data['dateUser'].' a las '. $data['dateHour']
+            ]);
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'descripcion' => 'Controller::CommandController[updateInformation()] => '.$e->getMessage()
