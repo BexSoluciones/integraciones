@@ -68,14 +68,9 @@ class UploadOrder extends Command
                 $orders = $this->getOrderHeder($db->id, $area, $closing);
             }else{
                 $orders = $this->getOrderHeder($db, $area, $closing);
-
-                print_r($orders);
-
-                exit;
             }
 
-   
-            
+
             if($orders == 0){
                 return 0;
             }
