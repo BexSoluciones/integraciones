@@ -29,7 +29,7 @@ class UploadOrder extends Command
             $id_importation = $this->argument('id_importation', null);
             $type           = $this->argument('type', null);
         
-            $configDB = $this->connectionDB($db, 'externa', $area);
+            $configDB = $this->connectionDB($db, 'externa', $area); 
        
             if($configDB != 0){
                 DB::connection('mysql')->table('tbl_log')->insert([
@@ -45,17 +45,15 @@ class UploadOrder extends Command
             if($closing == null || $closing == 'null'){
                 $db = Connection_Bexsoluciones::getAll()->where('id', $db)->first();
                
+                print_r($db);
+
+                exit;
                 $closing = DB::connection($db->name)
                     ->table('tbldmovenc')
                     ->where('codtipodoc', '4')
                     ->where('estadoenviows', '0')
                     ->whereNotNull('numcierre')
                     ->min('numcierre');
-
-                print_r($closing);
-                echo "holiwis";
-    
-                exit;
                
                 if($closing == null){
                     DB::connection('mysql')->table('tbl_log')->insert([
@@ -68,13 +66,13 @@ class UploadOrder extends Command
                     return 1;
                 }
             }
-            
+           
             if($closing == null || $closing == 'null'){
                 $orders = $this->getOrderHeder($db->id, $area, $closing);
             }else{
                 $orders = $this->getOrderHeder($db, $area, $closing);
             }
-
+            
             if($orders == 0){
                 return 0;
             }
@@ -83,16 +81,17 @@ class UploadOrder extends Command
                 $orderDetails = $this->getOrderDetail($orders);
                 return 0;
             }   
-
             return 1;
         }catch (\Exception $e) {
+
             echo $e;
+            exit;
             // DB::connection('mysql')->table('tbl_log')->insert([
             //     'descripcion' => 'Commands::UploadOrder[handle()] => '.$e->getMessage(),
             //     'created_at'  => now(),
             //     'updated_at'  => now()
             // ]);
-            return 1;
+            // return 1;
         }
     }
 }
