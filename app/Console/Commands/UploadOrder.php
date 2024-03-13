@@ -41,12 +41,10 @@ class UploadOrder extends Command
                 ]);
                 return 1;
             }
-
-            
         
             if($closing == null || $closing == 'null'){
                 $db = Connection_Bexsoluciones::getAll()->where('id', $db)->first();
-
+               
                 $closing = DB::connection($db->name)
                     ->table('tbldmovenc')
                     ->where('codtipodoc', '4')
@@ -82,15 +80,12 @@ class UploadOrder extends Command
             }   
             return 1;
         }catch (\Exception $e) {
-
-            echo $e;
-            exit;
-            // DB::connection('mysql')->table('tbl_log')->insert([
-            //     'descripcion' => 'Commands::UploadOrder[handle()] => '.$e->getMessage(),
-            //     'created_at'  => now(),
-            //     'updated_at'  => now()
-            // ]);
-            // return 1;
+            DB::connection('mysql')->table('tbl_log')->insert([
+                'descripcion' => 'Commands::UploadOrder[handle()] => '.$e->getMessage(),
+                'created_at'  => now(),
+                'updated_at'  => now()
+            ]);
+            return 1;
         }
     }
 }
