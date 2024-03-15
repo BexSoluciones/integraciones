@@ -424,8 +424,6 @@ class InsertCustom
                 unset($dato); // Desvincula la última referencia a $dato
                 unset($value); // Desvincula la última referencia a $value
 
-
-
                 foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
                     $dataToInsert = [];
                     $count = count($dato);
