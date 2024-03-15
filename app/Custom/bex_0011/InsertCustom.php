@@ -460,7 +460,7 @@ class InsertCustom
                             'codvendedor' => $dato[$i]->codvend
                         ];
                     }
-                    DB::connection($conectionBex)->table('s1e_estadopedidos')->insert($dataToInsert);
+                    DB::connection($conectionBex)->table('s1e_estadopedidos')->insertOrIgnore($dataToInsert);
                 }
                 print '◘ Datos insertados en la tabla s1e_estadopedidos' . PHP_EOL;
 
