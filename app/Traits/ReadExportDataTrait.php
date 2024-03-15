@@ -132,7 +132,13 @@ trait ReadExportDataTrait {
                 $chunks = array_chunk($dataToInsert, 1000); // Divide en lotes de 1000 registros
                 foreach ($chunks as $chunk) {
                     DB::transaction(function () use ($modelInstance, $chunk, $tableName) {
-                        $modelInstance->insertOrIgnore($chunk);
+                        try {
+                            $modelInstance->insertOrIgnore($chunk);
+                        } catch(\Illuminate\Database\QueryException $e){
+                            Tbl_Log::create([
+                                'descripcion' => $e->getMessage()
+                            ]);
+                        }
                     });
                 }
                 $this->info("◘ Datos insertados en la tabla " . $tableName);
