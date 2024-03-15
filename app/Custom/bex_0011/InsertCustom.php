@@ -429,7 +429,7 @@ class InsertCustom
                 foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
                     $dataToInsert = [];
                     $count = count($dato);
-                    
+                    print '◘ cantidad de columnas estados_pedidos' . $count . PHP_EOL;
                     if($count == 27) {
                         for ($i = 0; $i < $count; $i++) {
                             $dataToInsert[] = [
