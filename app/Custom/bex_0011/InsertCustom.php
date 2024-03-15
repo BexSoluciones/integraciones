@@ -424,44 +424,50 @@ class InsertCustom
                 unset($dato); // Desvincula la última referencia a $dato
                 unset($value); // Desvincula la última referencia a $value
 
+
+
                 foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
                     $dataToInsert = [];
                     $count = count($dato);
-                    for ($i = 0; $i < $count; $i++) {
-                        $dataToInsert[] = [
-                            'codemp'     => $dato[$i]->codemp,
-                            'codvend'    => $dato[$i]->codvend,
-                            'tipoped'    => $dato[$i]->tipoped,
-                            'numped'     => $dato[$i]->numped,
-                            'nitcli'     => $dato[$i]->nitcli,
-                            'succli'     => $dato[$i]->succli,
-                            'fecped'     => $dato[$i]->fecped,
-                            'ordenped'   => $dato[$i]->ordenped,
-                            'codpro'     => $dato[$i]->codpro,
-                            'refer'      => $dato[$i]->refer,
-                            'descrip'    => $dato[$i]->descrip,
-                            'cantped'    => $dato[$i]->cantped,
-                            'vlrbruped'  => $dato[$i]->vlrbruped,
-                            'ivabruped'  => $dato[$i]->ivabruped,
-                            'vlrnetoped' => $dato[$i]->vlrnetoped,
-                            'cantfacped' => $dato[$i]->cantfacped,
-                            'estado'     => $dato[$i]->estado,
-                            'tipo'       => $dato[$i]->tipo,
-                            'tipofac'    => $dato[$i]->tipofac,
-                            'factura'    => $dato[$i]->factura,
-                            'ordenfac'   => $dato[$i]->ordenfac,
-                            'cantfac'    => $dato[$i]->cantfac,
-                            'vlrbrufac'  => $dato[$i]->vlrbrufac,
-                            'ivabrufac'  => $dato[$i]->ivabrufac,
-                            'vlrnetofac' => $dato[$i]->vlrnetofac,
-                            'obsped'     => str_contains($dato[$i]->obsped, '|') ?
-                                join(" ", explode('|', $dato[$i]->obsped)) : $dato[$i]->obsped,
-                            'ws_id'      => $dato[$i]->ws_id,
-                            'codcliente' => null,
-                            'codvendedor' => $dato[$i]->codvend
-                        ];
-                    }
-                    DB::connection($conectionBex)->table('s1e_estadopedidos')->insert($dataToInsert);
+                    
+                    if($count == 27) {
+                        for ($i = 0; $i < $count; $i++) {
+                            $dataToInsert[] = [
+                                'codemp'     => $dato[$i]->codemp,
+                                'codvend'    => $dato[$i]->codvend,
+                                'tipoped'    => $dato[$i]->tipoped,
+                                'numped'     => $dato[$i]->numped,
+                                'nitcli'     => $dato[$i]->nitcli,
+                                'succli'     => $dato[$i]->succli,
+                                'fecped'     => $dato[$i]->fecped,
+                                'ordenped'   => $dato[$i]->ordenped,
+                                'codpro'     => $dato[$i]->codpro,
+                                'refer'      => $dato[$i]->refer,
+                                'descrip'    => $dato[$i]->descrip,
+                                'cantped'    => $dato[$i]->cantped,
+                                'vlrbruped'  => $dato[$i]->vlrbruped,
+                                'ivabruped'  => $dato[$i]->ivabruped,
+                                'vlrnetoped' => $dato[$i]->vlrnetoped,
+                                'cantfacped' => $dato[$i]->cantfacped,
+                                'estado'     => $dato[$i]->estado,
+                                'tipo'       => $dato[$i]->tipo,
+                                'tipofac'    => $dato[$i]->tipofac,
+                                'factura'    => $dato[$i]->factura,
+                                'ordenfac'   => $dato[$i]->ordenfac,
+                                'cantfac'    => $dato[$i]->cantfac,
+                                'vlrbrufac'  => $dato[$i]->vlrbrufac,
+                                'ivabrufac'  => $dato[$i]->ivabrufac,
+                                'vlrnetofac' => $dato[$i]->vlrnetofac,
+                                'obsped'     => $dato[$i]->obsped,
+                                'ws_id'      => $dato[$i]->ws_id,
+                                'codcliente' => null,
+                                'codvendedor' => $dato[$i]->codvend
+                            ];
+                        }
+                        DB::connection($conectionBex)->table('s1e_estadopedidos')->insert($dataToInsert);
+                    } 
+
+                    
                 }
                 print '◘ Datos insertados en la tabla s1e_estadopedidos' . PHP_EOL;
 
