@@ -155,7 +155,6 @@ trait ReadExportDataTrait
                 return 1;
             }
         } catch (\Illuminate\Database\QueryException $e) {
-            $this->info("◘ Datos insertados en la tabla " . $e->getMessage());
             return 1;
         } catch (\Exception $e) {
             Tbl_Log::create([
