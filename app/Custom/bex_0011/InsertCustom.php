@@ -454,7 +454,7 @@ class InsertCustom
                             'vlrbrufac'  => $dato[$i]->vlrbrufac,
                             'ivabrufac'  => $dato[$i]->ivabrufac,
                             'vlrnetofac' => $dato[$i]->vlrnetofac,
-                            'obsped'     => str_contains('|', $dato[$i]->obsped) ? 
+                            'obsped'     => str_contains($dato[$i]->obsped, '|') ?
                                 join(" ", explode('|', $dato[$i]->obsped)) : $dato[$i]->obsped,
                             'ws_id'      => $dato[$i]->ws_id,
                             'codcliente' => null,
