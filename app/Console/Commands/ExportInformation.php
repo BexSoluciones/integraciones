@@ -86,7 +86,7 @@ class ExportInformation extends Command
 
                 foreach ($customMethods as $method) {
                     $methodName = $method->method;
-                    $this->insertLog(null, null, $methodName);
+                    $this->info($methodName ?: "error");
                     if ($tableName == $method->name_table) {
                         $this->performCustomInsert($custom, $methodName, $conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance, $tableName);
                         $this->info("◘ Proceso $methodName Finalizado");
