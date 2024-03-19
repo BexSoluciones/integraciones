@@ -95,7 +95,7 @@ class UpdateInformation extends Command {
                 foreach ($customMigrations as $migration) {
                     if($migration->command == ":refresh"){
                         DB::connection('dynamic_connection')->table($migration->name_table)->truncate();
-                        print '◘ Tabla'.$migration->name_table." truncada.\n";
+                        print '◘ Tabla '.$migration->name_table." truncada.\n";
                     } 
                 }
             }else{
