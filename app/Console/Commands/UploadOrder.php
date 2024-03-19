@@ -52,8 +52,10 @@ class UploadOrder extends Command
                     ->whereNotNull('numcierre')
                     ->min('numcierre');
                     Log::info('cierre '.$closing);
-                    
+                
                 if($closing == null){
+                    return 1;
+                    /*
                     DB::connection('mysql')->table('tbl_log')->insert([
                         'id_table'    => $id_importation,
                         'type'        => $type,
@@ -61,7 +63,7 @@ class UploadOrder extends Command
                         'created_at'  => now(),
                         'updated_at'  => now()
                     ]);
-                    return 1;
+                    return 1;*/
                 }
                 $orders = $this->getOrderHeder($db->id, $area, $closing);
             }else{
