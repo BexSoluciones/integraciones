@@ -54,7 +54,7 @@ class UploadOrder extends Command
                     Log::info('cierre '.$closing);
                 
                 if($closing == null){
-                    return 0;
+                    return 1;
                     /*
                     DB::connection('mysql')->table('tbl_log')->insert([
                         'id_table'    => $id_importation,
