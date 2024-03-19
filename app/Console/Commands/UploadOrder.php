@@ -28,7 +28,7 @@ class UploadOrder extends Command
             $closing        = $this->argument('closing');
             $id_importation = $this->argument('id_importation', null);
             $type           = $this->argument('type', null);
-        
+            
             $configDB = $this->connectionDB($db, 'externa', $area); 
        
             if($configDB != 0){
@@ -51,7 +51,8 @@ class UploadOrder extends Command
                     ->where('estadoenviows', '0')
                     ->whereNotNull('numcierre')
                     ->min('numcierre');
-               
+                    Log::info('cierre '.$closing);
+                    
                 if($closing == null){
                     DB::connection('mysql')->table('tbl_log')->insert([
                         'id_table'    => $id_importation,
@@ -62,13 +63,11 @@ class UploadOrder extends Command
                     ]);
                     return 1;
                 }
-            }
-           
-            if($closing == null || $closing == 'null'){
                 $orders = $this->getOrderHeder($db->id, $area, $closing);
             }else{
                 $orders = $this->getOrderHeder($db, $area, $closing);
             }
+                
             
             if($orders == 0){
                 return 0;
