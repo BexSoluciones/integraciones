@@ -22,7 +22,7 @@ trait GetOrderTrait {
     public function getOrderHeder($db, $area, $closing){
 
         $connection_id = $db;
-
+        
         try {
             $codiva = Custom_Sql::join('connection_bexsoluciones', 'connection_bexsoluciones.connection_id', '=', 'custom_sql.connection_id')
                     ->where('custom_sql.category', 'pedidos')
