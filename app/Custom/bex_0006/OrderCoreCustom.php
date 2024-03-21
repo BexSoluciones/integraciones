@@ -300,13 +300,13 @@ class OrderCoreCustom
                 if($detail->nummov == $nummov){
                     $jsonDetail[] =
                         [
-                            "sw" => intval($detail->numvisita),
+                            "sw" => 1,
                             "numero" => $numero,
                             "codigo" =>  $detail->codproducto,
                             "seq" => $i+1,
                             "bodega" => intval($detail->codbodega),
                             "cantidad" => floatval(number_format($detail->cantidadmov, 2, '.', '')),
-                            "cantidadDespachada" => floatval(number_format($detail->cantidadmov, 2, '.', '')),
+                            "cantidadDespachada" => 0,
                             "valorUnitario" => floatval(number_format($detail->preciomov, 2, '.', '')),
                             "porcentajeIva" => floatval(number_format(($detail->ivamov) / 100, 2, '.', '')),
                             "porcentajeDescuento" => floatval(number_format($detail->dctopiefacaut, 2, '.', '')),

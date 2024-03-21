@@ -51,7 +51,6 @@ class UploadOrder extends Command
                     ->where('estadoenviows', '0')
                     ->whereNotNull('numcierre')
                     ->min('numcierre');
-                    Log::info('cierre '.$closing);
                 
                 if($closing == null){
                     return 1;
