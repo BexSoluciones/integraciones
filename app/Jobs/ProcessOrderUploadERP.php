@@ -82,7 +82,7 @@ class ProcessOrderUploadERP implements ShouldQueue
                 $objOrederCore = new OrderCoreCustom11();
                 $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing, $this->connection_id); 
             }elseif($this->cia->bdlicencias == 'platafor_pi291'){
-                $objOrederCore = new OrderCoreCustom11();
+                $objOrederCore = new OrderCoreCustom12();
                 $objOrederCore->uploadOrder($this->order, $this->cia, $this->closing, $this->connection_id); 
             }else{
                 $objOrederCore = new OrderCoreCustomGeneral();
