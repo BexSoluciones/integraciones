@@ -211,6 +211,7 @@ class InsertCustom
                             'codgrupodcto'  => $dato[$i]->codgrupodcto,
                             'email'         => $dato[$i]->email,
                             'bloqueo'       => $dato[$i]->bloqueo,
+                            'infoCupoDisponible'=> $dato[$i]->infoCupoDisponible,
                             'codcliente'    => '0',
                             'estado'        => $dato[$i]->estado,
                             'estadofpagovta'=> $dato[$i]->estadofpagovta
@@ -293,6 +294,23 @@ class InsertCustom
                     'tblmcliente.bloqueo' => DB::raw("IF(s1e_clientes.bloqueo=0, 'N', 'S')") 
                 ]);
             print '◘ Datos actualizados en la tabla tblmcliente' . PHP_EOL;
+
+            DB::connection($conectionBex)->table('tbldclienteadic')->truncate();
+            print '◘ La tabla tbldclienteadic fue truncada' . PHP_EOL;
+
+            DB::connection($conectionBex)
+                ->table('tbldclienteadic')
+                ->insertUsing([
+                    'codcliente', 'id_campo','numreg','valor','tipocliente'
+                ],function ($query) {
+                    $query->selectRaw('codcliente,"1" AS id_campo,"1" AS numreg,infoCupoDisponible,"N" as tipocliente')
+                    ->from('s1e_clientes')
+                    ->where('s1e_clientes.codcliente','<>','0')
+                    ->where('estado', 'C')
+                    ->groupBy('s1e_clientes.codcliente');
+                }
+            );
+            print '◘ Datos insertados en la tabla tbldclienteadic' . PHP_EOL;
 
         } catch (\Exception $e) {
             Tbl_Log::create([
