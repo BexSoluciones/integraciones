@@ -10,7 +10,7 @@ use App\Models\Connection_Bexsoluciones;
 use App\Models\LogErrorImportacionModel;
 use App\Traits\ApiTrait;
 use App\Traits\ConnectionTrait;
-
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
@@ -188,7 +188,7 @@ class OrderCoreCustom
                         ->update(['estadoenviows' => '1', 'fechamovws' => now()]);
 
                     // Enviamos el encabezado por API
-                    $sendHeaderApi = $this->sendHeaderApi($connection_id, $structureHeader, $orders, $encabezado->nummov, $closing);
+                    $sendHeaderApi = $this->sendHeaderApi($connection_id, $structureHeader, $orders, $encabezado->nummov, $closing, $nameDB, $encabezado);
                   
                     if($sendHeaderApi == 0){
                         // Si todo se realizo de manera exitosa cambiamos el estado a 2
@@ -206,7 +206,7 @@ class OrderCoreCustom
                         ->where('NUMMOV',  $encabezado->nummov)
                         ->where('CODTIPODOC', '4')
                         ->where('codvendedor', $encabezado->codvendedor)
-                        ->update(['estadoenviows' => '3', 'fechamovws' => now(), 'fechamovws' => 'Error al enviar el pedido']);
+                        ->update(['estadoenviows' => '3', 'fechamovws' => now(), 'msmovws' => 'Error API: Acceso prohibido (403)']);
 
                         return 1;
                     }
@@ -256,7 +256,7 @@ class OrderCoreCustom
         }
     }
 
-    private function sendHeaderApi($connection_id, $structureHeader, $orders, $nummov, $closing){
+    private function sendHeaderApi($connection_id, $structureHeader, $orders, $nummov, $closing, $nameDB,$encabezado){
         
         $db = Connection::where('id', $connection_id)->value('name');
        
@@ -271,25 +271,48 @@ class OrderCoreCustom
             return 1;
         }
 
-        $config = Ws_Config::where('estado', 1)->first();
-        $token = $this->loginToApi($config);
+        try{
+            $config = Ws_Config::where('estado', 1)->first();
+            $token = $this->loginToApi($config);
+            
+            $urlEncabezado = $config->urlEnvio;
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $token,
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json', // Encabezado
+            ])->post($urlEncabezado, $structureHeader);
 
-        $urlEncabezado = $config->urlEnvio;
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json', // Encabezado
-        ])->post($urlEncabezado, $structureHeader);
-
-        $numero = $response['respuesta'][0]['numero'];
-        
-        $details = $this->sendDetailsApi($numero, $orders, $nummov, $closing, $config, $token);
-        if($details == 0){
-            return 0;
-        }else{
-            return 1;
+            if ($response->status() == 403) {
+                return 1;
+            }else{
+                $numero = $response['respuesta'][0]['numero'];
+            }
+            
+            $details = $this->sendDetailsApi($numero, $orders, $nummov, $closing, $config, $token);
+            if($details == 0){
+                return 0;
+            }else{
+                return 1;
+            }
+            //dd('termino');
+        }catch(RequestException $e){
+            if ($e->response->status() == 403) {
+                DB::connection($nameDB)
+                ->table('tbldmovenc')
+                ->where('NUMMOV', $encabezado->nummov)
+                ->where('CODTIPODOC', '4')
+                ->where('codvendedor', $encabezado->codvendedor)
+                ->update(['estadoenviows' => '3', 'fechamovws' => now()->format('Y-m-d H:i:s'), 'msmovws' => 'Error API: Acceso prohibido (403)']);
+            }else{
+                DB::connection($nameDB)
+                ->table('tbldmovenc')
+                ->where('NUMMOV', $encabezado->nummov)
+                ->where('CODTIPODOC', '4')
+                ->where('codvendedor', $encabezado->codvendedor)
+                ->update(['estadoenviows' => '3', 'fechamovws' => now()->format('Y-m-d H:i:s'), 'msmovws' => "Error: " . $e->getMessage()]);
+            }
         }
-        //dd('termino');
+       
     }
 
     private function sendDetailsApi($numero, $orders, $nummov, $closing, $config, $token){
