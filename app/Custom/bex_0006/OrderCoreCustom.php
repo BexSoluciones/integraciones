@@ -106,12 +106,12 @@ class OrderCoreCustom
                     "sw" => 1,
                     "nit" => intval($encabezado->nitcliente),
                     "vendedor" => intval($encabezado->codvendedor),
-                    "fecha" =>   date('Y-m-d\TH:i:s'),
+                    "fecha" =>   date('d/m/Y H:i:s'),
                     "condicion" => $encabezado->codfpagovta,
                     "diasValidez" => intval(substr($encabezado->codfpagovta, -2)),
                     "descuentoPie" => intval($encabezado->dctopiefacaut),
                     "valorTotal" => $valorTotal,
-                    "fechaHora" => date('Y-m-d\TH:i:s'),
+                    "fechaHora" => date('d/m/Y H:i:s'),
                     "anulado" => 0, 
                     "notas" => $encabezado->mensajemov,
                     "usuario" => $encabezado->codvendedor,
@@ -120,7 +120,7 @@ class OrderCoreCustom
                     "concepto" => null,
                     "moneda" => null,
                     "despacho" => null,
-                    "fechaHoraEntrega" =>  date('Y-m-d\TH:i:s', strtotime('+1 day')),
+                    "fechaHoraEntrega" =>  date('d/m/Y H:i:s', strtotime('+1 day')),
                     "nitDestino" => null,
                     "codigoDireccion" => 0, 
                     "abono" => null,
@@ -200,13 +200,22 @@ class OrderCoreCustom
                         ->update(['estadoenviows' => '2', 'fechamovws' => now()]);
                         
                         return 0;
-                    }else{
+                    }elseif($sendHeaderApi == 1){
                         DB::connection($nameDB)
                         ->table('tbldmovenc')
                         ->where('NUMMOV',  $encabezado->nummov)
                         ->where('CODTIPODOC', '4')
                         ->where('codvendedor', $encabezado->codvendedor)
                         ->update(['estadoenviows' => '3', 'fechamovws' => now(), 'msmovws' => 'Error API: Acceso prohibido (403)']);
+
+                        return 1;
+                    }else {
+                        DB::connection($nameDB)
+                        ->table('tbldmovenc')
+                        ->where('NUMMOV',  $encabezado->nummov)
+                        ->where('CODTIPODOC', '4')
+                        ->where('codvendedor', $encabezado->codvendedor)
+                        ->update(['estadoenviows' => '3', 'fechamovws' => now(), 'msmovws' => 'Error API: page not found (404)']);
 
                         return 1;
                     }
@@ -284,6 +293,8 @@ class OrderCoreCustom
 
             if ($response->status() == 403) {
                 return 1;
+            }elseif($response->status() == 404){
+                return 2;
             }else{
                 $numero = $response['respuesta'][0]['numero'];
             }
@@ -303,6 +314,13 @@ class OrderCoreCustom
                 ->where('CODTIPODOC', '4')
                 ->where('codvendedor', $encabezado->codvendedor)
                 ->update(['estadoenviows' => '3', 'fechamovws' => now()->format('Y-m-d H:i:s'), 'msmovws' => 'Error API: Acceso prohibido (403)']);
+            }elseif($e->response->status() == 404) {
+                DB::connection($nameDB)
+                ->table('tbldmovenc')
+                ->where('NUMMOV', $encabezado->nummov)
+                ->where('CODTIPODOC', '4')
+                ->where('codvendedor', $encabezado->codvendedor)
+                ->update(['estadoenviows' => '3', 'fechamovws' => now()->format('Y-m-d H:i:s'), 'msmovws' => 'Error API: not found (404)']);
             }else{
                 DB::connection($nameDB)
                 ->table('tbldmovenc')
@@ -341,7 +359,7 @@ class OrderCoreCustom
                             "porcDcto3" => floatval(number_format(0.0, 2, '.', '')),
                             "cantidadOp" => floatval(number_format(0.0, 2, '.', '')),
                             "Consignacion" => 0,
-                            "fecCompromiso" =>  date('Y-m-d\TH:i:s', strtotime($detail->fechorentregacli)),
+                            "fecCompromiso" =>  date('d/m/Y H:i:s', strtotime('+1 day')),
                             "producido" => 1,
                             "calidad" => 2,
                             "valorUnitarioConfirmado" => floatval(number_format($detail->preciomov, 2, '.', '')),
