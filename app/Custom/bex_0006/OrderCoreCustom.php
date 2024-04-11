@@ -297,6 +297,12 @@ class OrderCoreCustom
                 return 2;
             }else{
                 $numero = $response['respuesta'][0]['numero'];
+                DB::connection($nameDB)
+                ->table('tbldmovenc')
+                ->where('NUMMOV', $encabezado->nummov)
+                ->where('CODTIPODOC', '4')
+                ->where('codvendedor', $encabezado->codvendedor)
+                ->update(['msmovws' => 'Numero del pedido en el ERP: '.$numero]);
             }
             
             $details = $this->sendDetailsApi($numero, $orders, $nummov, $closing, $config, $token);
