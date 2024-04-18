@@ -25,6 +25,11 @@ class Importation_Demand extends Model
         'created_at',
         'updated_at'
     ];
+
+    public function __construct()
+    {
+        return 2;
+    }
    
     public function scopeProcessAndRunning($query, $name_db, $area, $limit){
         $currentDate = Carbon::now()->toDateString();

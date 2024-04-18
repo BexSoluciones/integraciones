@@ -34,7 +34,9 @@ trait ConnectionTrait {
         }
        
         try {
+
             $connectionName = $type != 'local' ? $dataConnection->name : 'dynamic_connection';
+
             Config::set('database.connections.' . $connectionName,  [
                     'driver'    => 'mysql',
                     'host'      => $dataConnection->host,

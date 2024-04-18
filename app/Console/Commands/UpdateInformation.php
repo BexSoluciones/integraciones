@@ -55,6 +55,7 @@ class UpdateInformation extends Command {
             
             // Function to extract data through WS (DataImportTrait).
             $config = Ws_Config::where('estado', 1)->first();
+
             if(!$config){
                 Tbl_Log::create([
                     'id_table'    => $id_importation,
