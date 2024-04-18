@@ -915,16 +915,19 @@ class InsertCustom
 
                 DB::connection($conectionBex)
                     ->table('tbldproductoprecio')
-                    ->insertUsing([
-                        'CODPRODUCTO', 'codprecio','precioproductoprecio'
-                    ],function ($query) {
-                        $query->selectRaw('producto,lista,precio')
-                        ->from('s1e_precios')
-                        ->join('tblmproducto','s1e_precios.producto','=','tblmproducto.CODPRODUCTO')
-                        ->distinct()
-                        ->get();
-                    }
-                );
+                    ->insertUsing(
+                        [
+                            'CODPRODUCTO', 'codprecio', 'precioproductoprecio'
+                        ],
+                        function ($query) {
+                            $query->selectRaw('producto,lista,ROUND( ROUND(CAST(s1e_precios.precio AS DECIMAL(10,2)),2) / (1+(tbldstock.codimpuesto/100)),2) AS precio')
+                                ->from('s1e_precios')
+                                ->join('tblmproducto', 's1e_precios.producto', '=', 'tblmproducto.CODPRODUCTO')
+                                ->join('tbldstock', 'tblmproducto.CODPRODUCTO', '=', 'tbldstock.CODPRODUCTO')
+                                ->distinct()
+                                ->get();
+                        }
+                    );
                 print '◘ Datos insertados en la tabla tbldproductoprecio' . PHP_EOL;
             }
         } catch (\Exception $e) {
