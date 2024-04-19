@@ -83,6 +83,7 @@ class OrderCoreCustom
                     $dcto=($dcto*(1-($order->dctonc/100)));
                     $dcto=100-$dcto;
                     $pvsiesa=$order->preciomov/(1-($dcto/100));
+                    $pvsiesa=ROUND($pvsiesa*(1+($order->ivamov/100)),0);
                     $cadena.=str_pad(number_format($pvsiesa,2,"",""),11," ",STR_PAD_LEFT)."+";
                     $cadena.=str_pad(number_format($dcto,2,"",""),4,"0",STR_PAD_LEFT);
                     $cadena.=str_pad("",4,"0",STR_PAD_LEFT);
