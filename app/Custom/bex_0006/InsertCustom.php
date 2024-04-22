@@ -16,122 +16,127 @@ class InsertCustom
 
     public function insertCarteraCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance)
     {
-        try {
-            $modelInstance::whereRaw('nitcliente = succliente')
-                            ->whereRaw('succliente <> 0')
-                            ->update(['succliente' => '0']);
-            print '◘ Sucursal actualizada en la tabla de cartera' . PHP_EOL;
+        if($datosAInsertar->count() > 0){
 
-            //Tunca tabla s1e_cartera
-            DB::connection($conectionBex)->table('s1e_cartera')->truncate();
-            print '◘ Tabla s1e_cartera truncada' . PHP_EOL;
-
-            $datosAInsertarJson = json_decode(json_encode($datosAInsertar,true));
-
-            if(sizeof($datosAInsertarJson) != 0){
-                foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
-                    $Insert = [];
-                    $count = count($dato);
-                    for($i=0;$i<$count;$i++) {
-                        if ($dato[$i]->succliente == $dato[$i]->nitcliente) {
-                            $dato[$i]->succliente = '0';
+            try {
+                $modelInstance::whereRaw('nitcliente = succliente')
+                                ->whereRaw('succliente <> 0')
+                                ->update(['succliente' => '0']);
+                print '◘ Sucursal actualizada en la tabla de cartera' . PHP_EOL;
+    
+                //Tunca tabla s1e_cartera
+                DB::connection($conectionBex)->table('s1e_cartera')->truncate();
+                print '◘ Tabla s1e_cartera truncada' . PHP_EOL;
+    
+                $datosAInsertarJson = json_decode(json_encode($datosAInsertar,true));
+    
+                if(sizeof($datosAInsertarJson) != 0){
+                    foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
+                        $Insert = [];
+                        $count = count($dato);
+                        for($i=0;$i<$count;$i++) {
+                            if ($dato[$i]->succliente == $dato[$i]->nitcliente) {
+                                $dato[$i]->succliente = '0';
+                            }
+                            $Insert[] = [
+                                'nitcliente'    => $dato[$i]->nitcliente,
+                                'dv'            => $dato[$i]->dv,
+                                'succliente'    => $dato[$i]->succliente,
+                                'codtipodoc'    => $dato[$i]->codtipodoc,
+                                'documento'     => $dato[$i]->documento,
+                                'fecmov'        => $dato[$i]->fecmov,
+                                'fechavenci'    => $dato[$i]->fechavenci,
+                                'vrpostf'       => $dato[$i]->vrpostf,
+                                'valor'         => $dato[$i]->valor,
+                                'codvendedor'   => $dato[$i]->codvendedor,
+                                'x'             => null,
+                                'codcliente'    => '',
+                                'estadotipodoc' => 'A'
+                            ];    
                         }
-                        $Insert[] = [
-                            'nitcliente'    => $dato[$i]->nitcliente,
-                            'dv'            => $dato[$i]->dv,
-                            'succliente'    => $dato[$i]->succliente,
-                            'codtipodoc'    => $dato[$i]->codtipodoc,
-                            'documento'     => $dato[$i]->documento,
-                            'fecmov'        => $dato[$i]->fecmov,
-                            'fechavenci'    => $dato[$i]->fechavenci,
-                            'vrpostf'       => $dato[$i]->vrpostf,
-                            'valor'         => $dato[$i]->valor,
-                            'codvendedor'   => $dato[$i]->codvendedor,
-                            'x'             => null,
-                            'codcliente'    => '',
-                            'estadotipodoc' => 'A'
-                        ];    
+                        DB::connection($conectionBex)->table('s1e_cartera')->insert($Insert);
                     }
-                    DB::connection($conectionBex)->table('s1e_cartera')->insert($Insert);
+                    print '◘ Datos insertados la tabla s1e_cartera' . PHP_EOL;
                 }
-                print '◘ Datos insertados la tabla s1e_cartera' . PHP_EOL;
-            }
-
-            DB::connection($conectionBex)
-                ->table('s1e_cartera')
-                ->join('tblmtipodoc','s1e_cartera.codtipodoc','=','tblmtipodoc.codtipodoc')
-                ->update(['s1e_cartera.estadotipodoc' => 'C']);
-            
-            DB::connection($conectionBex)
-                ->table('tblmtipodoc')
-                ->insertUsing(['codtipodoc','nomtipodoc'],
-                function ($query) {
-                    $query->select('codtipodoc', DB::raw("concat('TIPO DOCUMENTO ', codtipodoc) as nomtipodoc"))
-                        ->from('s1e_cartera')
-                        ->where('estadotipodoc', '=', 'A')
-                        ->groupBy('s1e_cartera.codtipodoc');
-                }
-            );
-            print '◘ Datos insertados en la tabla tblmtipodoc' . PHP_EOL;
-            
-            //Actualiza codcliente en la tabla s1e_cartera
-            DB::connection($conectionBex)
-                ->table('s1e_cartera')
-                ->join('tblmcliente','s1e_cartera.nitcliente','=','tblmcliente.NITCLIENTE')
-                ->whereColumn('s1e_cartera.succliente','tblmcliente.SUCCLIENTE')
-                ->update(['s1e_cartera.codcliente' => DB::raw('tblmcliente.CODCLIENTE')]);
-            print '◘ Se actualizo la columna codcliente en la tabla s1e_cartera' . PHP_EOL;
-        
-            DB::connection($conectionBex)->table('tbldcartera')->truncate();
-            print '◘ Tabla tbldcartera truncada' . PHP_EOL;
-
-            DB::connection($conectionBex)
-                ->table('tbldcartera')
-                ->insertUsing(
-                    ['CODVENDEDOR', 'CODCLIENTE','CODTIPODOC','NUMMOV','FECMOV','FECVEN','PRECIOMOV','VALTOTCREDITO'],
+    
+                DB::connection($conectionBex)
+                    ->table('s1e_cartera')
+                    ->join('tblmtipodoc','s1e_cartera.codtipodoc','=','tblmtipodoc.codtipodoc')
+                    ->update(['s1e_cartera.estadotipodoc' => 'C']);
+                
+                DB::connection($conectionBex)
+                    ->table('tblmtipodoc')
+                    ->insertUsing(['codtipodoc','nomtipodoc'],
                     function ($query) {
-                        $query->select('s1e_cartera.codvendedor','s1e_cartera.codcliente','s1e_cartera.codtipodoc','documento','s1e_cartera.fecmov','fechavenci','valor','vrpostf')
-                        ->from('s1e_cartera')
-                        ->join('tblmcliente','s1e_cartera.codcliente','=','tblmcliente.CODCLIENTE')
-                        ->join('tblmvendedor','s1e_cartera.codvendedor','=','tblmvendedor.CODVENDEDOR');
+                        $query->select('codtipodoc', DB::raw("concat('TIPO DOCUMENTO ', codtipodoc) as nomtipodoc"))
+                            ->from('s1e_cartera')
+                            ->where('estadotipodoc', '=', 'A')
+                            ->groupBy('s1e_cartera.codtipodoc');
                     }
                 );
-            print '◘ Datos insertados en la tabla tbldcartera' . PHP_EOL;
-            
-            DB::connection($conectionBex)
-                ->table('tbldcartera')
-                ->where('preciomov','>=',0)
-                ->update(['debcre' => 'D']);
-            print '◘ Se actualizo la columna debcre en la tabla tbldcartera' . PHP_EOL;
+                print '◘ Datos insertados en la tabla tblmtipodoc' . PHP_EOL;
                 
-            DB::connection($conectionBex)
-                ->table('tbldcartera')
-                ->where('preciomov','<',0)
-                ->update(['debcre' => 'C']);
-            print '◘ Se actualizo la columna debcre en la tabla tbldcartera' . PHP_EOL;
-
-            DB::connection($conectionBex)
-                ->table('tbldcartera')
-                ->where('preciomov','<',0)
-                ->update(['preciomov' => DB::raw('preciomov * (-1)')]);
-            print '◘ Se actualizo la columna preciomov en la tabla tbldcartera' . PHP_EOL;
-
-            /*
-            DB::connection($conectionBex)
-                ->statement('CREATE TABLE IF NOT EXISTS s1e_dptos (
-                    codpais varchar(5),
-                    coddpto varchar(5),
-                    descripcion varchar(50)                          
-                )');
-
-            DB::connection($conectionBex)->statement('DROP TABLE IF EXISTS s1e_dptos');*/
-        } catch (\Exception $e) {
-            Tbl_Log::create([
-                'id_table'    => $id_importation,
-                'type'        => $type,
-                'descripcion' => 'Custom::bex_0006/InsertCustom[insertCarteraCustom()] => '.$e->getMessage()
-            ]);
-            return 1;
+                //Actualiza codcliente en la tabla s1e_cartera
+                DB::connection($conectionBex)
+                    ->table('s1e_cartera')
+                    ->join('tblmcliente','s1e_cartera.nitcliente','=','tblmcliente.NITCLIENTE')
+                    ->whereColumn('s1e_cartera.succliente','tblmcliente.SUCCLIENTE')
+                    ->update(['s1e_cartera.codcliente' => DB::raw('tblmcliente.CODCLIENTE')]);
+                print '◘ Se actualizo la columna codcliente en la tabla s1e_cartera' . PHP_EOL;
+            
+                DB::connection($conectionBex)->table('tbldcartera')->truncate();
+                print '◘ Tabla tbldcartera truncada' . PHP_EOL;
+    
+                DB::connection($conectionBex)
+                    ->table('tbldcartera')
+                    ->insertUsing(
+                        ['CODVENDEDOR', 'CODCLIENTE','CODTIPODOC','NUMMOV','FECMOV','FECVEN','PRECIOMOV','VALTOTCREDITO'],
+                        function ($query) {
+                            $query->select('s1e_cartera.codvendedor','s1e_cartera.codcliente','s1e_cartera.codtipodoc','documento','s1e_cartera.fecmov','fechavenci','valor','vrpostf')
+                            ->from('s1e_cartera')
+                            ->join('tblmcliente','s1e_cartera.codcliente','=','tblmcliente.CODCLIENTE')
+                            ->join('tblmvendedor','s1e_cartera.codvendedor','=','tblmvendedor.CODVENDEDOR');
+                        }
+                    );
+                print '◘ Datos insertados en la tabla tbldcartera' . PHP_EOL;
+                
+                DB::connection($conectionBex)
+                    ->table('tbldcartera')
+                    ->where('preciomov','>=',0)
+                    ->update(['debcre' => 'D']);
+                print '◘ Se actualizo la columna debcre en la tabla tbldcartera' . PHP_EOL;
+                    
+                DB::connection($conectionBex)
+                    ->table('tbldcartera')
+                    ->where('preciomov','<',0)
+                    ->update(['debcre' => 'C']);
+                print '◘ Se actualizo la columna debcre en la tabla tbldcartera' . PHP_EOL;
+    
+                DB::connection($conectionBex)
+                    ->table('tbldcartera')
+                    ->where('preciomov','<',0)
+                    ->update(['preciomov' => DB::raw('preciomov * (-1)')]);
+                print '◘ Se actualizo la columna preciomov en la tabla tbldcartera' . PHP_EOL;
+    
+                /*
+                DB::connection($conectionBex)
+                    ->statement('CREATE TABLE IF NOT EXISTS s1e_dptos (
+                        codpais varchar(5),
+                        coddpto varchar(5),
+                        descripcion varchar(50)                          
+                    )');
+    
+                DB::connection($conectionBex)->statement('DROP TABLE IF EXISTS s1e_dptos');*/
+            } catch (\Exception $e) {
+                Tbl_Log::create([
+                    'id_table'    => $id_importation,
+                    'type'        => $type,
+                    'descripcion' => 'Custom::bex_0006/InsertCustom[insertCarteraCustom()] => '.$e->getMessage()
+                ]);
+                return 1;
+            }
+        }else{
+            print '◘ No hay datos para insertar en la tbldcartera, no se borra la tabla' . PHP_EOL;
         }
     }
 
@@ -295,22 +300,28 @@ class InsertCustom
                 ]);
             print '◘ Datos actualizados en la tabla tblmcliente' . PHP_EOL;
 
-            DB::connection($conectionBex)->table('tbldclienteadic')->truncate();
-            print '◘ La tabla tbldclienteadic fue truncada' . PHP_EOL;
+            if($datosAInsertar->count() > 0){
 
-            DB::connection($conectionBex)
-                ->table('tbldclienteadic')
-                ->insertUsing([
-                    'codcliente', 'id_campo','numreg','valor','tipocliente'
-                ],function ($query) {
-                    $query->selectRaw('codcliente,"1" AS id_campo,"1" AS numreg,infoCupoDisponible,"N" as tipocliente')
-                    ->from('s1e_clientes')
-                    ->where('s1e_clientes.codcliente','<>','0')
-                    ->where('estado', 'C')
-                    ->groupBy('s1e_clientes.codcliente');
-                }
-            );
-            print '◘ Datos insertados en la tabla tbldclienteadic' . PHP_EOL;
+                DB::connection($conectionBex)->table('tbldclienteadic')->truncate();
+                print '◘ La tabla tbldclienteadic fue truncada' . PHP_EOL;
+    
+                DB::connection($conectionBex)
+                    ->table('tbldclienteadic')
+                    ->insertUsing([
+                        'codcliente', 'id_campo','numreg','valor','tipocliente'
+                    ],function ($query) {
+                        $query->selectRaw('codcliente,"1" AS id_campo,"1" AS numreg,infoCupoDisponible,"N" as tipocliente')
+                        ->from('s1e_clientes')
+                        ->where('s1e_clientes.codcliente','<>','0')
+                        ->where('estado', 'C')
+                        ->groupBy('s1e_clientes.codcliente');
+                    }
+                );
+                print '◘ Datos insertados en la tabla tbldclienteadic' . PHP_EOL;
+            }else{
+                print '◘ No hay datos para insertar en la tabla tbldclienteadic, no se trunca la tabla' . PHP_EOL;
+            }
+
 
         } catch (\Exception $e) {
             Tbl_Log::create([
