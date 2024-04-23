@@ -771,7 +771,7 @@ class InsertCustom
 
                 $insertMpios = DB::connection($conectionBex)
                     ->table('s1e_mpios')
-                    ->leftJoin('tblmmpio', 's1e_mpios.coddpto', '=', 'tblmmpio.CODDPTO')
+                    ->leftJoin('tblmmpio',  DB::raw("CONCAT(s1e_mpios.coddpto, s1e_mpios.codmpio)"), '=', 'tblmmpio.CODMPIO')
                     ->select('s1e_mpios.codpais', 's1e_mpios.coddpto', 's1e_mpios.codmpio', 's1e_mpios.descripcion')
                     ->whereNull('tblmmpio.codmpio')
                     ->get();
