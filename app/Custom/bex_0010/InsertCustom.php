@@ -741,7 +741,7 @@ class InsertCustom
                 
                 $insertMpios = DB::connection($conectionBex)
                                 ->table('s1e_mpios')
-                                ->leftJoin('tblmmpio', 's1e_mpios.coddpto', '=', 'tblmmpio.CODDPTO')
+                                ->leftJoin('tblmmpio', DB::raw("CONCAT(s1e_mpios.coddpto, s1e_mpios.codmpio)"), '=', 'tblmmpio.CODMPIO')
                                 ->select('s1e_mpios.codpais', 's1e_mpios.coddpto','s1e_mpios.codmpio','s1e_mpios.descripcion')
                                 ->whereNull('tblmmpio.codmpio')
                                 ->get();
@@ -2007,7 +2007,7 @@ class InsertCustom
                     print '◘ Datos insertados en la tabla s1e_bodegas' . PHP_EOL;
 
                 DB::connection($conectionBex)->table('s1e_bodegas')
-                    ->join('tblmbodega','s1e_bodegas.codigo','=','tblmbodega.codbodega')
+                    ->join('tblmbodega','s1e_bodegas.codigo','=',DB::raw('TRIM(tblmbodega.codbodega)'))
                     ->update(['s1e_bodegas.estadobodega' => 'C']);
                 print '◘ Codigo en la tabla s1e_bodegas actualizado' . PHP_EOL;  
 
