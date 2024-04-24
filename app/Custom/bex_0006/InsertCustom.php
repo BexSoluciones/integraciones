@@ -1499,11 +1499,17 @@ class InsertCustom
         }
     }
 
-    public function InsertAmovilCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type)
+    public function InsertAmovilCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type,$modelInstance)
     {   
         try {
             $inset=(count($datosAInsertar));
             if($inset > 0){
+
+                $modelInstance::whereRaw('nitcliente = succliente')
+                                ->whereRaw('succliente <> 0')
+                                ->update(['succliente' => '0']);
+                print '◘ Sucursal actualizada en la tabla Amovil' . PHP_EOL;
+
                 DB::connection($conectionBex)->table('tbldamovil')->truncate();
                 print '◘ Tabla tbldamovil truncada' . PHP_EOL;
 
