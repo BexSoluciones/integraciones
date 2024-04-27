@@ -38,7 +38,7 @@ class OrderCoreCustom
         }
         
         $config = Ws_Config::where('estado', 1)->first();
-       
+
         try{
             if (count($orders) > 0) {
                 foreach($orders as $order){
@@ -112,7 +112,7 @@ class OrderCoreCustom
                     
                     //Creacion Detalle - movimientos pedido
                     $counter = 3;
-                    $counterDetailOrder = 1;
+                    $counterDetailOrder = 0;
                     
                     foreach ($orders as $orderDetail) {
                         //---Declarando variables
@@ -123,7 +123,8 @@ class OrderCoreCustom
                                 $chain="";
                                 $chain.=str_pad($counter,7,"0",STR_PAD_LEFT);
                                 $chain.="0431";
-                                $chain.="0003".$config['IdCia'];
+                                $chain.="0003";
+                                $chain.=str_pad($config['IdCia'],3,"0",STR_PAD_LEFT);
                                 $chain.=str_pad($order->co,3,"0",STR_PAD_LEFT);
                                 $chain.=str_pad($order->tipodoc,3," ",STR_PAD_LEFT);
                                 $chain.=str_pad($order->nummov,8,"0",STR_PAD_LEFT);
@@ -147,7 +148,10 @@ class OrderCoreCustom
                                 $chain.=str_pad("",255," ",STR_PAD_LEFT);
                                 $chain.=str_pad("",2000," ",STR_PAD_LEFT);
                                 $chain.="5";
+                                $chain .= "\n"; 
+                                $counter++;
                             }else{
+                                $counterDetailOrder++;
                                 $chain .= str_pad($counter, 7, "0", STR_PAD_LEFT); //Numero consecutivo
                                 $chain .= '0431'; //Tipo registro
                                 $chain .= '00'; //Subtipo registro
@@ -188,8 +192,137 @@ class OrderCoreCustom
                                 $chain .= '1'; //Indicador de precio
                                 $chain .= "\n"; 
                                 $counter++;
-                                $counterDetailOrder++;
                             }
+                            $varconsdcto = 0;
+                       
+                        //No se incluye en el exportador porque el DCTOPIEFACAUT es un descuento oculto
+                        if($orderDetail->dctopiefacaut>0)
+                        {
+                            #--SUBDETALLE
+                            $varconsdcto++;
+                            // $chain="";
+                            $chain.=str_pad($counter,7,"0",STR_PAD_LEFT);
+                            $chain.="0432";
+                            $chain.="0001";
+                            $chain.=str_pad($config['IdCia'],3,"0",STR_PAD_LEFT);
+                            $chain.=str_pad($order->co,3,"0",STR_PAD_LEFT);
+                            $chain.=str_pad($order->tipodoc,3," ",STR_PAD_LEFT);
+                            $chain.=str_pad($order->nummov,8,"0",STR_PAD_LEFT);
+                            $chain.=str_pad($counterDetailOrder,10,"0",STR_PAD_LEFT);
+                            $chain.="0".$varconsdcto;
+                            $chain.="1";
+                            $chain.=str_pad(number_format($orderDetail->dctopiefacaut,4,".",""),8,"0",STR_PAD_LEFT);
+                            $chain.=str_pad("",15,"0",STR_PAD_LEFT);
+                            $chain.=".0000";
+                            $chain.= "\n";
+                            $counter++;
+                        }
+                   
+                        //se habilita el 16/06/2016
+                        if($orderDetail->dcto1mov>0)
+                        {
+                            //Ya no va porque el descuento original aplasta el DCTO1MOV
+                            /*
+                            if($orderDetail->ocultoporcval != '')
+                            {
+                                $arrOcultos = explode("|", $orderDetail->ocultoporcval);
+                                $newArrOc = array();
+                                foreach ($arrOcultos as $value)
+                                {
+                                    if($value[0] == '%')
+                                        $newArrOc[] = substr($value, 1);
+                                }
+                                if(count($newArrOc) > 0)
+                                {
+                                    $newdcto = 100 - $plano->fields['dcto1mov'];
+                                    echo "100 - ".$plano->fields['dcto1mov']."<hr>";
+                                    foreach ($newArrOc as $value)
+                                    {
+                                        if(floatval($value) > 0)
+                                        {
+                                            echo $newdcto."/(1-(".floatval($value)."/100))"."<hr>";
+                                            $newdcto = $newdcto/(1-(floatval($value)/100));
+                                            
+                                        }
+                                    }                    
+                                    echo "round((100-".$newdcto."),2)"."<hr>";
+                                    $plano->fields['dcto1mov'] = round((100-$newdcto),2);
+                                    
+                                }
+                                if($plano->fields['dcto1mov'] < 0)
+                                    $plano->fields['dcto1mov'] = 0;
+                            }
+                            */
+
+                            if($orderDetail->dcto1mov > 0 && $orderDetail->prepack!='S')
+                            {
+                                #--SUBDETALLE
+                                $varconsdcto++;
+                                // $chain="";
+                                $chain.=str_pad($counter,7,"0",STR_PAD_LEFT);
+                                $chain.="0432";
+                                $chain.="0001";
+                                $chain.=str_pad($config['IdCia'],3,"0",STR_PAD_LEFT);
+                                $chain.=str_pad($order->co,3,"0",STR_PAD_LEFT);
+                                $chain.=str_pad($order->tipodoc,3," ",STR_PAD_LEFT);
+                                $chain.=str_pad($order->nummov,8,"0",STR_PAD_LEFT); //nummov
+                                $chain.=str_pad($counterDetailOrder,10,"0",STR_PAD_LEFT);
+                                $chain.="0".$varconsdcto;
+                                $chain.="1";
+                                $chain.=str_pad(number_format($orderDetail->dcto1mov,4,".",""),8,"0",STR_PAD_LEFT);
+                                $chain.=str_pad("",15,"0",STR_PAD_LEFT);
+                                $chain.=".0000";                              
+                                $chain.="\n";
+                                $counter++;
+                            }
+                        }
+                        //se habilita el 16/06/2016
+                        if($orderDetail->dctovalor>0)
+                        {
+                            if($orderDetail->ocultoporcval != '')
+                            {
+                                $arrOcultos = explode("|", $orderDetail->ocultoporcval);
+                                $newArrOc = array();
+                                foreach ($arrOcultos as $value)
+                                {
+                                    if($value[0] == '$')
+                                        $newArrOc[] = substr($value, 1);
+                                }
+                                if(count($newArrOc) > 0)
+                                {
+                                    foreach ($newArrOc as $value)
+                                    {
+                                        if(floatval($value) > 0)
+                                        {
+                                            $orderDetail->dctovalor = $orderDetail->dctovalor - floatval($value);
+                                        }
+                                    }
+                                }
+                                if($orderDetail->dctovalor < 0)
+                                    $orderDetail->dctovalor = 0;
+                            }
+
+                            if($orderDetail->dctovalor > 0)
+                            {
+                                #--SUBDETALLE
+                                $varconsdcto++;
+                                // $chain="";
+                                $chain.=str_pad($counter,7,"0",STR_PAD_LEFT);
+                                $chain.="0432";
+                                $chain.="0001";
+                                $chain.=str_pad($config['IdCia'],3,"0",STR_PAD_LEFT);
+                                $chain.=str_pad($order->co,3,"0",STR_PAD_LEFT);
+                                $chain.=str_pad($order->tipodoc,3," ",STR_PAD_LEFT);
+                                $chain.=str_pad($order->nummov,8,"0",STR_PAD_LEFT); //nummov
+                                $chain.=str_pad($counterDetailOrder,10,"0",STR_PAD_LEFT);
+                                $chain.="0".$varconsdcto;
+                                $chain.="1";
+                                $chain.=str_pad(number_format(0,4,".",""),8,"0",STR_PAD_LEFT);
+                                $chain.=str_pad(number_format($orderDetail->dctovalor,4,".",""),20,"0",STR_PAD_LEFT);
+                                $chain.="\n";                                
+                                $counter++;
+                            }
+                        }            
                     }
 
                     $chain .= str_pad($counter, 7, "0", STR_PAD_LEFT) . "99990001002";
