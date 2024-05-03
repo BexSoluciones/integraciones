@@ -288,7 +288,7 @@ class InsertCustom
                 ->join('s1e_clientes','tblmcliente.codcliente','=','s1e_clientes.codcliente')
                 ->whereColumn('tblmcliente.nitcliente','s1e_clientes.codigo')
                 ->update([
-                    'tblmcliente.RAZCLIENTE' => DB::raw("IF(s1e_clientes.bloqueo in (1,2), CONCAT(s1e_clientes.razsoc,' ', '*BLOQUEADO*'), s1e_clientes.razsoc)"),
+                    'tblmcliente.RAZCLIENTE' => DB::raw("IF(s1e_clientes.bloqueo in (1,2), CONCAT(s1e_clientes.razsoc,' ','*', s1e_clientes.bloqueo,'*'), s1e_clientes.razsoc)"),
                     'tblmcliente.NOMCLIENTE' => DB::raw('s1e_clientes.representante'),
                     'tblmcliente.DIRCLIENTE' => DB::raw('s1e_clientes.direccion'),
                     'tblmcliente.TELCLIENTE' => DB::raw('s1e_clientes.telefono'),
