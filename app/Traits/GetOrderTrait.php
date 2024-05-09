@@ -53,15 +53,16 @@ trait GetOrderTrait {
                     ->where('tbldmovenc.codtipodoc', '4')
                     ->selectRaw('tblmvendedor.co,tblmvendedor.tipodoc,tbldmovenc.nummov,nitcliente,succliente,
                                 tbldmovenc.codfpagovta, tbldmovenc.codvendedor,fecmov,tbldmovdet.codproducto,
-                                tbldmovdet.codbodega,cantidadmov,tbldmovenc.codprecio,preciomov,dcto1mov,dcto2mov,dcto3mov,
-                                dcto4mov,pluproducto,nomunidademp,tblmproducto.codunidademp,mensajemov,dctopiefacaut,dctonc,
-                                numvisita,fechorfinvisita,fechorentregacli,origen,ordendecompra,tblmvendedor.cedula,
+                                tbldmovdet.codbodega,cantidadmov,tbldmovenc.codprecio,preciomov,dcto1mov,dcto2mov,
+                                dcto3mov,dcto4mov,pluproducto,nomunidademp,tblmproducto.codunidademp,
+                                REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(mensajemov,"á", "a"),"é", "e"),"í", "i"),"ó", "o"),"ú", "u"),"Á", "A"),"É", "E"),"Í", "I"),"Ó", "O"),"Ú", "U") AS mensajemov,
+                                dctopiefacaut,dctonc,numvisita,fechorfinvisita,fechorentregacli,origen,ordendecompra,tblmvendedor.cedula,
                                 tbldmovdet.prepack,ivamov,nomproducto,dctovalor,tblmvendedor.tercvendedor,tbldmovdet.bonificado,tblmproducto.codproveedor,
                                 tbldmovdet.ocultoporcval,tbldmovenc.codtipodoc,tbldmovenc.prefmov,tbldmovenc.numcierre,estadoenviows,tblmproducto.ccostos,tblmvendedor.nomvendedor'.$iva)
                     ->orderBy('tbldmovenc.nummov','asc')
                     ->orderBy('tbldmovdet.codmovdet','asc')
                     ->get();
-          
+
                 $plataforSys = 2;
                 $config = $this->connectionDB($plataforSys, 'externa', $area);
                 if($config != 0){
