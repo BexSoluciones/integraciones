@@ -21,6 +21,8 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
+    protected $importationAutomatic;
+
     protected function schedule(Schedule $schedule): void {
         try {
             $parameters = Command::getAll()->get();
@@ -31,14 +33,14 @@ class Kernel extends ConsoleKernel
 
                 // Verifica si la expresión cron coincide con la fecha actual
                 if ($cron->isDue()) {
-                    $this->importationAutomatic = Importation_Automatic::create([
-                        'id_table'  => $parameter->id,
-                        'state'     => 2,
-                        'area'      => $parameter->area,
-                        'date_init' => Carbon::now()
-                    ]);
-                                   
+                    
                     if($parameter->command == 'command:update-information'){
+                        $this->importationAutomatic = Importation_Automatic::create([
+                            'id_table'  => $parameter->id,
+                            'state'     => 2,
+                            'area'      => $parameter->area,
+                            'date_init' => Carbon::now()
+                        ]);
                         // Ejecuta el comando
                         $schedule->command($parameter->command, [$parameter->name_db, $parameter->area,'0', $this->importationAutomatic ? $this->importationAutomatic->id : null, 1])
                         ->before(function () use ($parameter) {
@@ -128,15 +130,15 @@ class Kernel extends ConsoleKernel
                                 );
                             }
                             
-                            $importationAutomaticToUpdate = Importation_Automatic::find($this->importationAutomatic->id);
-                            $importationAutomaticToUpdate->update(['state' => 3, 'date_init' => $this->importationAutomatic->date_init, 'date_end' => now()]);
+                            // $importationAutomaticToUpdate = Importation_Automatic::find($this->importationAutomatic->id);
+                            // $importationAutomaticToUpdate->update(['state' => 3, 'date_init' => $this->importationAutomatic->date_init, 'date_end' => now()]);
                         })
                         //si ocurre un error se se guarda y se cambia a state 1 para que vuelva aquedar activo 
                         ->onFailure(function (Stringable $output) use ($parameter) {
                             $parameter->updateOrInsert(['name_db' => $parameter->name_db, 'area' => $parameter->area], ['state' => '1']);
                         
-                            $importationAutomaticToUpdate = Importation_Automatic::find($this->importationAutomatic->id);
-                            $importationAutomaticToUpdate->update(['state' => 4, 'date_init' => $this->importationAutomatic->date_init, 'date_end' => now()]);
+                            // $importationAutomaticToUpdate = Importation_Automatic::find($this->importationAutomatic->id);
+                            // $importationAutomaticToUpdate->update(['state' => 4, 'date_init' => $this->importationAutomatic->date_init, 'date_end' => now()]);
                         })
                         // Sirve para que un schedule no se ejecute encima de otro y espere 1 mn
                         ->withoutOverlapping(1);
