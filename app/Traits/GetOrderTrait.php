@@ -58,7 +58,7 @@ trait GetOrderTrait {
                                 REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(mensajemov,"á", "a"),"é", "e"),"í", "i"),"ó", "o"),"ú", "u"),"Á", "A"),"É", "E"),"Í", "I"),"Ó", "O"),"Ú", "U"),"ñ","n"),"Ñ","N") AS mensajemov,
                                 dctopiefacaut,dctonc,numvisita,fechorfinvisita,fechorentregacli,origen,ordendecompra,tblmvendedor.cedula,
                                 tbldmovdet.prepack,ivamov,nomproducto,dctovalor,tblmvendedor.tercvendedor,tbldmovdet.bonificado,tblmproducto.codproveedor,
-                                tbldmovdet.ocultoporcval,tbldmovenc.codtipodoc,tbldmovenc.prefmov,tbldmovenc.numcierre,estadoenviows,tblmproducto.ccostos,tblmvendedor.nomvendedor'.$iva)
+                                tbldmovdet.ocultoporcval,tbldmovenc.codtipodoc,tbldmovenc.prefmov,tbldmovenc.numcierre,estadoenviows,tblmproducto.ccostos,tblmvendedor.nomvendedor,tbldmovenc.mensajeadic'.$iva)
                     ->orderBy('tbldmovenc.nummov','asc')
                     ->orderBy('tbldmovdet.codmovdet','asc')
                     ->get();
