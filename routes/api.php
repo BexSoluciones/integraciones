@@ -22,20 +22,22 @@ Route::group(['prefix' => 'prueba','middleware' => ['auth:sanctum']], function()
     Route::get('/', [AuthController::class, 'prueba']);
 });
 
+// , 'middleware' => ['auth:sanctum']
+
 // Rutas para ejecutar comandos
-Route::group(['prefix' => 'commands', 'middleware' => ['auth:sanctum']], function(){
+Route::group(['prefix' => 'commands'], function(){
     Route::post('/update/information', [CommandController::class, 'updateInformation']);
     // Sube todos los pedidos
     Route::post('/upload/order', [CommandController::class, 'uploadOrder']);
 });
 
 // Rutas para consultar el estado de las importaciones
-Route::group(['prefix' => 'importation', 'middleware' => ['auth:sanctum']], function(){
+Route::group(['prefix' => 'importation'], function(){
     Route::post('/consult/state', [ImportationController::class, 'consultState']);
     Route::post('/automatic/consult/state', [ImportationController::class, 'automaticConsultState']);
 });
 
 // Rutas para descargar archivos planos de pedidos
-Route::group(['prefix' => 'flatfile', 'middleware' => ['auth:sanctum']], function(){
+Route::group(['prefix' => 'flatfile'], function(){
     Route::post('/download/pedido', [FlatFileController::class, 'download']);
 });
