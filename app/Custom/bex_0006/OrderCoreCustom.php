@@ -341,7 +341,7 @@ class OrderCoreCustom
 
     private function sendDetailsApi($numero, $orders, $nummov, $closing, $config, $token){
         try{
-            $i = 0;
+            $i = 1;
             
             foreach($orders as $detail){
                 if($detail->nummov == $nummov){
@@ -350,7 +350,7 @@ class OrderCoreCustom
                             "sw" => 1,
                             "numero" => $numero,
                             "codigo" =>  $detail->codproducto,
-                            "seq" => $i+1,
+                            "seq" => $i,
                             "bodega" => intval($detail->codbodega),
                             "cantidad" => floatval(number_format($detail->cantidadmov, 2, '.', '')),
                             "cantidadDespachada" => 0,
@@ -360,7 +360,7 @@ class OrderCoreCustom
                             "und" => $detail->codunidademp,
                             "cantidadUnd" => floatval(number_format($detail->cantidadmov, 2, '.', '')),
                             "adicional" => "Informaci&oacute;n adicional",
-                            "despachoVirtual" => floatval(number_format(3.0, 2, '.', '')),
+                            "despachoVirtual" => floatval(number_format($detail->cantidadmov, 2, '.', '')),
                             "porcDcto2" => floatval(number_format(0.0, 2, '.', '')),
                             "porcDcto3" => floatval(number_format(0.0, 2, '.', '')),
                             "cantidadOp" => floatval(number_format(0.0, 2, '.', '')),
@@ -379,6 +379,7 @@ class OrderCoreCustom
                             "descripcionItemAdicional" => $detail->nomproducto
                         
                     ];
+                    $i++;
                 }  
 
             }
