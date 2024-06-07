@@ -358,7 +358,7 @@ class OrderCoreCustom
                             "porcentajeIva" => floatval(number_format(($detail->ivamov), 0, '.', '')),
                             "porcentajeDescuento" => floatval(number_format($detail->dctopiefacaut, 2, '.', '')),
                             "und" => $detail->codunidademp,
-                            "cantidadUnd" => floatval(number_format($detail->cantidadmov, 2, '.', '')),
+                            "cantidadUnd" => floatval(number_format(1, 2, '.', '')),
                             "adicional" => "Informaci&oacute;n adicional",
                             "despachoVirtual" => floatval(number_format($detail->cantidadmov, 2, '.', '')),
                             "porcDcto2" => floatval(number_format(0.0, 2, '.', '')),
