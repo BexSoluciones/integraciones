@@ -49,7 +49,6 @@ class InsertCustom
                                 'vrpostf'       => $dato[$i]->vrpostf,
                                 'valor'         => $dato[$i]->valor,
                                 'codvendedor'   => $dato[$i]->codvendedor,
-                                'x'             => null,
                                 'codcliente'    => '',
                                 'estadotipodoc' => 'A'
                             ];    
