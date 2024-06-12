@@ -90,7 +90,8 @@ trait ApiTrait {
                     $url = $clave->sentencia;
                     
                     $client = new Client();
-                    $response = Http::withHeaders([
+
+                    $response = Http::connectTimeout(60)->withHeaders([
                         'Authorization' => 'Bearer ' . $token,
                         'Accept' => 'application/json', 
                     ])->timeout($timeoutInSeconds)->get($url);
