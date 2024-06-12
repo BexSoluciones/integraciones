@@ -247,21 +247,22 @@ class InsertCustom
                 ->get();   
 
             if($insertClient->isNotEmpty()){
-                DB::connection($conectionBex)
-                    ->table('tblmcliente')
-                    ->insertUsing([
-                        'nitcliente', 'dvcliente','succliente','razcliente','nomcliente','dircliente','telcliente',
-                        'codbarrio','codtipocliente','codfpagovta','codprecio','coddescuento','email'
-                    ],function ($query) {
-                        $query->select('codigo','dv','sucursal','razsoc','representante','direccion','telefono',
-                        'periodicidad','periodicidad','conpag','precio','dv','email')
-                        ->from('s1e_clientes')
-                        ->where('s1e_clientes.codcliente','0')
-                        ->where('estado', 'A');
-                    }
-                );
+
+                    $sql = "
+                    INSERT IGNORE INTO tblmcliente (nitcliente, dvcliente, succliente, razcliente, nomcliente, dircliente, telcliente, codbarrio, codtipocliente, codfpagovta, codprecio, coddescuento, email)
+                    SELECT codigo, dv, 
+                            IF(LENGTH(sucursal) > 4, SUBSTR(sucursal, 2, LENGTH(sucursal)), sucursal) AS sucursal, 
+                            razsoc, representante, direccion, telefono, periodicidad, periodicidad, conpag, precio, dv, email
+                    FROM s1e_clientes
+                    WHERE codcliente = 0 AND estado = 'A';
+                ";
+                
+                DB::connection($conectionBex)->statement($sql);
+ 
                 print '◘ Datos insertados en la tabla tblmcliente' . PHP_EOL; 
                 
+       
+
                 DB::connection($conectionBex)
                     ->table('s1e_clientes')
                     ->join('tblmcliente','s1e_clientes.codigo','=','tblmcliente.nitcliente')
@@ -272,14 +273,16 @@ class InsertCustom
                         'fecingcliente' => $currentDate
                     ]);
                 print '◘ Datos actualizados en la tabla s1e_clientes' . PHP_EOL;
-                
-                DB::connection($conectionBex)
-                    ->table('s1e_clientes')
-                    ->join('tblmcliente','s1e_clientes.codcliente','=','tblmcliente.codcliente')
-                    ->whereColumn('s1e_clientes.sucursal','tblmcliente.succliente')
-                    ->whereColumn('s1e_clientes.codigo','tblmcliente.nitcliente')
-                    ->update(['s1e_clientes.estado' => 'C']);
+
+                $sql1 = "UPDATE tblmcliente, s1e_clientes
+                SET s1e_clientes.estado = 'C'
+                WHERE tblmcliente.nitcliente = s1e_clientes.codigo
+                AND tblmcliente.succliente = IF(LENGTH(s1e_clientes.sucursal) >4, SUBSTR(s1e_clientes.sucursal, 2, LENGTH(s1e_clientes.sucursal)), s1e_clientes.sucursal)
+                AND s1e_clientes.estado = 'A';";
+
+                DB::connection($conectionBex)->statement($sql1);
                 print '◘ Datos actualizados en la tabla s1e_clientes' . PHP_EOL;
+  
             }      
 
             DB::connection($conectionBex)
@@ -298,6 +301,14 @@ class InsertCustom
                     'tblmcliente.bloqueo' => DB::raw("IF(s1e_clientes.bloqueo=0, 'N', 'S')") 
                 ]);
             print '◘ Datos actualizados en la tabla tblmcliente' . PHP_EOL;
+
+            DB::connection($conectionBex)
+            ->table('tblmrutero')
+            ->join('s1e_clientes','tblmrutero.CODCLIENTE','=','s1e_clientes.codcliente')
+            ->update([
+                'tblmrutero.CUPO' => DB::raw('s1e_clientes.cupo'),
+                'tblmrutero.CODPRECIO' => DB::raw('s1e_clientes.precio')]);
+            print '◘ Datos Actualizados en la tabla tblmrutero' . PHP_EOL;
 
             if($datosAInsertar->count() > 0){
 
