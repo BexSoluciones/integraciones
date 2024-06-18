@@ -84,14 +84,14 @@ trait ApiTrait {
                     return 1;
                 }
                 foreach($sentence as $clave){
-                    $timeoutInSeconds = 60;
+                    $timeoutInSeconds = 500;
                     $allData = [];
                     $clie = [];
                     $url = $clave->sentencia;
                     
                     $client = new Client();
 
-                    $response = Http::connectTimeout(60)->withHeaders([
+                    $response = Http::connectTimeout(500)->withHeaders([
                         'Authorization' => 'Bearer ' . $token,
                         'Accept' => 'application/json', 
                     ])->timeout($timeoutInSeconds)->get($url);
