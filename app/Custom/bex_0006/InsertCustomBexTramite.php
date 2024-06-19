@@ -52,7 +52,7 @@ class InsertCustomBexTramite
                             'tipocartera'   => '',
                             'codcliente'   => null,
                             'codobligacion'   => NULL
-                        ];    
+                        ];
                     }
                     DB::connection($conectionBex)->table('pi_cartera')->insert($Insert);
                 }
@@ -69,16 +69,16 @@ class InsertCustomBexTramite
     }
 
     public function insertClientesCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance, $tableName)
-    {   
+    {
         try {
-            
+
             $cliente = $modelInstance::ClientBexTramite()->get();
 
             DB::connection($conectionBex)->table('pi_clientes')->truncate();
             print '◘ Tabla pi_clientes truncada' . PHP_EOL;
 
             $datosAInsertarJson = json_decode(json_encode($cliente,true));
-            
+
             if(sizeof($datosAInsertarJson) != 0){
                 foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
                     $Insert = [];
@@ -101,19 +101,20 @@ class InsertCustomBexTramite
                             'nomdpto'      => $dato[$i]->departamento,
                             'email'        => $dato[$i]->email,
                             'codvendedor'  => $dato[$i]->tercvendedor,
+                            'nomvendedor'  => $dato[$i]->nomvendedor,
                             'actcliente'   => $dato[$i]->actcliente,
                             'idregion'     => $dato[$i]->idregion,
                             'nomregion'    => $dato[$i]->nomregion,
                             'idcanal'      => $dato[$i]->idcanal,
                             'nomcanal'     => $dato[$i]->nomcanal,
                             'codcliente'   => NULL
-                        ];    
+                        ];
                     }
                     DB::connection($conectionBex)->table('pi_clientes')->insert($Insert);
                 }
                 print '◘ Datos insertados la tabla pi_clientes' . PHP_EOL;
             }
-                         
+
             print '◘ Datos actualizados en la tabla pi_clientes' . PHP_EOL;
 
         } catch (\Exception $e) {
@@ -127,14 +128,14 @@ class InsertCustomBexTramite
     }
 
     public function insertPagosBexTramitesCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance, $tableName)
-    {   
+    {
         try {
-            
+
             DB::connection($conectionBex)->table('pi_pagos')->truncate();
             print '◘ Tabla pi_pagos truncada' . PHP_EOL;
 
             $datosAInsertarJson = json_decode(json_encode($datosAInsertar,true));
-            
+
             if(sizeof($datosAInsertarJson) != 0){
                 foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
                     $Insert = [];
@@ -149,13 +150,13 @@ class InsertCustomBexTramite
                             'valpago'       => $dato[$i]->valpago,
                             'codcliente'    => NULL,
                             'codobligacion' => $dato[$i]->codobligacion
-                        ];    
+                        ];
                     }
                     DB::connection($conectionBex)->table('pi_pagos')->insert($Insert);
                 }
                 print '◘ Datos insertados la tabla pi_pagos' . PHP_EOL;
             }
-                         
+
             print '◘ Datos actualizados en la tabla pi_pagos' . PHP_EOL;
 
         } catch (\Exception $e) {
@@ -169,7 +170,7 @@ class InsertCustomBexTramite
     }
 
     public function insertObligacionesBexTramitesCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance, $tableName)
-    {   
+    {
         try {
             $cliente = $modelInstance::ObligacionesBexTramite()->get();
 
@@ -177,7 +178,7 @@ class InsertCustomBexTramite
             print '◘ Tabla pi_obligaciones truncada' . PHP_EOL;
 
             $datosAInsertarJson = json_decode(json_encode($cliente,true));
-            
+
             if(sizeof($datosAInsertarJson) != 0){
                 foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
                     $Insert = [];
@@ -214,13 +215,13 @@ class InsertCustomBexTramite
                             'codvendedor'   => $dato[$i]->codvendedor,
                             'nomvendedor'   => $dato[$i]->nomvendedor,
                             'cupo'          => $dato[$i]->cupo
-                        ];    
+                        ];
                     }
                     DB::connection($conectionBex)->table('pi_obligaciones')->insert($Insert);
                 }
                 print '◘ Datos insertados la tabla pi_obligaciones' . PHP_EOL;
             }
-                         
+
             print '◘ Datos actualizados en la tabla pi_obligaciones' . PHP_EOL;
 
         } catch (\Exception $e) {
@@ -234,14 +235,14 @@ class InsertCustomBexTramite
     }
 
     public function insertDetalleFacturaBexTramitesCustom($conectionBex, $conectionSys, $datosAInsertar, $id_importation, $type, $modelInstance, $tableName)
-    {   
+    {
         try {
-            
+
             DB::connection($conectionBex)->table('pi_detallefactura')->truncate();
             print '◘ Tabla pi_detallefactura truncada' . PHP_EOL;
 
             $datosAInsertarJson = json_decode(json_encode($datosAInsertar,true));
-            
+
             if(sizeof($datosAInsertarJson) != 0){
                 foreach (array_chunk($datosAInsertarJson, 2000) as $dato) {
                     $Insert = [];
@@ -259,13 +260,13 @@ class InsertCustomBexTramite
                             'valorUnitario' => $dato[$i]->valorUnitario,
                             'valorTotal'    => $dato[$i]->valorTotal,
                             'numobligacion' => $dato[$i]->numeroFactura
-                        ];    
+                        ];
                     }
                     DB::connection($conectionBex)->table('pi_detallefactura')->insert($Insert);
                 }
                 print '◘ Datos insertados la tabla pi_detallefactura' . PHP_EOL;
             }
-                         
+
             print '◘ Datos actualizados en la tabla pi_detallefactura' . PHP_EOL;
 
         } catch (\Exception $e) {
