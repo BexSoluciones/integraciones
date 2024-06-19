@@ -21,9 +21,9 @@ class OrderCoreCustom
     use ApiTrait, ConnectionTrait;
 
     public function uploadOrder($orders, $cia, $closing, $connection_id)
-    {   
+    {
         try{
-            // consultar platafor_pi287 y cambiamos el estado a [9 => alistando] 
+            // consultar platafor_pi287 y cambiamos el estado a [9 => alistando]
             $platafor_pi287 = Connection_Bexsoluciones::where('name', $cia->bdlicencias)->first();
             $config = $this->connectionDB($platafor_pi287->id, 'externa', $platafor_pi287->area);
             if($config != 0){
@@ -34,7 +34,7 @@ class OrderCoreCustom
                 ]);
                 return 1;
             }
-            
+
             foreach($orders as $order){
                 DB::connection($platafor_pi287->name)
                     ->table('tbldmovenc')
@@ -43,10 +43,10 @@ class OrderCoreCustom
                     ->where('codvendedor', $order->codvendedor)
                     ->update(['estadoenviows' => '9', 'fechamovws' => now()]);
             }
-            
+
             // Generamos plano y lo guardamos
             $flatFile = $this->createFlatFile($orders, $closing, $platafor_pi287->name, $connection_id);
-            
+
             if($flatFile != 0){
                 DB::connection('mysql')->table('tbl_log')->insert([
                     'descripcion' => 'Commands::OrderCoreCustom[uploadOrder()] => Error al crear encabezado archivo plano  con el cierre N° '.$closing,
@@ -55,7 +55,7 @@ class OrderCoreCustom
                 ]);
                 return 1;
             }
-        
+
         } catch (\Exception $e) {
             Tbl_Log::create([
                 'descripcion' => 'Custom::bex_0006/OrderCoreCustom[uploadOrder()] => '.$e->getMessage()
@@ -64,7 +64,7 @@ class OrderCoreCustom
         }
     }
 
-    private function createFlatFile($orders, $closing, $nameDB, $connection_id) 
+    private function createFlatFile($orders, $closing, $nameDB, $connection_id)
     {
         try{
             $grupos = [];
@@ -72,7 +72,7 @@ class OrderCoreCustom
             // Iterar sobre los elementos de cada arreglo
             foreach ($orders as $arreglo) {
                 $encontrado = false;
-                
+
                 // Verificar si el elemento ya existe en algún grupo
                 foreach ($grupos as $grupo) {
                     if ($this->sonIgualesElemento($arreglo, $grupo[0])) {
@@ -82,7 +82,7 @@ class OrderCoreCustom
                         break;
                     }
                 }
-                
+
                 // Si no se encuentra en ningún grupo, crear uno nuevo
                 if (!$encontrado) {
                     $grupoNuevo = [$arreglo];
@@ -91,15 +91,12 @@ class OrderCoreCustom
                 }
             }
 
-            // Extraer solo el primer elemento de cada grupo
-            $headerArray = array_map(function ($grupo) {
-                return $grupo[0];
-            }, $grupos);
-
-            foreach($headerArray as $encabezado){
-
-                // Calcular el "valorTotal" para cada elemento
-                $valorTotal = $encabezado->cantidadmov * $encabezado->preciomov * $encabezado->countGroup;
+            $valorTotal = 0;
+            // Calcular el "valorTotal" para cada elemento
+            foreach($grupo as $precioTotal){
+                $valorTotal += $precioTotal->cantidadmov * ($precioTotal->preciomov * (1+($precioTotal->ivamov/100)));
+            }
+            foreach($grupo as $encabezado){
 
                 $structureHeader[] = [
                     "bodega" => intval($encabezado->codbodega),
@@ -112,7 +109,7 @@ class OrderCoreCustom
                     "descuentoPie" => intval($encabezado->dctopiefacaut),
                     "valorTotal" => $valorTotal,
                     "fechaHora" => date('d/m/Y H:i:s'),
-                    "anulado" => 0, 
+                    "anulado" => 0,
                     "notas" => $encabezado->mensajemov,
                     "usuario" => $encabezado->codvendedor,
                     "pc" => 'Bex',
@@ -122,7 +119,7 @@ class OrderCoreCustom
                     "despacho" => null,
                     "fechaHoraEntrega" =>  date('d/m/Y H:i:s', strtotime('+1 day')),
                     "nitDestino" => null,
-                    "codigoDireccion" => 0, 
+                    "codigoDireccion" => 0,
                     "abono" => null,
                     "telefono" => null,
                     "emergencia" => null,
@@ -189,7 +186,7 @@ class OrderCoreCustom
 
                     // Enviamos el encabezado por API
                     $sendHeaderApi = $this->sendHeaderApi($connection_id, $structureHeader, $orders, $encabezado->nummov, $closing, $nameDB, $encabezado);
-                  
+
                     if($sendHeaderApi == 0){
                         // Si todo se realizo de manera exitosa cambiamos el estado a 2
                         DB::connection($nameDB)
@@ -198,7 +195,7 @@ class OrderCoreCustom
                         ->where('CODTIPODOC', '4')
                         ->where('codvendedor', $encabezado->codvendedor)
                         ->update(['estadoenviows' => '2', 'fechamovws' => now()]);
-                        
+
                         return 0;
                     }elseif($sendHeaderApi == 1){
                         DB::connection($nameDB)
@@ -266,11 +263,11 @@ class OrderCoreCustom
     }
 
     private function sendHeaderApi($connection_id, $structureHeader, $orders, $nummov, $closing, $nameDB,$encabezado){
-        
+
         $db = Connection::where('id', $connection_id)->value('name');
-       
-        // Consultar en BEXconection 
-        $configDB = $this->connectionDB($db, 'local'); 
+
+        // Consultar en BEXconection
+        $configDB = $this->connectionDB($db, 'local');
         if($configDB != 0){
             DB::connection('mysql')->table('tbl_log')->insert([
                 'descripcion' => 'Commands::OrderCoreCustom[sendHeaderApi()] => Conexion Local: Linea '.__LINE__.'; '.$configDB,
@@ -283,7 +280,7 @@ class OrderCoreCustom
         try{
             $config = Ws_Config::where('estado', 1)->first();
             $token = $this->loginToApi($config);
-            
+
             $urlEncabezado = $config->urlEnvio;
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $token,
@@ -304,7 +301,7 @@ class OrderCoreCustom
                 ->where('codvendedor', $encabezado->codvendedor)
                 ->update(['msmovws' => 'Numero del pedido en el ERP: '.$numero]);
             }
-            
+
             $details = $this->sendDetailsApi($numero, $orders, $nummov, $closing, $config, $token);
             if($details == 0){
                 return 0;
@@ -336,13 +333,13 @@ class OrderCoreCustom
                 ->update(['estadoenviows' => '3', 'fechamovws' => now()->format('Y-m-d H:i:s'), 'msmovws' => "Error: " . $e->getMessage()]);
             }
         }
-       
+
     }
 
     private function sendDetailsApi($numero, $orders, $nummov, $closing, $config, $token){
         try{
             $i = 1;
-            
+
             foreach($orders as $detail){
                 if($detail->nummov == $nummov){
                     $jsonDetail[] =
@@ -377,16 +374,16 @@ class OrderCoreCustom
                             "ano" => intval(date('Y', strtotime($detail->fecmov))),
                             "idAdmonPedCot" => "",
                             "descripcionItemAdicional" => $detail->nomproducto
-                        
+
                     ];
                     $i++;
-                }  
+                }
 
             }
 
                     $namefile = $closing.'_'.$nummov.'.json';
                     $jsonHeader = json_decode(Storage::disk('public')->get('export/bex_0006/bexmovil/pedidos_txt/' . $namefile), true);
-        
+
                     // Unimos los resultados
                     $contenidoFinal = array_merge($jsonHeader, $jsonDetail);
 
@@ -412,8 +409,8 @@ class OrderCoreCustom
                     }else{
                         return 1;
                     }
-                
-            
+
+
         } catch (\Exception $e) {
             Log::info($e);
             Tbl_Log::create([
