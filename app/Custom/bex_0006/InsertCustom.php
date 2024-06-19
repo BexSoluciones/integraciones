@@ -1168,7 +1168,7 @@ class InsertCustom
                             }
                             $Insert[] = [
                                 'codvendedor'    => $dato[$i]->tercvendedor,
-                                'dia'            => $dato[$i]->dia,
+                                'dia'            => str_replace("-", "/", $dato[$i]->dia),
                                 'dia_descrip'    => $dato[$i]->dia_descrip,
                                 'cliente'        => $dato[$i]->cliente,
                                 'dv'             => $dato[$i]->dv,
