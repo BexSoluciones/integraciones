@@ -19,9 +19,9 @@ use Illuminate\Support\Facades\Log;
 trait ApiTrait {
 
     use FlatFileTrait,BackupFlatFileTrait;
-    
+
     public function loginToApi($config)
-    {  
+    {
         $url = $config->url;
         $credentials ='';
         eval("\$credentials = $config->AreaTrabajo;");
@@ -68,7 +68,7 @@ trait ApiTrait {
                 ]);
                 return 1;
             }
-        
+
             if($token){
                 if($area == 'bexmovil'){
                     $sentence = Ws_Consulta::getAll();
@@ -88,14 +88,14 @@ trait ApiTrait {
                     $allData = [];
                     $clie = [];
                     $url = $clave->sentencia;
-                    
+
                     $client = new Client();
 
                     $response = Http::connectTimeout(500)->withHeaders([
                         'Authorization' => 'Bearer ' . $token,
-                        'Accept' => 'application/json', 
+                        'Accept' => 'application/json',
                     ])->timeout($timeoutInSeconds)->get($url);
-            
+
                     $respon = $response->json();
                     $data = json_decode(json_encode($respon), true);
                     if($respon == null){
@@ -105,7 +105,7 @@ trait ApiTrait {
                         dd('------------ ERROR API '.$clave->IdConsulta.' ------------');
                     }
                     foreach($data['respuesta'] as $key){
-                        eval("\$clie[] = $clave->parametro;");                        
+                        eval("\$clie[] = $clave->parametro;");
                     }
 
                     $allData[] = [
@@ -113,7 +113,7 @@ trait ApiTrait {
                         'descripcion' => $clave->descripcion,
                         'separador' => $config->separador
                     ];
-                    $this->generateFlatFile($allData,$db);                    
+                    $this->generateFlatFile($allData,$db);
             }
                 $this->info('◘ Proceso archivos planos completado.');
                 return true;
