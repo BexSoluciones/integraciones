@@ -93,10 +93,10 @@ class OrderCoreCustom
 
             $valorTotal = 0;
             // Calcular el "valorTotal" para cada elemento
-            foreach($grupo as $precioTotal){
+            foreach($orders as $precioTotal){
                 $valorTotal += $precioTotal->cantidadmov * ($precioTotal->preciomov * (1+($precioTotal->ivamov/100)));
             }
-            foreach($grupo as $encabezado){
+            foreach($orders as $encabezado){
 
                 $structureHeader[] = [
                     "bodega" => intval($encabezado->codbodega),
@@ -107,7 +107,7 @@ class OrderCoreCustom
                     "condicion" => $encabezado->codfpagovta,
                     "diasValidez" => 120,
                     "descuentoPie" => intval($encabezado->dctopiefacaut),
-                    "valorTotal" => $valorTotal,
+                    "valorTotal" => floatval(number_format($valorTotal, 2, '.', '')),
                     "fechaHora" => date('d/m/Y H:i:s'),
                     "anulado" => 0,
                     "notas" => $encabezado->mensajemov,
