@@ -94,7 +94,14 @@ trait ApiTrait {
                     $response = Http::connectTimeout(500)->withHeaders([
                         'Authorization' => 'Bearer ' . $token,
                         'Accept' => 'application/json',
-                    ])->timeout($timeoutInSeconds)->get($url);
+                    ])->timeout($timeoutInSeconds)
+                    ->withOptions([
+                        'verify' => false, // Disables SSL verification (not recommended for production)
+                        // 'curl' => [ // Uncomment and modify to set specific cURL options if needed
+                        //     CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2, // Example for forcing TLS 1.2 (not directly supported by Guzzle)
+                        // ],
+                    ])
+                    ->get($url);
 
                     $respon = $response->json();
                     $data = json_decode(json_encode($respon), true);
