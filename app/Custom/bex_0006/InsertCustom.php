@@ -89,7 +89,7 @@ class InsertCustom
                 print '◘ Tabla tbldcartera truncada' . PHP_EOL;
 
                 DB::connection($conectionBex)
-                    ->rawQuery('INSERT into tbldcartera (codvendedor,codcliente,codtipodoc,nummov,fecmov,fecven,preciomov, VALTOTCREDITO)  SELECT distinct s1e_cartera.codvendedor,s1e_cartera.codcliente,s1e_cartera.codtipodoc,documento,s1e_cartera.fecmov,fechavenci,valor, vrpostf  FROM tblmvendedor,s1e_cartera,tblmcliente where s1e_cartera.codcliente=tblmcliente.codcliente AND tblmvendedor.codvendedor=s1e_cartera.codvendedor;');
+                    ->statement('INSERT into tbldcartera (codvendedor,codcliente,codtipodoc,nummov,fecmov,fecven,preciomov, VALTOTCREDITO)  SELECT distinct s1e_cartera.codvendedor,s1e_cartera.codcliente,s1e_cartera.codtipodoc,documento,s1e_cartera.fecmov,fechavenci,valor, vrpostf  FROM tblmvendedor,s1e_cartera,tblmcliente where s1e_cartera.codcliente=tblmcliente.codcliente AND tblmvendedor.codvendedor=s1e_cartera.codvendedor;');
     
                 // DB::connection($conectionBex)
                 //     ->table('tbldcartera')
