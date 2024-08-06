@@ -9,14 +9,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 trait FlatFileTrait {
-    
+
     public function generateFlatFile($dataWS, $db, $id_importation = null, $type = null) {
         try {
             foreach ($dataWS as $item) {
                 $separador = $item['separador'];
                 $descripcion = $item['descripcion'];
                 $data = $item['data'];
-                
+
                 // No tomar en cuenta la columna 'ws_id' de $data
                 foreach ($data as &$key) {
                     unset($key['ws_id']);
@@ -33,7 +33,7 @@ trait FlatFileTrait {
                 if ($db == 'bex_0007') {
                     Storage::disk('local')->put('imports/'.$db.'/planos/'. $namefile, str_replace('"','',$content));
                     $this->info('◘ Archivo '.$descripcion.'.txt guardado con éxito');
-                     
+
                     $sendToSFTP = $this->sendToSFTP($namefile, $id_importation, $type, $db);
                     if ($sendToSFTP == 1) {
                         return 1;
@@ -67,6 +67,8 @@ trait FlatFileTrait {
                 // Iniciar sesión FTP
                 $login = ftp_login($connId, $ftpUser, $ftpPass);
                 if ($login) {
+                    ftp_set_option($connId, FTP_USEPASVADDRESS, false);
+                    ftp_pasv($connId, true);
                     $remoteDirectory = '/';
                     if (ftp_chdir($connId, $remoteDirectory)) {
                         // Subir el archivo al servidor FTP
@@ -119,4 +121,4 @@ trait FlatFileTrait {
     }
 
 }
-    
+
