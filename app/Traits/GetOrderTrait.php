@@ -22,22 +22,18 @@ trait GetOrderTrait {
     public function getOrderHeder($db, $area, $closing){
 
         $connection_id = $db;
-        
+
         try {
             $codiva = Custom_Sql::join('connection_bexsoluciones', 'connection_bexsoluciones.connection_id', '=', 'custom_sql.connection_id')
                     ->where('custom_sql.category', 'pedidos')
                     ->where('custom_sql.connection_id', $db)
                     ->select('custom_sql.txt')
                     ->first();
-     
-            if($codiva){
-                $iva=$codiva->txt;
-            }else{
-                $iva='';
-            }
-            
+
+            $iva = $codiva ? $codiva->txt : '';
+
             $db = Connection_Bexsoluciones::getAll()->where('id', $db)->value('name');
-       
+
             if($db){
                 $order = DB::connection($db)
                     ->table('tbldmovenc')
@@ -62,8 +58,8 @@ trait GetOrderTrait {
                     ->orderBy('tbldmovenc.nummov','asc')
                     ->orderBy('tbldmovdet.codmovdet','asc')
                     ->get();
-                    // print_r($order);
-                    // dd();
+                    //  print_r($order['0']);
+                    //  dd();
                 $plataforSys = 2;
                 $config = $this->connectionDB($plataforSys, 'externa', $area);
                 if($config != 0){
@@ -74,14 +70,31 @@ trait GetOrderTrait {
                     ]);
                     return 1;
                 }
-         
+
                 $plataforSys = Connection_Bexsoluciones::getAll()->where('id', $plataforSys)->value('name');
                 $cia = DB::connection($plataforSys)
                         ->table('tblslicencias')
                         ->where('bdlicencias', $db)
                         ->first();
-                //$cia = 123;    
-                ProcessOrderUploadERP::dispatch($order, $cia, $closing, null, $connection_id)->onQueue('pedidos')->onConnection('sync');
+                //$cia = 123;
+                if(!$order->isEmpty()){
+                    ProcessOrderUploadERP::dispatch($order, $cia, $closing, null, $connection_id)->onQueue('pedidos')->onConnection('sync');
+                }else{
+                    $order = DB::connection($db)
+                    ->table('tbldmovenc')
+                    ->where('numcierre', $closing)
+                    ->selectRaw('tbldmovenc.nummov,tbldmovenc.codmovenc')
+                    ->get();
+
+                    DB::connection($db)
+                    ->table('tbldmovenc')
+                    ->where('NUMMOV', $order['0']->nummov)
+                    ->where('CODMOVENC', $order['0']->codmovenc)
+                    ->where('CODTIPODOC', '4')
+                    ->update(['estadoenviows' => '3', 'fechamovws' => now(), 'msmovws' => 'Pedido incompleto']);
+
+                }
+
                 return 0;
             } else {
 
@@ -95,7 +108,7 @@ trait GetOrderTrait {
                 //         ->get()
                 // ), true);
             }
-            
+
         }catch (\Exception $e) {
             Tbl_Log::create([
                 'descripcion' => 'Trait::GetOrderTrait[getOrderHeder()] => '.$e->getMessage()
@@ -123,5 +136,5 @@ trait GetOrderTrait {
             ]);
         }
     }
-    
+
 }
