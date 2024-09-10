@@ -107,7 +107,8 @@ class InsertCustomBexTramite
                             'nomregion'    => $dato[$i]->nomregion,
                             'idcanal'      => $dato[$i]->idcanal,
                             'nomcanal'     => $dato[$i]->nomcanal,
-                            'codcliente'   => NULL
+                            'codcliente'   => NULL,
+                            'sector'       => $dato[$i]->sector
                         ];
                     }
                     DB::connection($conectionBex)->table('pi_clientes')->insert($Insert);
