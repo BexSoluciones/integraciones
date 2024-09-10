@@ -11,7 +11,7 @@ class T05BexClientes extends Model
 
 protected $connection = 'dynamic_connection';
 protected $table = 't05_bex_clientes';
-protected $fillable = ['consecutivo', 'codigo', 'dv', 'sucursal', 'razsoc', 'representante', 'direccion', 'telefono', 'precio', 'conpag', 'periodicidad', 'tercvendedor', 'cupo', 'codgrupodcto', 'email', 'barrio', 'codcliente', 'tipocliente', 'cobraiva', 'codpais', 'coddpto', 'codmpio', 'codbarrio', 'celular', 'actcliente', 'idregion', 'nomregion', 'idcanal', 'nomcanal','bloqueo', 'infoCupoDisponible','estado', 'estadofpagovta'];
+protected $fillable = ['consecutivo', 'codigo', 'dv', 'sucursal', 'razsoc', 'representante', 'direccion', 'telefono', 'precio', 'conpag', 'periodicidad', 'tercvendedor', 'cupo', 'codgrupodcto', 'email', 'barrio', 'codcliente', 'tipocliente', 'cobraiva', 'codpais', 'coddpto', 'codmpio', 'codbarrio', 'celular', 'actcliente', 'idregion', 'nomregion', 'idcanal', 'nomcanal','bloqueo', 'infoCupoDisponible','sector','estado', 'estadofpagovta'];
 public $timestamps = false;
 
 public function scopeCodPago($query){
@@ -48,7 +48,8 @@ public function scopeClientBexTramite($query)
         't05_bex_clientes.idregion',
         't05_bex_clientes.nomregion',
         't05_bex_clientes.idcanal',
-        't05_bex_clientes.nomcanal'
+        't05_bex_clientes.nomcanal',
+        't05_bex_clientes.sector'
     ]);
 }
 
